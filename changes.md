@@ -4,6 +4,101 @@ All system modifications, bug fixes, endpoint alignments, and UI improvements ar
 
 ---
 
+## [Phase 22: Vector Map Hover Glass HUD & Simulator Mass-Balance Formula Engine] — 2026-10-21 23:15 IST
+### Vector GIS Map Hover Polish (`client/src/components/WardMap.jsx`)
+- **Eliminated White Hover Box Glitch:** Resolved the jarring stark-white rectangular background and stroke glitch on hover over dark vector map geometry.
+- **Dark Aerospace Glass HUD Tooltips:** Upgraded ward hover HUD and hotspot markers to dark aerospace glass styling (`bg-[#0a1222]/95 backdrop-blur-md border border-cyan-500/40 text-slate-100 shadow-2xl`), perfectly matching the dark radar GIS canvas in both Light and Dark application themes.
+- **Cyan Vector Hover Geometry:** Replaced default harsh white stroke on polygons with a vivid cyan `#38bdf8` outline paired with a custom SVG glow filter (`url(#glow-cyan)`), providing subtle, professional boundary identification.
+- **Glassified Floating GIS Controls:** Refactored Yamuna Gauge card, instruction badges, command bar, zoom buttons, and risk legends to aerospace translucent glass (`bg-[#091220]/90 backdrop-blur-md border border-slate-800`), eliminating visual clashes with underlying ward polygons.
+
+### What-If Scenario Simulator Upgrade (`client/src/pages/Simulator.jsx` & `client/src/index.css`)
+- **Deterministic Mass-Balance Decomposition Card:** Embedded live mathematical mass-balance calculation preview directly on the Simulator:
+  `Risk = (0.40 × Drainage) + (0.35 × Rainfall) + (0.25 × Complaints)`
+  with real-time parameter contributions and delta calculations.
+- **Dual Comparative Risk Reduction Bar Gauge:** Added visual progress bar gauge contrasting baseline risk vs. simulated risk side-by-side with semantic risk tier badges.
+- **Sleek Custom Precision Range Sliders:** Implemented modern, dark-themed slider tracks and cyan thumb glows in `client/src/index.css` (`-webkit-slider-thumb` / `-moz-range-thumb`), eliminating bulky OS-default controls.
+- **Verification:** Oxlint confirmed 0 syntax or identifier errors; Vite client production build completed cleanly in 1.33s.
+
+---
+
+## [Phase 21: What-If Scenario Simulator Redesign & Mitigation Suite] — 2026-10-21 23:05 IST
+### Scenario Simulator (`client/src/pages/Simulator.jsx`)
+- **Municipal Command HUD & Status Bar:** Integrated Digital Twin badge, IST live clock, telemetry status indicator, and mass-balance weight reference (`0.40(D) + 0.35(R) + 0.25(C)`).
+- **Interactive Scenario Presets Bar:** Real-world Delhi scenario pills (*Cloudburst Shock (100 mm/h)*, *Sustained Heavy Downpour (50 mm/h)*, *Pre-Monsoon Siltation Crisis (-40%)*, *Desilted Network Dredging (+25%)*, *Max Field Pump Deployment (+4 Units)*) with active state indicators.
+- **Intervention Variables Cockpit:**
+  - High-contrast target catchment ward selector with real-time baseline telemetry preview (drainage %, zone, rainfall mm).
+  - Mobile Dewatering Pump slider with quick-select buttons (`0P`, `2P`, `4P`, `6P`, `8P`) and live relief capacity in m³/s.
+  - Precipitation rate slider with quick presets (`Normal 20mm/h`, `Heavy 50mm/h`, `Cloudburst 100mm/h`).
+  - Desilting & canal dredging modifier with quick presets (`Choked -30%`, `Standard 0%`, `Desilted +40%`).
+- **3 Quantitative Executive Delta Metrics:**
+  - *Risk Delta ($\Delta\text{Risk}$):* Score shift with before/after comparison (`HIGH (68.0) → MODERATE (50.0)`).
+  - *Inundation Relief:* Predicted duration reduction (mins) and hydraulic pumping relief.
+  - *Resource Feasibility:* Estimated budget in INR, approved field crew size, and equipment specs.
+- **Baseline vs Simulated Risk Decomposition Chart:** Recharts bar comparison with semantic tokens and zero hardcoded dark slate values.
+- **Actionable Tactical Handoff:** Added direct "Mobilize in Incident Command" button linking directly to the Emergency Operations Center (`/incidents`).
+- **Offline Fallback Enrichment (`client/src/services/api.js`):** Enriched `runSimulation` and `getSimulationPresets` fallbacks to return full component decompositions and delta metrics under offline conditions.
+- **Verification:** Vite client build succeeded in 1.67s; Phase 14 Master Reliability suite passed 19/19 checks; oxlint: 0 errors.
+
+---
+
+## [Phase 20: Ground Incident Interaction & Form Visibility Polish] — 2026-10-21 22:40 IST
+### Incident Command Center (`client/src/pages/IncidentCommand.jsx`)
+- **Tactical Roadmap Auto-Relocation:** Clicking any item in the Citywide Tactical Roadmap or clicking "Stage Crew for this Ward" now automatically selects/creates the incident, auto-assigns an available QRT team, and smoothly scrolls (`scrollIntoView({ behavior: 'smooth' })`) directly down to the Ground Incident Registry and dispatch console.
+- **Removed All Ground Incident Borders:** Completely eliminated borders across all incident cards, registry panels, filter toolbars, dispatch briefing boxes, and hotline containers. Used subtle solid elevated surfaces (`bg-[var(--surface-soft)]`) with crisp urgency edge stripes (crimson/amber) for a clean modern flat aesthetic.
+- **Subdued & Refined Hover Transitions:** Replaced heavy translation leaps, aggressive glows, and border changes with subtle, non-distracting opacity/background fades (`transition-colors duration-150`).
+- **Emergency Dispatch Button Fix:** Auto-initializes `selectedTeamId` on load and fallback-resolves an available response team during dispatch, ensuring the "Authorize Emergency QRT Mobilization" button is never blocked or silently disabled. Added automatic smooth scroll to deployment confirmation banners.
+
+### Form Dropdown Contrast & Ward Selection Visibility (`index.css`, `CitizenPortal.jsx`, `Simulator.jsx`, `AdminPortal.jsx`)
+- **Resolved Native Option Invisibility (White-on-White):** In Chromium/Windows, `<select>` dropdown menus with dark styles often defaulted to a white option popup menu while inheriting white text, causing ward names to be completely invisible until hovered over.
+- **Global CSS Contrast Normalization:** Added explicit `:root[data-theme='light'] select option` and `:root[data-theme='dark'] select option` styles ensuring high-contrast dark text on light backgrounds and light text on dark backgrounds across all operating systems.
+- **Component Token Alignment:** Updated ward selection dropdowns in `CitizenPortal.jsx`, `Simulator.jsx`, and `AdminPortal.jsx` to semantic `bg-[var(--surface-soft)]`, `text-[var(--text-primary)]`, and `border-[var(--border)]`.
+
+---
+
+## [Hotfix: JSX LaTeX Variable Reference Resolution] — 2026-10-21 22:24 IST
+- **Fixed `ReferenceError: Risk is not defined`:**
+  - Resolved unescaped mathematical notation `($\Delta\text{Risk}$)` in `IncidentCommand.jsx` where `{Risk}` was evaluated by the JSX parser as an uninitialized JavaScript identifier.
+  - Replaced with standard Unicode text `(ΔRisk)` to prevent runtime evaluation exceptions.
+- **Codebase-Wide Static Analysis Audit (`oxlint`):**
+  - Audited all 17 client components and pages using `oxlint`.
+  - Confirmed 0 unresolved identifiers and 0 syntax errors across the entire codebase.
+  - Removed unused imports across `IncidentCommand.jsx`, `WardMap.jsx`, `Dashboard.jsx`, `Landing.jsx`, and `SmallFooter.jsx`.
+- **Verification:** Vite client build succeeded in 1.99s with 0 errors.
+
+---
+
+## [Phase 19: Incident Command Center Redesign & Organic Vector Map Indicators] — 2026-10-21 IST
+### Incident Command Center (`client/src/pages/IncidentCommand.jsx`)
+- **Municipal Command HUD & Status Bar:** Integrated OPCON-2 rapid mobilization badge, Delhi Emergency Clock (IST live), live telemetry broadcast indicator, emergency hotline quick reference (`MCD Dispatch: 155304`, `DDMA: 1077`), and manual telemetry sync trigger.
+- **4 Real-Time Executive KPI Metric Tiles:**
+  - *Active Flood Incidents:* Total verified reports with critical severity counter.
+  - *Peak Inundation Depth:* Real-time max water depth (cm) across underpass bottlenecks.
+  - *Available Emergency QRTs:* Certified teams standing by for deployment.
+  - *Mobilized On-Scene Crews:* Field units actively dewatering or dredging.
+- **Citywide Tactical Action Roadmap ("What Should the City Do Now?"):**
+  - High-contrast ranked cards highlighting $\Delta\text{Risk}$ reduction points, operational feasibility, and estimated intervention budget in INR.
+  - Added 1-click **"Stage Crew for this Ward"** button to auto-select and stage the target ward in the dispatch console.
+- **Incident Registry & Filter Toolbar:**
+  - Search input filtering by ward code (e.g., `W056`), ward name, or description.
+  - Severity tabs (`ALL`, `CRITICAL`, `HIGH`, `ACTIVE`, `DISPATCHED`).
+  - Visual urgency border stripes (crimson for CRITICAL, amber for HIGH), recorded water depth gauge, and status pills.
+- **Tactical Emergency Dispatch Console:**
+  - Target incident briefing summary with severity and water depth metrics.
+  - Field QRT unit selector displaying crew size, operational zone, and readiness.
+  - Specialized equipment allocation selector (`5000 GPM Mobile Pump Trailer`, `High-Capacity Sludge Dredger`, `Traffic Diversion Squad`, `Inflatable Rescue Boat`).
+  - Dispatch directives & operational orders input.
+  - Authorize mobilization CTA with loading state and notification toasts.
+  - Offline-first resilient fallback execution.
+- **Theme & Design Tokens:** Standardized on rectangular high-contrast municipal styling (`surface-card`, `border-[var(--border)]`, `bg-[var(--surface-elevated)]`, `rounded-none`, `var(--brand)`).
+
+### Vector GIS Engine Indicator Shapes (`client/src/components/WardMap.jsx`)
+- **Organic Boundary Smoothing:** Replaced rigid 6-sided hexagon polygons with quadratic Bezier curve midpoint interpolation (`buildSmoothPath`), rendering natural, rounded municipal zones instead of synthetic honeycomb hexagons.
+- **Simplified Circular Beacon Markers:** Replaced diamond polygon markers with clean, high-contrast concentric circular radar nodes and warning cores.
+- **Round Stroke Joins:** Added `strokeLinecap="round"` and `strokeLinejoin="round"` across all SVG ward boundaries.
+- **Verification:** Vite client build succeeded in 1.37s; Phase 14 Master Reliability suite passed 19/19 checks; Phase 15 Client Integration suite passed 9/9 checks.
+
+---
+
 ## [Design Refinements & Theme Synchronization] — 2026-09-24 21:38 IST
 ### Layout, Navigation, and Theme Engine Refinements
 - **Rainbow Asset & Calculation Removed:** Completely removed rainbow image and parallax calculations from `Landing.jsx`.

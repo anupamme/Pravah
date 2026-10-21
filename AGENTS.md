@@ -7,6 +7,11 @@ Delhi municipal flood risk monitoring, explainable risk intelligence, multi-hori
 
 ## Developer Commands
 
+### Universal One-Command Launch (Root)
+```powershell
+npm run dev        # Concurrently launches Server (port 5000) and React Client (port 5173)
+```
+
 ### Backend (run from `server/`)
 ```powershell
 # Setup
@@ -22,7 +27,7 @@ npm run dev
 
 # Run Automated Verification & Test Suites
 npm test                  # Phase 14 Master Reliability & Failure Suite (19/19 checks)
-npm run verify:phase15    # Phase 15 Client Integration Suite (8/8 checks)
+npm run verify:phase15    # Phase 15 Client Integration Suite (9/9 checks)
 ```
 
 ### Frontend Clients
