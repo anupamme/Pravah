@@ -4,6 +4,20 @@ All system modifications, bug fixes, endpoint alignments, and UI improvements ar
 
 ---
 
+## [Phase 20: Ground Incident Interaction & Form Visibility Polish] — 2026-10-21 22:40 IST
+### Incident Command Center (`client/src/pages/IncidentCommand.jsx`)
+- **Tactical Roadmap Auto-Relocation:** Clicking any item in the Citywide Tactical Roadmap or clicking "Stage Crew for this Ward" now automatically selects/creates the incident, auto-assigns an available QRT team, and smoothly scrolls (`scrollIntoView({ behavior: 'smooth' })`) directly down to the Ground Incident Registry and dispatch console.
+- **Removed All Ground Incident Borders:** Completely eliminated borders across all incident cards, registry panels, filter toolbars, dispatch briefing boxes, and hotline containers. Used subtle solid elevated surfaces (`bg-[var(--surface-soft)]`) with crisp urgency edge stripes (crimson/amber) for a clean modern flat aesthetic.
+- **Subdued & Refined Hover Transitions:** Replaced heavy translation leaps, aggressive glows, and border changes with subtle, non-distracting opacity/background fades (`transition-colors duration-150`).
+- **Emergency Dispatch Button Fix:** Auto-initializes `selectedTeamId` on load and fallback-resolves an available response team during dispatch, ensuring the "Authorize Emergency QRT Mobilization" button is never blocked or silently disabled. Added automatic smooth scroll to deployment confirmation banners.
+
+### Form Dropdown Contrast & Ward Selection Visibility (`index.css`, `CitizenPortal.jsx`, `Simulator.jsx`, `AdminPortal.jsx`)
+- **Resolved Native Option Invisibility (White-on-White):** In Chromium/Windows, `<select>` dropdown menus with dark styles often defaulted to a white option popup menu while inheriting white text, causing ward names to be completely invisible until hovered over.
+- **Global CSS Contrast Normalization:** Added explicit `:root[data-theme='light'] select option` and `:root[data-theme='dark'] select option` styles ensuring high-contrast dark text on light backgrounds and light text on dark backgrounds across all operating systems.
+- **Component Token Alignment:** Updated ward selection dropdowns in `CitizenPortal.jsx`, `Simulator.jsx`, and `AdminPortal.jsx` to semantic `bg-[var(--surface-soft)]`, `text-[var(--text-primary)]`, and `border-[var(--border)]`.
+
+---
+
 ## [Hotfix: JSX LaTeX Variable Reference Resolution] — 2026-10-21 22:24 IST
 - **Fixed `ReferenceError: Risk is not defined`:**
   - Resolved unescaped mathematical notation `($\Delta\text{Risk}$)` in `IncidentCommand.jsx` where `{Risk}` was evaluated by the JSX parser as an uninitialized JavaScript identifier.

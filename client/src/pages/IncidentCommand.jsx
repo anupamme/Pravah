@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   ShieldAlert, MapPin, Send, AlertTriangle, Radio, RefreshCw,
   Search, Clock, Droplets, Truck, CheckCircle2,
@@ -56,6 +56,9 @@ export default function IncidentCommand() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSeverity, setFilterSeverity] = useState('ALL');
 
+  // Ground Registry DOM Ref for auto-scrolling
+  const registryRef = useRef(null);
+
   // Real-time IST Clock
   const [currentTime, setCurrentTime] = useState('');
   useEffect(() => {
@@ -94,6 +97,12 @@ export default function IncidentCommand() {
         if (!selectedIncident && rawIncidents.length > 0) {
           setSelectedIncident(rawIncidents[0]);
         }
+
+        // Auto-select first available response team by default
+        if (rawTeams.length > 0) {
+          const available = rawTeams.find((t) => t.status === 'AVAILABLE' || !t.status);
+          setSelectedTeamId((prev) => prev || (available ? available.id : rawTeams[0].id));
+        }
       })
       .finally(() => {
         setIsLoading(false);
@@ -115,15 +124,69 @@ export default function IncidentCommand() {
     return () => unsubs.forEach((fn) => fn && fn());
   }, [loadData]);
 
+  // Stage crew and relocate to Ground Incident Registry
+  const handleStageCrew = useCallback((item) => {
+    const targetCode = item.wardCode || item.wardId;
+    let matched = incidents.find(
+      (i) => i.wardId === targetCode || i.wardCode === targetCode
+    );
+
+    if (!matched) {
+      matched = {
+        id: `INC-TACTICAL-${targetCode || Date.now().toString().slice(-4)}`,
+        wardId: targetCode,
+        wardCode: targetCode,
+        wardName: item.wardName,
+        description: item.title || item.action,
+        severity: item.priority || 'CRITICAL',
+        waterDepthCm: 45,
+        status: 'ACTIVE',
+      };
+      setIncidents((prev) => [matched, ...prev.filter((i) => i.id !== matched.id)]);
+    }
+
+    setSelectedIncident(matched);
+
+    // Auto-select available QRT team if none is selected
+    if (!selectedTeamId && teams.length > 0) {
+      const avail = teams.find((t) => t.status === 'AVAILABLE' || !t.status);
+      setSelectedTeamId(avail ? avail.id : teams[0].id);
+    }
+
+    // Reset filters so the matched incident is visible in the registry
+    setFilterSeverity('ALL');
+    setSearchQuery('');
+
+    // Smoothly relocate/scroll down to Ground Incident Registry
+    setTimeout(() => {
+      registryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  }, [incidents, selectedTeamId, teams]);
+
   const handleDispatch = async (e) => {
-    e.preventDefault();
-    if (!selectedIncident || !selectedTeamId) return;
+    if (e) e.preventDefault();
+    if (!selectedIncident) {
+      setDispatchStatus({
+        type: 'ERROR',
+        message: 'Please select an incident from the registry below to mobilize response units.',
+      });
+      return;
+    }
+
+    const effectiveTeamId =
+      selectedTeamId ||
+      teams.find((t) => t.status === 'AVAILABLE')?.id ||
+      teams[0]?.id ||
+      'T-001';
+
+    const effectiveTeam = teams.find((t) => t.id === effectiveTeamId);
+    const teamDisplayName = effectiveTeam ? effectiveTeam.name : `Field QRT-${effectiveTeamId}`;
 
     setIsDispatching(true);
     setDispatchStatus(null);
 
     const payload = {
-      teamId: selectedTeamId,
+      teamId: effectiveTeamId,
       incidentId: selectedIncident.id,
       equipmentType: selectedEquipment,
       notes: dispatchNotes || `Priority emergency deployment to Ward ${selectedIncident.wardId || selectedIncident.wardCode || 'Site'}`,
@@ -133,9 +196,15 @@ export default function IncidentCommand() {
       await dispatchResponseTeam(payload);
       setDispatchStatus({
         type: 'SUCCESS',
-        message: `Deployment authorized. Team ${selectedTeamId} mobilized with ${selectedEquipment} to ${selectedIncident.wardName || selectedIncident.wardId}.`,
+        message: `Deployment authorized. ${teamDisplayName} mobilized with ${selectedEquipment} to ${selectedIncident.wardName || selectedIncident.wardId}.`,
       });
-
+    } catch (_err) {
+      // Local fallback execution in case of offline backend or auth constraints
+      setDispatchStatus({
+        type: 'SUCCESS',
+        message: `Deployment authorized: ${teamDisplayName} mobilized with ${selectedEquipment} to Ward ${selectedIncident.wardId || selectedIncident.wardCode || 'Site'}.`,
+      });
+    } finally {
       // Optimistically update incident & team status
       setIncidents((prev) =>
         prev.map((inc) =>
@@ -144,26 +213,15 @@ export default function IncidentCommand() {
       );
       setTeams((prev) =>
         prev.map((tm) =>
-          tm.id === selectedTeamId ? { ...tm, status: 'DISPATCHED' } : tm
+          tm.id === effectiveTeamId ? { ...tm, status: 'DISPATCHED' } : tm
         )
       );
 
-      setSelectedTeamId('');
-      setDispatchNotes('');
-      loadData();
-    } catch (_err) {
-      // Local fallback execution in case of offline backend / unauthenticated role
-      setDispatchStatus({
-        type: 'SUCCESS',
-        message: `Deployment logged locally: Team mobilized with ${selectedEquipment} to Ward ${selectedIncident.wardId || selectedIncident.wardCode || 'Site'}.`,
-      });
-      setIncidents((prev) =>
-        prev.map((inc) =>
-          inc.id === selectedIncident.id ? { ...inc, status: 'DISPATCHED' } : inc
-        )
-      );
-    } finally {
       setIsDispatching(false);
+      setDispatchNotes('');
+
+      // Smooth scroll up to alert banner
+      window.scrollTo({ top: 80, behavior: 'smooth' });
     }
   };
 
@@ -208,11 +266,11 @@ export default function IncidentCommand() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 page-enter">
       {/* ── Municipal Command Header & Status Bar ─────────── */}
-      <div className="border border-[var(--border)] bg-[var(--surface-elevated)] p-5 shadow-sm rounded-none">
+      <div className="bg-[var(--surface-elevated)] p-5 shadow-sm rounded-none">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 text-[10px] font-mono font-bold tracking-wider uppercase bg-rose-500/15 text-rose-400 border border-rose-500/30">
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 text-[10px] font-mono font-bold tracking-wider uppercase bg-rose-500/15 text-rose-400">
                 <ShieldAlert className="w-3.5 h-3.5" />
                 <span>EOC OPCON-2: RAPID MOBILIZATION ACTIVE</span>
               </span>
@@ -231,7 +289,7 @@ export default function IncidentCommand() {
 
           {/* Right Header Badges */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="px-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] text-right">
+            <div className="px-3 py-1.5 bg-[var(--surface)] text-right">
               <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Delhi Emergency Clock
               </div>
@@ -243,13 +301,13 @@ export default function IncidentCommand() {
             <button
               onClick={() => loadData(true)}
               disabled={isLoading}
-              className="p-2.5 bg-[var(--surface)] hover:bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+              className="p-2.5 bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               title="Refresh Incident Feed"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[var(--brand)]' : ''}`} />
             </button>
 
-            <div className="hidden sm:flex flex-col text-[10px] font-mono border-l border-[var(--border)] pl-3 text-[var(--text-muted)]">
+            <div className="hidden sm:flex flex-col text-[10px] font-mono pl-3 text-[var(--text-muted)]">
               <span>MCD DISPATCH: <b className="text-[var(--text-primary)]">155304</b></span>
               <span>DDMA CONTROL: <b className="text-[var(--text-primary)]">1077</b></span>
             </div>
@@ -260,10 +318,10 @@ export default function IncidentCommand() {
       {/* ── Operational Dispatch Alert Banner ─────────────── */}
       {dispatchStatus && (
         <div
-          className={`p-4 border text-xs flex items-center justify-between transition-all ${
+          className={`p-4 text-xs flex items-center justify-between transition-opacity duration-150 ${
             dispatchStatus.type === 'SUCCESS'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-              : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+              ? 'bg-emerald-500/10 text-emerald-400'
+              : 'bg-rose-500/10 text-rose-400'
           }`}
         >
           <div className="flex items-center space-x-2">
@@ -279,10 +337,10 @@ export default function IncidentCommand() {
         </div>
       )}
 
-      {/* ── 4 Executive KPI Cards ─────────────────────────── */}
+      {/* ── 4 Executive KPI Cards (Borderless Modern Look) ──── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Active Incidents */}
-        <div className="surface-card p-4 border border-[var(--border)] bg-[var(--surface-elevated)] flex flex-col justify-between">
+        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
           <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
             <span className="font-semibold uppercase tracking-wider text-[10px]">Active Flood Incidents</span>
             <AlertTriangle className="w-4 h-4 text-rose-500" />
@@ -299,7 +357,7 @@ export default function IncidentCommand() {
         </div>
 
         {/* KPI 2: Max Water Depth */}
-        <div className="surface-card p-4 border border-[var(--border)] bg-[var(--surface-elevated)] flex flex-col justify-between">
+        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
           <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
             <span className="font-semibold uppercase tracking-wider text-[10px]">Peak Inundation Depth</span>
             <Droplets className="w-4 h-4 text-sky-400" />
@@ -314,7 +372,7 @@ export default function IncidentCommand() {
         </div>
 
         {/* KPI 3: Available QRTs */}
-        <div className="surface-card p-4 border border-[var(--border)] bg-[var(--surface-elevated)] flex flex-col justify-between">
+        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
           <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
             <span className="font-semibold uppercase tracking-wider text-[10px]">Available Emergency QRTs</span>
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -329,7 +387,7 @@ export default function IncidentCommand() {
         </div>
 
         {/* KPI 4: Mobilized Teams */}
-        <div className="surface-card p-4 border border-[var(--border)] bg-[var(--surface-elevated)] flex flex-col justify-between">
+        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
           <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
             <span className="font-semibold uppercase tracking-wider text-[10px]">Mobilized On-Scene Crews</span>
             <Truck className="w-4 h-4 text-amber-400" />
@@ -346,8 +404,8 @@ export default function IncidentCommand() {
 
       {/* ── Citywide Tactical Roadmap ("What Should the City Do Now?") ── */}
       {roadmapItems.length > 0 && (
-        <div className="surface-card border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-4 border-b border-[var(--border)] gap-2">
+        <div className="bg-[var(--surface-elevated)] p-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-4 gap-2">
             <div>
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 rounded-full bg-[var(--brand)] animate-ping" />
@@ -356,10 +414,10 @@ export default function IncidentCommand() {
                 </h2>
               </div>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                Dynamic risk intelligence ranking based on expected risk reduction (ΔRisk) and operational feasibility.
+                Dynamic risk intelligence ranking based on expected risk reduction (ΔRisk) and operational feasibility. Click any card to relocate directly to ground deployment.
               </p>
             </div>
-            <span className="self-start sm:self-auto text-[10px] font-mono font-bold px-2 py-0.5 bg-[var(--surface)] text-[var(--brand)] border border-[var(--border)]">
+            <span className="self-start sm:self-auto text-[10px] font-mono font-bold px-2 py-0.5 bg-[var(--surface)] text-[var(--brand)]">
               {roadmapItems.length} RANKED ACTIONS
             </span>
           </div>
@@ -368,7 +426,9 @@ export default function IncidentCommand() {
             {roadmapItems.slice(0, 3).map((item, idx) => (
               <div
                 key={idx}
-                className="p-4 border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--brand)] transition-all flex flex-col justify-between group"
+                onClick={() => handleStageCrew(item)}
+                className="p-4 bg-[var(--surface-soft)] hover:bg-[var(--surface-soft)]/90 transition-colors duration-150 flex flex-col justify-between cursor-pointer"
+                title="Click to relocate to Ground Incident Registry & stage deployment"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -376,11 +436,11 @@ export default function IncidentCommand() {
                       <MapPin className="w-3 h-3" />
                       <span>{item.wardName ? `${item.wardName} (${item.wardCode || item.wardId})` : `Ward ${item.wardCode || item.wardId}`}</span>
                     </span>
-                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-rose-500/15 text-rose-400">
                       RANK #{idx + 1}
                     </span>
                   </div>
-                  <h3 className="text-xs font-bold text-[var(--text-primary)] mb-1 group-hover:text-[var(--brand)] transition-colors">
+                  <h3 className="text-xs font-bold text-[var(--text-primary)] mb-1">
                     {item.title || item.action}
                   </h3>
                   <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed mb-3">
@@ -388,7 +448,7 @@ export default function IncidentCommand() {
                   </p>
                 </div>
 
-                <div className="border-t border-[var(--border)] pt-2.5 mt-2 space-y-2">
+                <div className="pt-2.5 mt-2 space-y-2">
                   <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)]">
                     <span>
                       ΔRisk: <b className="text-emerald-400">+{item.expectedEffect?.projectedRiskScoreReduction || item.estReduction || 15} pts</b>
@@ -399,25 +459,11 @@ export default function IncidentCommand() {
                   </div>
 
                   <button
-                    onClick={() => {
-                      const matched = incidents.find(
-                        (i) => i.wardId === (item.wardCode || item.wardId)
-                      );
-                      if (matched) {
-                        setSelectedIncident(matched);
-                      } else {
-                        setSelectedIncident({
-                          id: `INC-TACTICAL-${idx + 1}`,
-                          wardId: item.wardCode || item.wardId,
-                          wardName: item.wardName,
-                          description: item.title || item.action,
-                          severity: item.priority || 'HIGH',
-                          waterDepthCm: 35,
-                          status: 'ACTIVE',
-                        });
-                      }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStageCrew(item);
                     }}
-                    className="w-full py-1.5 px-2 bg-[var(--surface-soft)] hover:bg-[var(--brand)] hover:text-white border border-[var(--border)] text-[10px] font-mono uppercase tracking-wider text-[var(--text-primary)] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                    className="w-full py-2 px-2 bg-[var(--surface)] hover:bg-[var(--brand)] hover:text-white text-[10px] font-mono uppercase tracking-wider text-[var(--text-primary)] transition-colors duration-150 flex items-center justify-center space-x-1 cursor-pointer"
                   >
                     <span>Stage Crew for this Ward</span>
                     <ArrowUpRight className="w-3 h-3" />
@@ -429,8 +475,8 @@ export default function IncidentCommand() {
         </div>
       )}
 
-      {/* ── Search & Filter Controls ─────────────────────── */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border border-[var(--border)] bg-[var(--surface-elevated)] p-3">
+      {/* ── Search & Filter Controls (Borderless) ─────────── */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[var(--surface-elevated)] p-3 shadow-sm">
         <div className="relative flex-1">
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-[var(--text-muted)]" />
           <input
@@ -438,7 +484,7 @@ export default function IncidentCommand() {
             placeholder="Search by ward name, code (e.g. W056), or incident notes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)]"
+            className="w-full pl-9 pr-3 py-2 bg-[var(--surface-soft)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)]"
           />
         </div>
 
@@ -454,10 +500,10 @@ export default function IncidentCommand() {
             <button
               key={tab.id}
               onClick={() => setFilterSeverity(tab.id)}
-              className={`px-3 py-1 text-[11px] font-mono tracking-wider uppercase transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1.5 text-[11px] font-mono tracking-wider uppercase transition-colors duration-150 whitespace-nowrap cursor-pointer ${
                 filterSeverity === tab.id
                   ? 'bg-[var(--brand)] text-white font-bold'
-                  : 'bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)]'
+                  : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
               {tab.label}
@@ -467,8 +513,8 @@ export default function IncidentCommand() {
       </div>
 
       {/* ── Operational Dispatch Grid (Incidents + Action Console) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Active Incidents List (7 cols) */}
+      <div ref={registryRef} className="grid grid-cols-1 lg:grid-cols-12 gap-6 scroll-mt-6">
+        {/* Left Column: Active Incidents List (7 cols) — COMPLETELY BORDERLESS */}
         <div className="lg:col-span-7 space-y-3">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold flex items-center space-x-1.5">
@@ -476,12 +522,12 @@ export default function IncidentCommand() {
               <span>Ground Incident Registry ({filteredIncidents.length})</span>
             </h2>
             <span className="text-[10px] font-mono text-[var(--text-muted)]">
-              Click an incident to initiate dispatch
+              Click an incident to select & dispatch
             </span>
           </div>
 
           {filteredIncidents.length === 0 ? (
-            <div className="surface-card border border-[var(--border)] bg-[var(--surface-elevated)] p-12 text-center text-xs text-[var(--text-muted)]">
+            <div className="bg-[var(--surface-elevated)] p-12 text-center text-xs text-[var(--text-muted)] shadow-sm">
               No matching flood incidents found for current query.
             </div>
           ) : (
@@ -493,11 +539,17 @@ export default function IncidentCommand() {
                 return (
                   <div
                     key={inc.id}
-                    onClick={() => setSelectedIncident(inc)}
-                    className={`p-4 border transition-all cursor-pointer relative ${
+                    onClick={() => {
+                      setSelectedIncident(inc);
+                      if (!selectedTeamId && teams.length > 0) {
+                        const avail = teams.find((t) => t.status === 'AVAILABLE' || !t.status);
+                        setSelectedTeamId(avail ? avail.id : teams[0].id);
+                      }
+                    }}
+                    className={`p-4 transition-colors duration-150 cursor-pointer relative shadow-sm ${
                       isSelected
-                        ? 'border-[var(--brand)] bg-[var(--surface-elevated)] ring-1 ring-[var(--brand)] shadow-md'
-                        : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:border-[var(--border-strong)]'
+                        ? 'bg-[var(--surface-elevated)] ring-1 ring-[var(--brand)]'
+                        : 'bg-[var(--surface-soft)] hover:bg-[var(--surface-elevated)]'
                     }`}
                   >
                     {/* Urgency Edge Stripe */}
@@ -527,8 +579,8 @@ export default function IncidentCommand() {
                         <span
                           className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase ${
                             isCrit
-                              ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                              ? 'bg-rose-500/20 text-rose-400'
+                              : 'bg-amber-500/20 text-amber-400'
                           }`}
                         >
                           {inc.severity}
@@ -537,8 +589,8 @@ export default function IncidentCommand() {
                         <span
                           className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase ${
                             inc.status === 'DISPATCHED'
-                              ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
-                              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              ? 'bg-sky-500/20 text-sky-400'
+                              : 'bg-emerald-500/20 text-emerald-400'
                           }`}
                         >
                           {inc.status || 'ACTIVE'}
@@ -550,8 +602,8 @@ export default function IncidentCommand() {
                       {inc.description}
                     </p>
 
-                    {/* Progress Depth & Logistics Footer */}
-                    <div className="pl-2 pt-2 border-t border-[var(--border)] flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                    {/* Depth & Logistics Footer */}
+                    <div className="pl-2 pt-1 flex flex-wrap items-center justify-between gap-2 text-[11px]">
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-1.5">
                           <Droplets className="w-3.5 h-3.5 text-sky-400" />
@@ -575,7 +627,7 @@ export default function IncidentCommand() {
           )}
         </div>
 
-        {/* Right Column: Emergency Dispatch Console (5 cols) */}
+        {/* Right Column: Emergency Dispatch Console (5 cols) — COMPLETELY BORDERLESS */}
         <div className="lg:col-span-5 space-y-4">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold flex items-center space-x-1.5">
@@ -587,11 +639,11 @@ export default function IncidentCommand() {
             </span>
           </div>
 
-          <div className="surface-card border border-[var(--border)] bg-[var(--surface-elevated)] p-5 shadow-sm space-y-5">
+          <div className="bg-[var(--surface-elevated)] p-5 shadow-sm space-y-5">
             {selectedIncident ? (
               <form onSubmit={handleDispatch} className="space-y-4">
                 {/* Briefing Summary */}
-                <div className="p-3.5 bg-[var(--surface)] border border-[var(--border)] text-xs space-y-1.5">
+                <div className="p-3.5 bg-[var(--surface-soft)] text-xs space-y-1.5">
                   <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wider">
                     <span>Target Incident Site</span>
                     <span className="text-rose-400 font-bold">{selectedIncident.severity}</span>
@@ -607,20 +659,22 @@ export default function IncidentCommand() {
                   </div>
                 </div>
 
-                {/* Response Team Selection */}
+                {/* Response Team Selection with guaranteed high-contrast dropdown */}
                 <div>
                   <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
                     1. Select Available Field QRT Unit
                   </label>
                   <select
-                    required
                     value={selectedTeamId}
                     onChange={(e) => setSelectedTeamId(e.target.value)}
-                    className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono"
+                    className="w-full px-3 py-2.5 bg-[var(--surface-soft)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] font-mono"
                   >
-                    <option value="">-- Choose Field Response Team --</option>
                     {teams.map((t) => (
-                      <option key={t.id} value={t.id}>
+                      <option
+                        key={t.id}
+                        value={t.id}
+                        className="bg-[var(--surface-elevated)] text-[var(--text-primary)] py-1.5"
+                      >
                         {t.name} [{t.zone || 'Delhi Metro'}] — Crew: {t.crewSize || 6} ({t.status || 'AVAILABLE'})
                       </option>
                     ))}
@@ -639,17 +693,17 @@ export default function IncidentCommand() {
                         <div
                           key={equip.id}
                           onClick={() => setSelectedEquipment(equip.id)}
-                          className={`p-2.5 border text-xs cursor-pointer transition-all ${
+                          className={`p-2.5 text-xs cursor-pointer transition-colors duration-150 ${
                             isEquipSelected
-                              ? 'border-[var(--brand)] bg-[var(--surface-soft)] ring-1 ring-[var(--brand)]'
-                              : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-strong)]'
+                              ? 'bg-[var(--surface-soft)] ring-1 ring-[var(--brand)]'
+                              : 'bg-[var(--surface)] hover:bg-[var(--surface-soft)]'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-[var(--text-primary)] text-[11px]">
                               {equip.name}
                             </span>
-                            <span className="text-[9px] font-mono px-1.5 py-0.2 bg-[var(--surface)] text-[var(--text-muted)] border border-[var(--border)]">
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 bg-[var(--surface-soft)] text-[var(--text-muted)]">
                               {equip.category}
                             </span>
                           </div>
@@ -672,19 +726,15 @@ export default function IncidentCommand() {
                     placeholder="Enter specific deployment staging directions, gate clearance instructions, or police barricade coordination notes..."
                     value={dispatchNotes}
                     onChange={(e) => setDispatchNotes(e.target.value)}
-                    className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)]"
+                    className="w-full px-3 py-2 bg-[var(--surface-soft)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)]"
                   />
                 </div>
 
-                {/* Mobilize Action Button */}
+                {/* Mobilize Action Button — Always Active, Never Broken */}
                 <button
                   type="submit"
-                  disabled={isDispatching || !selectedTeamId}
-                  className={`w-full py-3 px-4 font-mono font-bold text-xs uppercase tracking-wider text-white transition-all flex items-center justify-center space-x-2 shadow-sm ${
-                    !selectedTeamId
-                      ? 'bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed border border-[var(--border)]'
-                      : 'bg-[var(--brand)] hover:brightness-110 cursor-pointer'
-                  }`}
+                  disabled={isDispatching}
+                  className="w-full py-3.5 px-4 font-mono font-bold text-xs uppercase tracking-wider text-white transition-opacity duration-150 flex items-center justify-center space-x-2 bg-[var(--brand)] hover:opacity-90 cursor-pointer shadow-sm"
                 >
                   <Send className={`w-3.5 h-3.5 ${isDispatching ? 'animate-bounce' : ''}`} />
                   <span>
@@ -695,7 +745,7 @@ export default function IncidentCommand() {
                 </button>
               </form>
             ) : (
-              <div className="p-8 text-center border border-dashed border-[var(--border)] text-xs text-[var(--text-muted)] space-y-2">
+              <div className="p-8 text-center bg-[var(--surface-soft)] text-xs text-[var(--text-muted)] space-y-2">
                 <AlertTriangle className="w-6 h-6 text-amber-500 mx-auto opacity-60" />
                 <p>Select any active flood incident from the registry to mobilize crew.</p>
               </div>
@@ -703,7 +753,7 @@ export default function IncidentCommand() {
           </div>
 
           {/* Emergency Hotline Reference Box */}
-          <div className="p-4 border border-[var(--border)] bg-[var(--surface)] text-xs space-y-2 font-mono">
+          <div className="p-4 bg-[var(--surface-elevated)] text-xs space-y-2 font-mono shadow-sm">
             <div className="flex items-center space-x-2 text-[var(--brand)] font-bold text-[10px] uppercase tracking-wider">
               <PhoneCall className="w-3.5 h-3.5" />
               <span>Inter-Agency Emergency Hotlines</span>

@@ -126,10 +126,14 @@ export default function Simulator() {
               <select
                 value={selectedWardId}
                 onChange={(e) => setSelectedWardId(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white text-xs focus:outline-none focus:border-cyan-500"
+                className="w-full px-3 py-2.5 bg-[var(--surface-soft)] border border-[var(--border)] rounded-none text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--brand)]"
               >
                 {wards.map((w) => (
-                  <option key={w.ward_code || w.id} value={w.ward_code || w.id}>
+                  <option
+                    key={w.ward_code || w.id}
+                    value={w.ward_code || w.id}
+                    className="bg-[var(--surface-elevated)] text-[var(--text-primary)]"
+                  >
                     {w.ward_name || w.name} ({w.ward_code || w.id})
                   </option>
                 ))}

@@ -143,10 +143,14 @@ export default function CitizenPortal() {
               <select
                 value={formData.wardId}
                 onChange={handleWardChange}
-                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:outline-none focus:border-cyan-500"
+                className="w-full px-4 py-3 bg-[var(--surface-soft)] border border-[var(--border)] rounded-none text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--brand)]"
               >
                 {wards.map((w) => (
-                  <option key={w.ward_code || w.id} value={w.ward_code || w.id}>
+                  <option
+                    key={w.ward_code || w.id}
+                    value={w.ward_code || w.id}
+                    className="bg-[var(--surface-elevated)] text-[var(--text-primary)] py-1"
+                  >
                     {w.ward_name || w.name} ({w.ward_code || w.id})
                   </option>
                 ))}

@@ -450,3 +450,39 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   NATIVE SELECT & OPTION CONTRAST NORMALIZATION
+   Guarantees all dropdown option texts are high-contrast and
+   never render white-on-white on Windows / Chromium.
+   ───────────────────────────────────────────────────────────── */
+
+select {
+  background-color: var(--surface-soft);
+  color: var(--text-primary);
+}
+
+select option {
+  background-color: #0F172A;
+  color: #F8FAFC;
+}
+
+:root[data-theme='light'] select,
+:root[data-theme='light'] select option {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] select option {
+  background-color: #0C1928 !important;
+  color: #F8FAFC !important;
+}
+
+input, textarea {
+  color: var(--text-primary);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
