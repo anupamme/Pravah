@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ShieldAlert, MapPin, Send, AlertTriangle, Radio, RefreshCw,
-  Search, Filter, Activity, Clock, Droplets, Truck, Wrench, CheckCircle2,
-  ChevronRight, ArrowUpRight, PhoneCall, Layers, ShieldCheck
+  Search, Clock, Droplets, Truck, CheckCircle2,
+  ChevronRight, ArrowUpRight, PhoneCall, ShieldCheck
 } from 'lucide-react';
 import {
   listIncidents,
@@ -151,7 +151,7 @@ export default function IncidentCommand() {
       setSelectedTeamId('');
       setDispatchNotes('');
       loadData();
-    } catch (err) {
+    } catch (_err) {
       // Local fallback execution in case of offline backend / unauthenticated role
       setDispatchStatus({
         type: 'SUCCESS',
@@ -356,7 +356,7 @@ export default function IncidentCommand() {
                 </h2>
               </div>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                Dynamic risk intelligence ranking based on expected risk reduction ($\Delta\text{Risk}$) and operational feasibility.
+                Dynamic risk intelligence ranking based on expected risk reduction (ΔRisk) and operational feasibility.
               </p>
             </div>
             <span className="self-start sm:self-auto text-[10px] font-mono font-bold px-2 py-0.5 bg-[var(--surface)] text-[var(--brand)] border border-[var(--border)]">
