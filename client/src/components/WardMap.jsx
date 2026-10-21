@@ -252,6 +252,7 @@ export default function WardMap({
       onMouseLeave={() => {
         setIsDragging(false);
         setHoveredWard(null);
+        setHoveredHotspot(null);
       }}
       style={{ height, width: '100%' }}
       className={`relative select-none overflow-hidden rounded-none border border-[var(--border)] bg-[#030712] ${
@@ -326,9 +327,14 @@ export default function WardMap({
                 strokeWidth={isSelected ? 2.8 : isHovered ? 2.0 : 0.8}
                 filter={isSelected ? 'url(#glow-cyan)' : undefined}
                 className="transition-colors duration-150 cursor-pointer"
-                onMouseEnter={() => setHoveredWard(ward)}
+                onMouseEnter={() => {
+                  setHoveredHotspot(null);
+                  setHoveredWard(ward);
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  setHoveredHotspot(null);
+                  setHoveredWard(null);
                   if (onSelectWard) onSelectWard(ward.rawProperties);
                 }}
               />
@@ -393,11 +399,14 @@ export default function WardMap({
                   key={h.id}
                   className="cursor-pointer"
                   onMouseEnter={() => {
-                    setHoveredHotspot(h);
                     setHoveredWard(null);
+                    setHoveredHotspot(h);
                   }}
+                  onMouseLeave={() => setHoveredHotspot(null)}
                   onClick={(e) => {
                     e.stopPropagation();
+                    setHoveredHotspot(null);
+                    setHoveredWard(null);
                     const targetWard = wardPaths.find((w) => w.code === h.ward);
                     if (targetWard && onSelectWard) onSelectWard(targetWard.rawProperties);
                   }}
@@ -437,33 +446,93 @@ export default function WardMap({
         </text>
       </svg>
 
-      {/* Hydrological River Yamuna Water Level HUD (Top Center) */}
-      {showYamunaGauge && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2.5 px-3 py-1.5 bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-amber-500/40 text-xs shadow-xl pointer-events-auto">
-          <Waves className="w-4 h-4 text-sky-400 animate-pulse flex-shrink-0" />
-          <div className="flex items-center space-x-2 font-mono text-[11px]">
-            <span className="font-bold text-[var(--text-primary)]">Yamuna Old Railway Bridge:</span>
-            <span className="font-black text-rose-500 bg-rose-500/10 px-1.5 py-0.5 border border-rose-500/30">
-              205.38 m
-            </span>
-            <span className="text-[10px] text-[var(--text-muted)] hidden md:inline">
-              (Warn: 204.50m · Danger: 205.33m)
-            </span>
-            <span className="text-[10px] text-rose-400 font-bold uppercase tracking-wider hidden lg:inline animate-pulse">
-              ● DANGER BREACHED (+0.05m)
-            </span>
+      {/* ── Top Command Bar (Non-Colliding Unified Layout) ─────── */}
+      <div className="absolute top-2.5 inset-x-2.5 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+        {/* Left: Vector Badge & Hydrological Gauge */}
+        <div className="flex items-center gap-1.5 pointer-events-auto flex-wrap">
+          <div className="px-2 py-1 bg-[var(--surface-elevated)]/90 backdrop-blur-md border border-[var(--border)] text-[10px] font-mono text-[var(--text-muted)] flex items-center space-x-1.5 shadow-sm">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none animate-pulse" />
+            <span className="hidden sm:inline">Vector GIS · Keyless</span>
+            <span className="sm:hidden">GIS</span>
+          </div>
+
+          {showYamunaGauge && (
+            <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-rose-500/40 text-[10px] font-mono shadow-sm">
+              <Waves className="w-3 h-3 text-sky-400 flex-shrink-0 animate-pulse" />
+              <span className="text-[var(--text-secondary)] hidden md:inline">Yamuna Gauge:</span>
+              <span className="font-bold text-rose-400">205.38m</span>
+              <span className="text-rose-500 font-bold uppercase text-[9px] px-1 bg-rose-500/10 border border-rose-500/30 hidden sm:inline">
+                DANGER +5cm
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Layer Toggles & Zoom Controls */}
+        <div className="flex items-center gap-1.5 pointer-events-auto ml-auto">
+          {/* Layer Toggles */}
+          <div className="flex items-center space-x-1 bg-[var(--surface-elevated)]/90 backdrop-blur-md p-0.5 border border-[var(--border)] text-[10px] font-mono shadow-sm">
+            <button
+              onClick={() => setShowHotspots(!showHotspots)}
+              className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
+                showHotspots
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              title="Toggle Chronic Flood Hotspots"
+            >
+              <AlertTriangle className="w-3 h-3 text-rose-400" />
+              <span className="hidden sm:inline">Hotspots</span>
+              <span>({CHRONIC_HOTSPOTS.length})</span>
+            </button>
+            <button
+              onClick={() => setShowYamunaGauge(!showYamunaGauge)}
+              className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
+                showYamunaGauge
+                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              title="Toggle River Yamuna Water Level Gauge"
+            >
+              <Waves className="w-3 h-3 text-sky-400" />
+              <span className="hidden sm:inline">Yamuna</span>
+            </button>
+          </div>
+
+          {/* Zoom Buttons */}
+          <div className="flex items-center space-x-0.5 bg-[var(--surface-elevated)]/90 backdrop-blur-md p-0.5 border border-[var(--border)] shadow-sm">
+            <button
+              onClick={() => setZoom((z) => Math.min(z * 1.25, 4.5))}
+              className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setZoom((z) => Math.max(z * 0.8, 0.8))}
+              className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={resetView}
+              className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+              title="Reset Overview"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Floating Hotspot Tooltip */}
-      {hoveredHotspot && (
+      {/* ── Mutually Exclusive Tooltips (No Overlapping Collisions) ── */}
+      {hoveredHotspot ? (
         <div
-          className="absolute z-50 pointer-events-none p-3.5 rounded-none bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-rose-500/60 text-xs shadow-2xl transition-all duration-75"
+          className="absolute z-50 pointer-events-none p-3.5 rounded-none bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-rose-500/60 text-xs shadow-2xl transition-all duration-75 max-w-[240px]"
           style={{
-            left: `${Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 240)}px`,
-            top: `${Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 160)}px`,
-            minWidth: '220px',
+            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 250))}px`,
+            top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 160))}px`,
           }}
         >
           <div className="flex items-center space-x-1.5 text-rose-500 font-bold text-[10px] uppercase tracking-wider mb-1">
@@ -487,20 +556,13 @@ export default function WardMap({
           <div className="p-1.5 bg-rose-500/10 border border-rose-500/30 text-[10px] text-rose-300 font-mono">
             STATUS: {hoveredHotspot.status}
           </div>
-          <div className="text-[9px] text-[var(--brand)] mt-1.5 font-medium">
-            Click to inspect ward telemetry →
-          </div>
         </div>
-      )}
-
-      {/* Floating Interactive Tooltip */}
-      {hoveredWard && (
+      ) : hoveredWard ? (
         <div
-          className="absolute z-50 pointer-events-none p-3 rounded-none bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--border-strong)] text-xs shadow-2xl transition-all duration-75"
+          className="absolute z-50 pointer-events-none p-3 rounded-none bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--border-strong)] text-xs shadow-2xl transition-all duration-75 max-w-[210px]"
           style={{
-            left: `${Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 210)}px`,
-            top: `${Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 130)}px`,
-            minWidth: '190px',
+            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 220))}px`,
+            top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 130))}px`,
           }}
         >
           <div className="flex items-center justify-between gap-2 mb-1">
@@ -543,66 +605,7 @@ export default function WardMap({
             Click polygon to view live telemetry →
           </div>
         </div>
-      )}
-
-      {/* GIS Operational Layer Toggles HUD (Top Right) */}
-      <div className="absolute top-3 right-14 z-20 hidden md:flex items-center space-x-1 bg-[var(--surface-elevated)]/90 backdrop-blur-md p-1 border border-[var(--border)] text-[10px] font-mono shadow-md">
-        <button
-          onClick={() => setShowHotspots(!showHotspots)}
-          className={`px-2 py-1 rounded-none flex items-center space-x-1.5 transition-colors cursor-pointer ${
-            showHotspots
-              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-          }`}
-          title="Toggle Chronic Flood Hotspots (Minto Bridge, ITO, Pul Prahladpur)"
-        >
-          <AlertTriangle className="w-3 h-3 text-rose-400" />
-          <span>Hotspots ({CHRONIC_HOTSPOTS.length})</span>
-        </button>
-        <button
-          onClick={() => setShowYamunaGauge(!showYamunaGauge)}
-          className={`px-2 py-1 rounded-none flex items-center space-x-1.5 transition-colors cursor-pointer ${
-            showYamunaGauge
-              ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-          }`}
-          title="Toggle River Yamuna Water Level Gauge"
-        >
-          <Waves className="w-3 h-3 text-sky-400" />
-          <span>Yamuna Gauge</span>
-        </button>
-      </div>
-
-      {/* Map Control Toolbar (Top Right) */}
-      <div className="absolute top-3 right-3 z-20 flex flex-col space-y-1 bg-[var(--surface-elevated)]/90 backdrop-blur-md p-1 border border-[var(--border)] shadow-md">
-        <button
-          onClick={() => setZoom((z) => Math.min(z * 1.25, 4.5))}
-          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
-          title="Zoom In"
-        >
-          <ZoomIn className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={() => setZoom((z) => Math.max(z * 0.8, 0.8))}
-          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
-          title="Zoom Out"
-        >
-          <ZoomOut className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={resetView}
-          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
-          title="Reset Overview"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-        </button>
-      </div>
-
-      {/* Keyless Architecture Badge (Top Left) */}
-      <div className="absolute top-3 left-3 z-20 px-2.5 py-1 bg-[var(--surface-elevated)]/90 backdrop-blur-md border border-[var(--border)] text-[10px] font-mono text-[var(--text-muted)] flex items-center space-x-1.5">
-        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none animate-pulse" />
-        <span>Vector GIS Engine • 100% Offline &amp; Keyless</span>
-      </div>
+      ) : null}
 
       {/* Theme-Adaptive Risk Legend (Bottom Left) */}
       <div className="absolute bottom-3 left-3 z-20 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-3 rounded-none border border-[var(--border)] text-xs shadow-md">

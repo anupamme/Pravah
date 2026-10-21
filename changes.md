@@ -221,3 +221,23 @@ All system modifications, bug fixes, endpoint alignments, and UI improvements ar
   - Added River Yamuna Live Gauge HUD overlay at Old Railway Bridge showing current water level (`205.38m`) against Warning (`204.50m`) and Danger (`205.33m`) marks.
   - Built GIS layer switchers (`Hotspots`, `Yamuna Gauge`) on the map toolbar.
   - **Bugfix:** Added missing `Layers` icon import from `lucide-react` in [`client/src/components/WardMap.jsx`](client/src/components/WardMap.jsx) resolving `ReferenceError: Layers is not defined`.
+
+---
+
+## [Phase 18 — Vector Map HUD Layout Alignment & Tooltip Exclusivity Fix] — 2026-10-21 22:03 IST
+
+### 1. Unified Responsive Top Command Bar
+- **Files Modified:** [`client/src/components/WardMap.jsx`](client/src/components/WardMap.jsx)
+- **Problem:** The River Yamuna Gauge overlay (`left-1/2 -translate-x-1/2`) collided directly with the top-left Vector GIS badge and the top-right layer switcher and zoom buttons, causing visual text overlapping and unreadable UI.
+- **Fix:** Replaced independent absolute positioned controls with a unified, responsive flex-wrap top command bar (`absolute top-2.5 inset-x-2.5`).
+  - Left group: GIS keyless badge + compact Yamuna water level pill (`205.38m · DANGER +5cm`).
+  - Right group: GIS layer switchers (`Hotspots`, `Yamuna`) + Zoom controls (`+`, `-`, `Reset`).
+  - Guaranteed zero overlap across desktop, tablet, and mobile screens.
+
+### 2. Mutually Exclusive Tooltips & Event Dismissal
+- **Problem:** Clicking or hovering over wards while near a chronic hotspot caused the "Chronic Vulnerability Choke" tooltip to persist indefinitely and overlap across ward inspection details.
+- **Fix:**
+  - Added `onMouseLeave={() => setHoveredHotspot(null)}` to hotspot marker groups.
+  - Implemented mutual exclusivity: hovering over a ward now clears `hoveredHotspot`, and hovering over a hotspot clears `hoveredWard`.
+  - Clicking any ward or hotspot polygon immediately dismisses all floating tooltips (`setHoveredHotspot(null); setHoveredWard(null);`).
+  - Added strict coordinate bounding (`Math.max(10, Math.min(...))`) ensuring tooltips remain neatly within the map viewport without clipping or overflowing.
