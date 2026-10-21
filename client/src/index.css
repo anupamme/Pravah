@@ -69,28 +69,28 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  /* Atmospheric Backgrounds */
-  --bg: #F4F8FA;
-  --bg-deep: #EAF2F6;
-  --bg-soft: #EDF5F8;
-  --bg-subtle: #DEEAF0;
+  /* Crisp Light Surfaces & Backgrounds */
+  --bg: #F8FAFC;
+  --bg-deep: #FFFFFF;
+  --bg-soft: #F1F5F9;
+  --bg-subtle: #E2E8F0;
 
   /* Surfaces */
-  --surface: rgba(255, 255, 255, 0.75);
+  --surface: #FFFFFF;
   --surface-elevated: #FFFFFF;
-  --surface-soft: #EDF5F8;
-  --surface-glass: rgba(255, 255, 255, 0.80);
-  --surface-glass-strong: rgba(255, 255, 255, 0.94);
+  --surface-soft: #F1F5F9;
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  --surface-glass-strong: rgba(255, 255, 255, 0.98);
 
   /* Borders */
-  --border: #D8E5EA;
-  --border-strong: #BCCFD8;
-  --border-focus: rgba(2, 132, 199, 0.45);
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --border-focus: rgba(2, 132, 199, 0.5);
 
   /* Typography */
-  --text-primary: #0B2239;
-  --text-secondary: rgba(11, 34, 57, 0.68);
-  --text-muted: rgba(11, 34, 57, 0.45);
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
   --text-inverse: #FFFFFF;
 
   /* Brand Palette */
@@ -102,27 +102,27 @@
 
   /* Risk Severity Color System */
   --risk-critical: #DC2626;
-  --risk-critical-bg: rgba(220, 38, 38, 0.08);
-  --risk-critical-border: rgba(220, 38, 38, 0.22);
+  --risk-critical-bg: #FEE2E2;
+  --risk-critical-border: #FCA5A5;
 
   --risk-high: #EA580C;
-  --risk-high-bg: rgba(234, 88, 12, 0.08);
-  --risk-high-border: rgba(234, 88, 12, 0.22);
+  --risk-high-bg: #FFEDD5;
+  --risk-high-border: #FDBA74;
 
   --risk-moderate: #CA8A04;
-  --risk-moderate-bg: rgba(202, 138, 4, 0.08);
-  --risk-moderate-border: rgba(202, 138, 4, 0.22);
+  --risk-moderate-bg: #FEF9C3;
+  --risk-moderate-border: #FDE047;
 
   --risk-low: #16A34A;
-  --risk-low-bg: rgba(22, 163, 74, 0.08);
-  --risk-low-border: rgba(22, 163, 74, 0.22);
+  --risk-low-bg: #DCFCE7;
+  --risk-low-border: #86EFAC;
 
-  /* Shadows & Glow */
-  --shadow-sm: 0 2px 6px -1px rgba(11, 34, 57, 0.05);
-  --shadow-md: 0 10px 24px -6px rgba(11, 34, 57, 0.08);
-  --shadow-lg: 0 20px 48px -12px rgba(11, 34, 57, 0.12);
+  /* Minimal Shadows */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
   --hero-glow: none;
-  --button-glow: 0 0 16px rgba(2, 132, 199, 0.2);
+  --button-glow: none;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -152,6 +152,14 @@
 
   .font-instrument {
     font-family: 'Instrument Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
+  }
+
+  .font-limelight {
+    font-family: 'Limelight', cursive, sans-serif;
+  }
+
+  .font-dancing {
+    font-family: 'Dancing Script', cursive, sans-serif;
   }
 
   .font-inter {
@@ -237,55 +245,115 @@
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 255, 255, 0.1);
 }
 
-/* MotionSites Button Component */
+/* Surface Cards */
+.surface-card {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 0px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+}
+
+.surface-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.6rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  border-radius: 9999px;
+  color: #FFFFFF;
+  background-color: var(--brand-strong);
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.6rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  border-radius: 9999px;
+  color: var(--text-primary);
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-soft);
+  border-color: var(--brand);
+  transform: translateY(-1px);
+}
+
+/* Minimal MotionSites Buttons */
 .motionsites-btn-white {
-  background: #FFFFFF;
-  color: #0A0A0C;
-  padding: 0.875rem 2rem;
+  background-color: #FFFFFF;
+  color: #0F172A;
+  padding: 0.75rem 1.75rem;
   border-radius: 9999px;
   font-family: 'Inter', sans-serif;
   font-weight: 500;
   font-size: 0.875rem;
-  letter-spacing: 0.025em;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   text-decoration: none;
   cursor: pointer;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .motionsites-btn-white:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background-color: #F8FAFC;
   transform: translateY(-1px);
 }
 
 :root[data-theme='light'] .motionsites-btn-white {
-  background: #0B2239;
+  background-color: #0F172A;
   color: #FFFFFF;
-  box-shadow: 0 4px 16px -2px rgba(11, 34, 57, 0.25);
+  border: 1px solid #0F172A;
 }
 
 :root[data-theme='light'] .motionsites-btn-white:hover {
-  background: #07192A;
+  background-color: #1E293B;
 }
 
 .motionsites-btn-ghost {
-  background: rgba(255, 255, 255, 0.06);
+  background-color: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: var(--text-primary);
-  padding: 0.875rem 2rem;
+  color: #FFFFFF;
+  padding: 0.75rem 1.75rem;
   border-radius: 9999px;
   font-family: 'Inter', sans-serif;
   font-weight: 500;
   font-size: 0.875rem;
-  letter-spacing: 0.025em;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid var(--border-strong);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -295,9 +363,19 @@
 }
 
 .motionsites-btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: var(--brand);
+  background-color: rgba(255, 255, 255, 0.16);
   transform: translateY(-1px);
+}
+
+:root[data-theme='light'] .motionsites-btn-ghost {
+  background-color: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
+}
+
+:root[data-theme='light'] .motionsites-btn-ghost:hover {
+  background-color: #F1F5F9;
+  border-color: #94A3B8;
 }
 
 /* Severity Risk Badges */
@@ -305,7 +383,7 @@
   background-color: var(--risk-critical-bg);
   color: var(--risk-critical);
   border: 1px solid var(--risk-critical-border);
-  border-radius: 0.5rem;
+  border-radius: 0px;
   padding: 0.2rem 0.6rem;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -317,7 +395,7 @@
   background-color: var(--risk-high-bg);
   color: var(--risk-high);
   border: 1px solid var(--risk-high-border);
-  border-radius: 0.5rem;
+  border-radius: 0px;
   padding: 0.2rem 0.6rem;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -329,7 +407,7 @@
   background-color: var(--risk-moderate-bg);
   color: var(--risk-moderate);
   border: 1px solid var(--risk-moderate-border);
-  border-radius: 0.5rem;
+  border-radius: 0px;
   padding: 0.2rem 0.6rem;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -341,7 +419,7 @@
   background-color: var(--risk-low-bg);
   color: var(--risk-low);
   border: 1px solid var(--risk-low-border);
-  border-radius: 0.5rem;
+  border-radius: 0px;
   padding: 0.2rem 0.6rem;
   font-size: 0.6875rem;
   font-weight: 700;

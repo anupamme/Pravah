@@ -98,6 +98,37 @@ export default function WardMap({
     }
   };
 
+  // Helper to convert ring coordinates into a smooth organic SVG path
+  const buildSmoothPath = useCallback((ring) => {
+    if (!ring || ring.length < 3) return '';
+    const pts = ring.map((pt) => project(pt[0], pt[1]));
+    // Remove duplicate trailing point if closed
+    if (
+      pts.length > 3 &&
+      Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 0.1
+    ) {
+      pts.pop();
+    }
+    const n = pts.length;
+    if (n < 3) return '';
+
+    // Calculate midpoints between each consecutive vertex
+    const midpoints = [];
+    for (let i = 0; i < n; i++) {
+      const next = pts[(i + 1) % n];
+      midpoints.push([(pts[i][0] + next[0]) / 2, (pts[i][1] + next[1]) / 2]);
+    }
+
+    // Smooth path using quadratic Bezier curves through midpoints
+    let str = `M ${midpoints[0][0].toFixed(1)} ${midpoints[0][1].toFixed(1)}`;
+    for (let i = 0; i < n; i++) {
+      const ctrl = pts[(i + 1) % n];
+      const nextMid = midpoints[(i + 1) % n];
+      str += ` Q ${ctrl[0].toFixed(1)} ${ctrl[1].toFixed(1)} ${nextMid[0].toFixed(1)} ${nextMid[1].toFixed(1)}`;
+    }
+    return str + ' Z ';
+  }, [project]);
+
   // Convert GeoJSON MultiPolygons into SVG path elements
   const wardPaths = useMemo(() => {
     return (data.features || []).map((feature, idx) => {
@@ -114,23 +145,13 @@ export default function WardMap({
 
       if (feature.geometry?.type === 'Polygon') {
         for (const ring of coords) {
-          if (!ring || ring.length === 0) continue;
-          for (let i = 0; i < ring.length; i++) {
-            const [x, y] = project(ring[i][0], ring[i][1]);
-            pathStr += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
-          }
-          pathStr += 'Z ';
+          pathStr += buildSmoothPath(ring);
         }
       } else {
         // MultiPolygon
         for (const polygon of coords) {
           for (const ring of polygon) {
-            if (!ring || ring.length === 0) continue;
-            for (let i = 0; i < ring.length; i++) {
-              const [x, y] = project(ring[i][0], ring[i][1]);
-              pathStr += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
-            }
-            pathStr += 'Z ';
+            pathStr += buildSmoothPath(ring);
           }
         }
       }
@@ -154,7 +175,7 @@ export default function WardMap({
         rawProperties: p,
       };
     });
-  }, [data, project]);
+  }, [data, project, buildSmoothPath]);
 
   // Stylized Yamuna River path across Delhi
   const yamunaPath = useMemo(() => {
@@ -325,6 +346,8 @@ export default function WardMap({
                 fillOpacity={isSelected ? 0.75 : isHovered ? 0.70 : colors.opacity}
                 stroke={isSelected ? '#38bdf8' : isHovered ? '#ffffff' : colors.stroke}
                 strokeWidth={isSelected ? 2.8 : isHovered ? 2.0 : 0.8}
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 filter={isSelected ? 'url(#glow-cyan)' : undefined}
                 className="transition-colors duration-150 cursor-pointer"
                 onMouseEnter={() => {
@@ -411,20 +434,22 @@ export default function WardMap({
                     if (targetWard && onSelectWard) onSelectWard(targetWard.rawProperties);
                   }}
                 >
-                  {/* Ping Ring */}
+                  {/* Circular Radar Ripple */}
                   <circle cx={h.x} cy={h.y} r="14" fill="none" stroke={col} strokeWidth="1.5" opacity="0.85">
                     <animate attributeName="r" values="6;22;6" dur="2s" repeatCount="indefinite" />
                     <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2s" repeatCount="indefinite" />
                   </circle>
-                  {/* Outer Diamond */}
-                  <polygon
-                    points={`${h.x},${h.y - 9} ${h.x + 8},${h.y} ${h.x},${h.y + 9} ${h.x - 8},${h.y}`}
-                    fill="#0F172A"
+                  {/* Simple Circular Beacon Badge */}
+                  <circle
+                    cx={h.x}
+                    cy={h.y}
+                    r="8.5"
+                    fill="#030712"
                     stroke={col}
-                    strokeWidth="2"
+                    strokeWidth="2.2"
                   />
                   {/* Inner Warning Core */}
-                  <circle cx={h.x} cy={h.y} r="3" fill={col} />
+                  <circle cx={h.x} cy={h.y} r="3.5" fill={col} />
                 </g>
               );
             })}
