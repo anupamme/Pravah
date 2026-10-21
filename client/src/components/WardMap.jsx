@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import {
   ZoomIn, ZoomOut, RotateCcw, MapPin, AlertTriangle,
-  Waves, Activity, Eye, EyeOff, Radio
+  Waves, Activity, Eye, EyeOff, Radio, Layers
 } from 'lucide-react';
 import fallbackWards from '../data/fallback-wards.json';
 

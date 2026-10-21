@@ -220,3 +220,4 @@ All system modifications, bug fixes, endpoint alignments, and UI improvements ar
   - Added dedicated Chronic Hotspot Tooltips showing water depth, infrastructure classification, and dispatch status.
   - Added River Yamuna Live Gauge HUD overlay at Old Railway Bridge showing current water level (`205.38m`) against Warning (`204.50m`) and Danger (`205.33m`) marks.
   - Built GIS layer switchers (`Hotspots`, `Yamuna Gauge`) on the map toolbar.
+  - **Bugfix:** Added missing `Layers` icon import from `lucide-react` in [`client/src/components/WardMap.jsx`](client/src/components/WardMap.jsx) resolving `ReferenceError: Layers is not defined`.
