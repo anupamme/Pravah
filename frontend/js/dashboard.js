@@ -105,11 +105,15 @@ function renderMapMarkers(geoJsonData) {
     markersLayer.clearLayers();
 
     geoJsonData.features.forEach(feature => {
-        const props = feature.properties;
-        const lat = feature.geometry.coordinates[1];
-        const lng = feature.geometry.coordinates[0];
-        
-        const riskLevel = (props.riskLevel || 'Low').toLowerCase();
+        const props = feature.properties || {};
+        let lat = props.centroid ? props.centroid.latitude : null;
+        let lng = props.centroid ? props.centroid.longitude : null;
+        if ((lat == null || lng == null) && feature.geometry && feature.geometry.type === 'Point') {
+            lng = feature.geometry.coordinates[0];
+            lat = feature.geometry.coordinates[1];
+        }
+        if (lat == null || lng == null) return;
+        const riskLevel = (props.riskLevel || props.current_risk_level || 'Low').toLowerCase();
         
         // Safe Color Fallback
         let color = "#22c55e"; // default low
