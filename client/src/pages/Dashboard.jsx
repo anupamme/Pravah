@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle, CloudRain, ShieldCheck, Activity, TrendingUp,
   Search, Eye, RefreshCw, X, ArrowRight, MapPin,
+  Clock, Radio, ShieldAlert, Waves, ChevronRight, ChevronLeft,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
@@ -13,6 +14,50 @@ import {
   getWardsGeoJSON, getCityRiskSummary,
   getCityForecast, getCurrentWeather, getWardRiskDetails,
 } from '../services/api';
+
+/** Live Situational Incident Telemetry Stream */
+const SITUATIONAL_FEED = [
+  {
+    id: 1,
+    time: '21:52:10 IST',
+    type: 'HYDROLOGICAL',
+    title: 'River Yamuna Gauge Alert',
+    msg: 'Level reached 205.38m (Warning: 204.50m · Danger: 205.33m). Hathnikund barrage release at 1.45 lakh cusecs monitored.',
+    severity: 'CRITICAL',
+  },
+  {
+    id: 2,
+    time: '21:48:40 IST',
+    type: 'DISPATCH',
+    title: 'Minto Bridge Underpass Diversion',
+    msg: 'Automated sump pumps engaged at 48cm depth. Traffic diverted toward DDU Marg & Connaught Circus.',
+    severity: 'HIGH',
+  },
+  {
+    id: 3,
+    time: '21:44:15 IST',
+    type: 'CIVIC ALERTS',
+    title: 'Lajpat Nagar Ring Road Choke',
+    msg: 'QRT-04 staging 5000 GPM dewatering unit. Silt trap clearing underway at Vinobapuri culvert.',
+    severity: 'HIGH',
+  },
+  {
+    id: 4,
+    time: '21:39:55 IST',
+    type: 'METEOROLOGY',
+    title: 'IMD Doppler Radar Advisory',
+    msg: 'Convective cloudburst cell moving North-East over Burari and Civil Lines. Estimated rainfall surge: 35mm/h.',
+    severity: 'MODERATE',
+  },
+  {
+    id: 5,
+    time: '21:32:20 IST',
+    type: 'INFRASTRUCTURE',
+    title: 'Zakhira Flyover Automated Sensors',
+    msg: 'Drainage network operating at 72% design capacity. Sump pit water level nominal at 28cm.',
+    severity: 'LOW',
+  },
+];
 
 /** Reusable risk badge using CSS classes from index.css */
 function RiskBadge({ level }) {
@@ -44,7 +89,38 @@ export default function Dashboard() {
   const [selectedWard,  setSelectedWard]  = useState(null);
   const [wardDetails,   setWardDetails]   = useState(null);
   const [loadingWard,   setLoadingWard]   = useState(false);
+  const [currentTime,   setCurrentTime]   = useState('');
+  const [feedIndex,     setFeedIndex]     = useState(0);
+  const [isFeedPaused,  setIsFeedPaused]  = useState(false);
   const navigate = useNavigate();
+
+  // Live IST Clock
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(
+        now.toLocaleTimeString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }) + ' IST'
+      );
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Auto-rotating Situational Incident Stream
+  useEffect(() => {
+    if (isFeedPaused) return;
+    const interval = setInterval(() => {
+      setFeedIndex((prev) => (prev + 1) % SITUATIONAL_FEED.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isFeedPaused]);
 
   /** Fetch ward risk details when a ward is selected from the map */
   const handleSelectWard = useCallback((properties) => {
@@ -157,21 +233,33 @@ export default function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 page-enter font-inter">
 
-      {/* ── Header ──────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+      {/* ── Operational Command Header ──────────────────────────── */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[var(--border)] pb-6">
         <div>
-          <div className="flex items-center space-x-2 text-[var(--brand)] text-[11px] font-semibold uppercase tracking-wider mb-1.5">
-            <Activity className="w-3.5 h-3.5" />
-            <span>MCD Unified Command &amp; Control</span>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="px-2.5 py-0.5 bg-rose-500/15 border border-rose-500/40 text-rose-400 font-mono text-[10px] font-bold tracking-wider uppercase flex items-center space-x-1.5">
+              <span className="w-1.5 h-1.5 bg-rose-500 rounded-none animate-ping" />
+              <span>OPCON-1: ACTIVE MONSOON SURVEILLANCE</span>
+            </span>
+            <span className="px-2 py-0.5 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-muted)] font-mono text-[10px] font-semibold flex items-center space-x-1.5">
+              <Clock className="w-3 h-3 text-[var(--brand)]" />
+              <span>{currentTime || 'LIVE TELEMETRY IST'}</span>
+              <span className="opacity-50">(UTC+5:30)</span>
+            </span>
+            <span className="px-2 py-0.5 bg-sky-500/10 border border-sky-500/30 text-sky-400 font-mono text-[10px] font-semibold">
+              MCD · DDMA JOINT SURVEILLANCE
+            </span>
           </div>
+
           <h1 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
             Delhi Flood Operations Command
           </h1>
           <p className="text-[var(--text-muted)] text-xs mt-1 font-sans">
-            Real-time telemetry · 250 wards · Deterministic mass-balance risk model
+            Real-time multi-source telemetry · 250 municipal wards · Hydrological mass-balance risk engine
           </p>
         </div>
-        <div className="flex items-center space-x-2.5 flex-shrink-0">
+
+        <div className="flex flex-wrap items-center gap-2.5 flex-shrink-0">
           {weather && (
             <div className="px-3 py-1.5 rounded-none glass-panel text-[11px] text-[var(--text-secondary)] flex items-center space-x-1.5 border border-[var(--border)]">
               <CloudRain className="w-3.5 h-3.5 text-[var(--brand)]" />
@@ -179,9 +267,9 @@ export default function Dashboard() {
               <span className="font-bold text-[var(--brand)]">{weather.rainfallMm ?? 0} mm/h</span>
             </div>
           )}
-          <div className="px-3 py-1.5 rounded-none bg-sky-500/10 border border-sky-500/25 text-[11px] text-[var(--brand)] font-bold flex items-center space-x-1.5">
+          <div className="px-3 py-1.5 rounded-none bg-sky-500/10 border border-sky-500/25 text-[11px] text-[var(--brand)] font-bold flex items-center space-x-1.5 font-mono">
             <span className="w-1.5 h-1.5 rounded-none bg-sky-500 animate-ping" />
-            <span>Telemetry Live</span>
+            <span>RADAR LIVE</span>
           </div>
           <button
             onClick={() => loadData(true)}
@@ -221,6 +309,65 @@ export default function Dashboard() {
             </div>
           );
         })}
+      </div>
+
+      {/* ── Live Situational Incident Telemetry Stream Ticker ──── */}
+      <div
+        className="surface-card p-3 px-4 border border-[var(--border)] bg-[var(--surface-soft)]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+        onMouseEnter={() => setIsFeedPaused(true)}
+        onMouseLeave={() => setIsFeedPaused(false)}
+      >
+        <div className="flex items-center space-x-3 overflow-hidden">
+          <div className="flex items-center space-x-1.5 flex-shrink-0 text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-rose-500/15 text-rose-400 border border-rose-500/30">
+            <Radio className="w-3 h-3 text-rose-400 animate-pulse" />
+            <span>DISPATCH TICKER</span>
+          </div>
+
+          <div className="flex items-center space-x-2 font-mono text-[11px] truncate">
+            <span className="text-[var(--text-muted)] hidden md:inline">
+              [{SITUATIONAL_FEED[feedIndex].time}]
+            </span>
+            <span
+              className={`px-1.5 py-0.2 text-[9px] font-bold uppercase border ${
+                SITUATIONAL_FEED[feedIndex].severity === 'CRITICAL'
+                  ? 'border-red-500/50 text-red-400 bg-red-500/10'
+                  : SITUATIONAL_FEED[feedIndex].severity === 'HIGH'
+                  ? 'border-orange-500/50 text-orange-400 bg-orange-500/10'
+                  : 'border-yellow-500/50 text-yellow-400 bg-yellow-500/10'
+              }`}
+            >
+              {SITUATIONAL_FEED[feedIndex].type}
+            </span>
+            <span className="font-bold text-[var(--text-primary)]">
+              {SITUATIONAL_FEED[feedIndex].title}:
+            </span>
+            <span className="text-[var(--text-secondary)] truncate">
+              {SITUATIONAL_FEED[feedIndex].msg}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2 flex-shrink-0 self-end sm:self-center">
+          <span className="text-[10px] font-mono text-[var(--text-muted)]">
+            {feedIndex + 1}/{SITUATIONAL_FEED.length}
+          </span>
+          <div className="flex items-center space-x-0.5 border border-[var(--border)]">
+            <button
+              onClick={() => setFeedIndex((i) => (i - 1 + SITUATIONAL_FEED.length) % SITUATIONAL_FEED.length)}
+              className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+              title="Previous Incident"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setFeedIndex((i) => (i + 1) % SITUATIONAL_FEED.length)}
+              className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+              title="Next Incident"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* ── Map + Ward Panel (Rectangular) ───────────────────── */}

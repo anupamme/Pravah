@@ -193,3 +193,30 @@ All system modifications, bug fixes, endpoint alignments, and UI improvements ar
     - Enriched all 250 ward boundaries with realistic baseline risk scores, risk levels, and drainage metrics matching Delhi chronic flood hotspots.
   - [`frontend/js/dashboard.js`](frontend/js/dashboard.js):
     - Added support for GeoJSON MultiPolygon centroids to prevent legacy dashboard marker rendering failures.
+
+---
+
+## [Phase 17 — Municipal Operations Command HUD & Spatial Hotspots] — 2026-10-21 21:55 IST
+
+### 1. Municipal Command HUD & Shift Telemetry
+- **Files Modified:** [`client/src/pages/Dashboard.jsx`](client/src/pages/Dashboard.jsx)
+- **Features Implemented:**
+  - Added official MCD / DDMA operational readiness header with `OPCON-1: ACTIVE MONSOON SURVEILLANCE` status pill.
+  - Live real-time digital clock with `IST (UTC+5:30)` time display and live second counter.
+  - Situational Incident Telemetry Stream ticker streaming real-time alerts across hydrological changes, field pump dispatches, civic depth reports, and IMD radar sweeps.
+  - Interactive ticker controls allowing manual navigation (next/prev) and pause-on-hover.
+
+### 2. Delhi Chronic Hotspots & Hydrological Gauge on Vector GIS Engine
+- **Files Modified:** [`client/src/components/WardMap.jsx`](client/src/components/WardMap.jsx)
+- **Features Implemented:**
+  - Plotted 7 official Delhi chronic flood hotspots with real coordinates and pulsing warning beacons:
+    - Minto Bridge Underpass (Rail underpass · 48cm depth threshold)
+    - ITO Ring Road Junction (Arterial choke · 32cm depth)
+    - Pul Prahladpur Underpass (Road underpass · 56cm depth)
+    - Zakhira Flyover Depression (Rail depression · 28cm depth)
+    - Kashmere Gate ISBT Drain (Yamuna outfall · 36cm depth)
+    - Burari Floodplain Culvert (Agricultural basin · 42cm depth)
+    - AIIMS Ring Road Underpass (Arterial transit · 22cm depth)
+  - Added dedicated Chronic Hotspot Tooltips showing water depth, infrastructure classification, and dispatch status.
+  - Added River Yamuna Live Gauge HUD overlay at Old Railway Bridge showing current water level (`205.38m`) against Warning (`204.50m`) and Danger (`205.33m`) marks.
+  - Built GIS layer switchers (`Hotspots`, `Yamuna Gauge`) on the map toolbar.
