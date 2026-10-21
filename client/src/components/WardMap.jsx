@@ -343,12 +343,12 @@ export default function WardMap({
                 key={ward.code}
                 d={ward.path}
                 fill={isSelected ? '#0284c7' : colors.fill}
-                fillOpacity={isSelected ? 0.75 : isHovered ? 0.70 : colors.opacity}
-                stroke={isSelected ? '#38bdf8' : isHovered ? '#ffffff' : colors.stroke}
+                fillOpacity={isSelected ? 0.80 : isHovered ? 0.72 : colors.opacity}
+                stroke={isSelected ? '#38bdf8' : isHovered ? '#38bdf8' : colors.stroke}
                 strokeWidth={isSelected ? 2.8 : isHovered ? 2.0 : 0.8}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                filter={isSelected ? 'url(#glow-cyan)' : undefined}
+                filter={isSelected || isHovered ? 'url(#glow-cyan)' : undefined}
                 className="transition-colors duration-150 cursor-pointer"
                 onMouseEnter={() => {
                   setHoveredHotspot(null);
@@ -475,18 +475,18 @@ export default function WardMap({
       <div className="absolute top-2.5 inset-x-2.5 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Left: Vector Badge & Hydrological Gauge */}
         <div className="flex items-center gap-1.5 pointer-events-auto flex-wrap">
-          <div className="px-2 py-1 bg-[var(--surface-elevated)]/90 backdrop-blur-md border border-[var(--border)] text-[10px] font-mono text-[var(--text-muted)] flex items-center space-x-1.5 shadow-sm">
+          <div className="px-2 py-1 bg-[#091220]/90 backdrop-blur-md border border-slate-800 text-[10px] font-mono text-slate-400 flex items-center space-x-1.5 shadow-sm">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none animate-pulse" />
             <span className="hidden sm:inline">Vector GIS · Keyless</span>
             <span className="sm:hidden">GIS</span>
           </div>
 
           {showYamunaGauge && (
-            <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-rose-500/40 text-[10px] font-mono shadow-sm">
+            <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-[#091220]/95 backdrop-blur-md border border-rose-500/40 text-[10px] font-mono shadow-sm">
               <Waves className="w-3 h-3 text-sky-400 flex-shrink-0 animate-pulse" />
-              <span className="text-[var(--text-secondary)] hidden md:inline">Yamuna Gauge:</span>
+              <span className="text-slate-300 hidden md:inline">Yamuna Gauge:</span>
               <span className="font-bold text-rose-400">205.38m</span>
-              <span className="text-rose-500 font-bold uppercase text-[9px] px-1 bg-rose-500/10 border border-rose-500/30 hidden sm:inline">
+              <span className="text-rose-400 font-bold uppercase text-[9px] px-1 bg-rose-500/15 border border-rose-500/30 hidden sm:inline">
                 DANGER +5cm
               </span>
             </div>
@@ -496,13 +496,13 @@ export default function WardMap({
         {/* Right: Layer Toggles & Zoom Controls */}
         <div className="flex items-center gap-1.5 pointer-events-auto ml-auto">
           {/* Layer Toggles */}
-          <div className="flex items-center space-x-1 bg-[var(--surface-elevated)]/90 backdrop-blur-md p-0.5 border border-[var(--border)] text-[10px] font-mono shadow-sm">
+          <div className="flex items-center space-x-1 bg-[#091220]/90 backdrop-blur-md p-0.5 border border-slate-800 text-[10px] font-mono shadow-sm">
             <button
               onClick={() => setShowHotspots(!showHotspots)}
               className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
                 showHotspots
                   ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
               title="Toggle Chronic Flood Hotspots"
             >
@@ -515,7 +515,7 @@ export default function WardMap({
               className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
                 showYamunaGauge
                   ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
               title="Toggle River Yamuna Water Level Gauge"
             >
@@ -525,24 +525,24 @@ export default function WardMap({
           </div>
 
           {/* Zoom Buttons */}
-          <div className="flex items-center space-x-0.5 bg-[var(--surface-elevated)]/90 backdrop-blur-md p-0.5 border border-[var(--border)] shadow-sm">
+          <div className="flex items-center space-x-0.5 bg-[#091220]/90 backdrop-blur-md p-0.5 border border-slate-800 shadow-sm">
             <button
               onClick={() => setZoom((z) => Math.min(z * 1.25, 4.5))}
-              className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+              className="p-1 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
               title="Zoom In"
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setZoom((z) => Math.max(z * 0.8, 0.8))}
-              className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+              className="p-1 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
               title="Zoom Out"
             >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={resetView}
-              className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+              className="p-1 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
               title="Reset Overview"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -551,26 +551,26 @@ export default function WardMap({
         </div>
       </div>
 
-      {/* ── Mutually Exclusive Tooltips (No Overlapping Collisions) ── */}
+      {/* ── Mutually Exclusive Tooltips (Sleek Dark Aerospace Glass) ── */}
       {hoveredHotspot ? (
         <div
-          className="absolute z-50 pointer-events-none p-3.5 rounded-none bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-rose-500/60 text-xs shadow-2xl transition-all duration-75 max-w-[240px]"
+          className="absolute z-50 pointer-events-none p-3.5 rounded-none bg-[#0a1222]/95 backdrop-blur-md border border-rose-500/50 text-xs shadow-2xl transition-opacity duration-75 max-w-[240px]"
           style={{
             left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 250))}px`,
             top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 160))}px`,
           }}
         >
-          <div className="flex items-center space-x-1.5 text-rose-500 font-bold text-[10px] uppercase tracking-wider mb-1">
+          <div className="flex items-center space-x-1.5 text-rose-400 font-bold text-[10px] uppercase tracking-wider mb-1">
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>Chronic Vulnerability Choke</span>
           </div>
-          <div className="font-bold text-[var(--text-primary)] text-[13px] mb-0.5">
+          <div className="font-bold text-white text-[13px] mb-0.5">
             {hoveredHotspot.name}
           </div>
-          <div className="text-[10px] text-[var(--text-muted)] font-mono mb-2">
+          <div className="text-[10px] text-slate-400 font-mono mb-2">
             Classification: {hoveredHotspot.type} · Ward {hoveredHotspot.ward}
           </div>
-          <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-[var(--border)] pt-2 mb-2">
+          <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-slate-800 pt-2 mb-2">
             <div>
               Water Depth: <b className="text-rose-400">{hoveredHotspot.depth}</b>
             </div>
@@ -584,23 +584,23 @@ export default function WardMap({
         </div>
       ) : hoveredWard ? (
         <div
-          className="absolute z-50 pointer-events-none p-3 rounded-none bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--border-strong)] text-xs shadow-2xl transition-all duration-75 max-w-[210px]"
+          className="absolute z-50 pointer-events-none p-3 rounded-none bg-[#0a1222]/95 backdrop-blur-md border border-cyan-500/40 text-xs shadow-2xl transition-opacity duration-75 max-w-[220px]"
           style={{
-            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 220))}px`,
+            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 230))}px`,
             top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 130))}px`,
           }}
         >
           <div className="flex items-center justify-between gap-2 mb-1">
-            <span className="font-bold text-[var(--text-primary)] text-[12px] truncate">
+            <span className="font-bold text-white text-[12px] truncate">
               {hoveredWard.name}
             </span>
-            <span className="font-mono text-[10px] text-[var(--brand)] font-bold">
+            <span className="font-mono text-[10px] text-sky-400 font-bold">
               {hoveredWard.code}
             </span>
           </div>
 
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider">
               Composite Risk
             </span>
             <span
@@ -618,24 +618,24 @@ export default function WardMap({
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-[10px] text-[var(--text-secondary)] border-t border-[var(--border)] pt-1.5">
+          <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-300 border-t border-slate-800 pt-1.5">
             <div>
-              Drainage: <b className="text-[var(--text-primary)]">{hoveredWard.drainage}%</b>
+              Drainage: <b className="text-white">{hoveredWard.drainage}%</b>
             </div>
             <div>
-              Rainfall: <b className="text-[var(--text-primary)]">{hoveredWard.rainfall} mm</b>
+              Rainfall: <b className="text-white">{hoveredWard.rainfall} mm</b>
             </div>
           </div>
-          <div className="text-[9px] text-[var(--brand)] mt-1.5 font-medium">
+          <div className="text-[9px] text-sky-400 mt-1.5 font-medium">
             Click polygon to view live telemetry →
           </div>
         </div>
       ) : null}
 
-      {/* Theme-Adaptive Risk Legend (Bottom Left) */}
-      <div className="absolute bottom-3 left-3 z-20 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-3 rounded-none border border-[var(--border)] text-xs shadow-md">
-        <div className="font-bold text-[var(--text-primary)] mb-2 text-[10px] uppercase tracking-wider flex items-center space-x-1.5">
-          <Layers className="w-3 h-3 text-[var(--brand)]" />
+      {/* Theme-Adaptive Risk Legend (Bottom Left - Dark Telemetry Panel) */}
+      <div className="absolute bottom-3 left-3 z-20 bg-[#091220]/95 backdrop-blur-md p-3 rounded-none border border-slate-800 text-xs shadow-md">
+        <div className="font-bold text-white mb-2 text-[10px] uppercase tracking-wider flex items-center space-x-1.5">
+          <Layers className="w-3 h-3 text-sky-400" />
           <span>Delhi Ward Risk Index</span>
         </div>
         <div className="space-y-1 text-[11px] font-medium">
@@ -647,16 +647,16 @@ export default function WardMap({
           ].map((item) => (
             <div key={item.label} className="flex items-center space-x-2">
               <span className={`w-2.5 h-2.5 ${item.color} ${item.pulse ? 'animate-pulse' : ''}`} />
-              <span className="text-[var(--text-secondary)]">{item.label}</span>
-              <span className="text-[var(--text-muted)] text-[9px] font-mono">({item.range})</span>
+              <span className="text-slate-300">{item.label}</span>
+              <span className="text-slate-500 text-[9px] font-mono">({item.range})</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Drag & Zoom Instruction Badge (Bottom Right) */}
-      <div className="absolute bottom-3 right-3 z-20 hidden sm:flex items-center space-x-1.5 px-2 py-1 bg-[var(--surface-elevated)]/80 backdrop-blur-sm border border-[var(--border)] text-[9px] font-mono text-[var(--text-muted)]">
-        <MapPin className="w-2.5 h-2.5 text-[var(--brand)]" />
+      <div className="absolute bottom-3 right-3 z-20 hidden sm:flex items-center space-x-1.5 px-2 py-1 bg-[#091220]/80 backdrop-blur-sm border border-slate-800 text-[9px] font-mono text-slate-400">
+        <MapPin className="w-2.5 h-2.5 text-sky-400" />
         <span>Drag to pan · Scroll to zoom · Click to select</span>
       </div>
     </div>

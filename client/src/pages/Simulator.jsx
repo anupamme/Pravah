@@ -465,6 +465,81 @@ export default function Simulator() {
             </div>
           </div>
 
+          {/* Comparative Risk Reduction Bar Gauge */}
+          <div className="bg-[var(--surface-elevated)] p-4 shadow-sm space-y-3 font-mono text-xs">
+            <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
+              <span>Hydrological Risk Shift (Before vs After)</span>
+              <span className={isMitigated ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                {isMitigated ? `MITIGATION: ${deltas.riskScore} PTS` : `HAZARD SURGE: +${deltas.riskScore} PTS`}
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {/* Baseline */}
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-[var(--text-muted)]">Pre-Intervention Baseline</span>
+                  <span className="font-bold text-[var(--text-primary)]">{baselineRisk} / 100</span>
+                </div>
+                <div className="w-full h-2.5 bg-[var(--surface-soft)] overflow-hidden">
+                  <div
+                    className="h-full bg-slate-500 transition-all duration-300"
+                    style={{ width: `${Math.min(100, Math.max(0, baselineRisk))}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Simulated */}
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-[var(--text-muted)]">Simulated Post-Mitigation</span>
+                  <span className="font-bold text-[var(--brand)]">{simulatedRisk} / 100</span>
+                </div>
+                <div className="w-full h-2.5 bg-[var(--surface-soft)] overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      simulatedRisk >= 75
+                        ? 'bg-rose-500'
+                        : simulatedRisk >= 60
+                        ? 'bg-amber-500'
+                        : simulatedRisk >= 40
+                        ? 'bg-yellow-500'
+                        : 'bg-emerald-500'
+                    }`}
+                    style={{ width: `${Math.min(100, Math.max(0, simulatedRisk))}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Deterministic Mass-Balance Formula Card */}
+          <div className="bg-[var(--surface-elevated)] p-4 shadow-sm space-y-2.5 font-mono text-xs">
+            <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
+              <span>Explainable Mass-Balance Decomposition</span>
+              <span className="text-[var(--brand)] font-bold">Deterministic Model</span>
+            </div>
+            <div className="p-3 bg-[var(--surface-soft)] space-y-2 text-[11px]">
+              <div className="text-[var(--text-muted)] text-[10px]">
+                Risk = (0.40 × Drainage Deficit) + (0.35 × Rainfall Surge) + (0.25 × Citizen Complaints)
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1.5 border-t border-[var(--border)]">
+                <div>
+                  <span className="text-[var(--text-muted)]">Baseline: </span>
+                  <b className="text-[var(--text-primary)]">
+                    (0.40×52) + (0.35×48) + (0.25×35) = <span className="text-amber-400 font-bold">{baselineRisk}</span>
+                  </b>
+                </div>
+                <div>
+                  <span className="text-[var(--text-muted)]">Simulated: </span>
+                  <b className="text-[var(--text-primary)]">
+                    (0.40×{Math.max(10, Math.round(52 - additionalPumps * 6 - drainageModifier * 0.3))}) + (0.35×{Math.round(rainfallMm * 1.2)}) + (0.25×35) = <span className="text-emerald-400 font-bold">{simulatedRisk}</span>
+                  </b>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Recharts Baseline vs Simulated Comparison BarChart */}
           <div className="bg-[var(--surface-elevated)] p-5 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b border-[var(--border)] gap-2">

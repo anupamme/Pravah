@@ -4,6 +4,23 @@ All system modifications, bug fixes, endpoint alignments, and UI improvements ar
 
 ---
 
+## [Phase 22: Vector Map Hover Glass HUD & Simulator Mass-Balance Formula Engine] — 2026-10-21 23:15 IST
+### Vector GIS Map Hover Polish (`client/src/components/WardMap.jsx`)
+- **Eliminated White Hover Box Glitch:** Resolved the jarring stark-white rectangular background and stroke glitch on hover over dark vector map geometry.
+- **Dark Aerospace Glass HUD Tooltips:** Upgraded ward hover HUD and hotspot markers to dark aerospace glass styling (`bg-[#0a1222]/95 backdrop-blur-md border border-cyan-500/40 text-slate-100 shadow-2xl`), perfectly matching the dark radar GIS canvas in both Light and Dark application themes.
+- **Cyan Vector Hover Geometry:** Replaced default harsh white stroke on polygons with a vivid cyan `#38bdf8` outline paired with a custom SVG glow filter (`url(#glow-cyan)`), providing subtle, professional boundary identification.
+- **Glassified Floating GIS Controls:** Refactored Yamuna Gauge card, instruction badges, command bar, zoom buttons, and risk legends to aerospace translucent glass (`bg-[#091220]/90 backdrop-blur-md border border-slate-800`), eliminating visual clashes with underlying ward polygons.
+
+### What-If Scenario Simulator Upgrade (`client/src/pages/Simulator.jsx` & `client/src/index.css`)
+- **Deterministic Mass-Balance Decomposition Card:** Embedded live mathematical mass-balance calculation preview directly on the Simulator:
+  `Risk = (0.40 × Drainage) + (0.35 × Rainfall) + (0.25 × Complaints)`
+  with real-time parameter contributions and delta calculations.
+- **Dual Comparative Risk Reduction Bar Gauge:** Added visual progress bar gauge contrasting baseline risk vs. simulated risk side-by-side with semantic risk tier badges.
+- **Sleek Custom Precision Range Sliders:** Implemented modern, dark-themed slider tracks and cyan thumb glows in `client/src/index.css` (`-webkit-slider-thumb` / `-moz-range-thumb`), eliminating bulky OS-default controls.
+- **Verification:** Oxlint confirmed 0 syntax or identifier errors; Vite client production build completed cleanly in 1.33s.
+
+---
+
 ## [Phase 21: What-If Scenario Simulator Redesign & Mitigation Suite] — 2026-10-21 23:05 IST
 ### Scenario Simulator (`client/src/pages/Simulator.jsx`)
 - **Municipal Command HUD & Status Bar:** Integrated Digital Twin badge, IST live clock, telemetry status indicator, and mass-balance weight reference (`0.40(D) + 0.35(R) + 0.25(C)`).

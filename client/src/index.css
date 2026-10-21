@@ -486,3 +486,39 @@ input, textarea {
 input::placeholder, textarea::placeholder {
   color: var(--text-muted);
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   PRECISION RANGE SLIDERS
+   High-contrast, sleek custom thumb and track styling.
+   ───────────────────────────────────────────────────────────── */
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface-soft);
+  height: 6px;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brand);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+  border: 2px solid #0C1928;
+  transition: transform 0.1s ease;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+:root[data-theme='light'] input[type='range']::-webkit-slider-thumb {
+  border: 2px solid #FFFFFF;
+}
