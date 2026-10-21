@@ -4,6 +4,26 @@ All system modifications, bug fixes, endpoint alignments, and UI improvements ar
 
 ---
 
+## [Phase 21: What-If Scenario Simulator Redesign & Mitigation Suite] — 2026-10-21 23:05 IST
+### Scenario Simulator (`client/src/pages/Simulator.jsx`)
+- **Municipal Command HUD & Status Bar:** Integrated Digital Twin badge, IST live clock, telemetry status indicator, and mass-balance weight reference (`0.40(D) + 0.35(R) + 0.25(C)`).
+- **Interactive Scenario Presets Bar:** Real-world Delhi scenario pills (*Cloudburst Shock (100 mm/h)*, *Sustained Heavy Downpour (50 mm/h)*, *Pre-Monsoon Siltation Crisis (-40%)*, *Desilted Network Dredging (+25%)*, *Max Field Pump Deployment (+4 Units)*) with active state indicators.
+- **Intervention Variables Cockpit:**
+  - High-contrast target catchment ward selector with real-time baseline telemetry preview (drainage %, zone, rainfall mm).
+  - Mobile Dewatering Pump slider with quick-select buttons (`0P`, `2P`, `4P`, `6P`, `8P`) and live relief capacity in m³/s.
+  - Precipitation rate slider with quick presets (`Normal 20mm/h`, `Heavy 50mm/h`, `Cloudburst 100mm/h`).
+  - Desilting & canal dredging modifier with quick presets (`Choked -30%`, `Standard 0%`, `Desilted +40%`).
+- **3 Quantitative Executive Delta Metrics:**
+  - *Risk Delta ($\Delta\text{Risk}$):* Score shift with before/after comparison (`HIGH (68.0) → MODERATE (50.0)`).
+  - *Inundation Relief:* Predicted duration reduction (mins) and hydraulic pumping relief.
+  - *Resource Feasibility:* Estimated budget in INR, approved field crew size, and equipment specs.
+- **Baseline vs Simulated Risk Decomposition Chart:** Recharts bar comparison with semantic tokens and zero hardcoded dark slate values.
+- **Actionable Tactical Handoff:** Added direct "Mobilize in Incident Command" button linking directly to the Emergency Operations Center (`/incidents`).
+- **Offline Fallback Enrichment (`client/src/services/api.js`):** Enriched `runSimulation` and `getSimulationPresets` fallbacks to return full component decompositions and delta metrics under offline conditions.
+- **Verification:** Vite client build succeeded in 1.67s; Phase 14 Master Reliability suite passed 19/19 checks; oxlint: 0 errors.
+
+---
+
 ## [Phase 20: Ground Incident Interaction & Form Visibility Polish] — 2026-10-21 22:40 IST
 ### Incident Command Center (`client/src/pages/IncidentCommand.jsx`)
 - **Tactical Roadmap Auto-Relocation:** Clicking any item in the Citywide Tactical Roadmap or clicking "Stage Crew for this Ward" now automatically selects/creates the incident, auto-assigns an available QRT team, and smoothly scrolls (`scrollIntoView({ behavior: 'smooth' })`) directly down to the Ground Incident Registry and dispatch console.
