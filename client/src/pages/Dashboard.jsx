@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle, CloudRain, ShieldCheck, Activity, TrendingUp,
   Search, Eye, RefreshCw, X, ArrowRight, MapPin,
-  Clock, Radio, ChevronRight, ChevronLeft,
+  Clock, Radio, ChevronRight, ChevronLeft, ArrowUpDown, ChevronUp, ChevronDown,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
@@ -84,6 +84,8 @@ export default function Dashboard() {
   const [forecastData, setForecastData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [levelFilter, setLevelFilter] = useState('ALL');
+  const [sortField,   setSortField]   = useState('score'); // 'score' | 'code' | 'name' | 'drainage'
+  const [sortOrder,   setSortOrder]   = useState('desc');  // 'asc' | 'desc'
   const [loading,     setLoading]     = useState(true);
   const [refreshing,  setRefreshing]  = useState(false);
   const [mapError,    setMapError]    = useState(null);
@@ -191,20 +193,74 @@ export default function Dashboard() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const counts = riskSummary?.countsByLevel || { critical: 12, high: 38, moderate: 110, low: 90 };
+  const counts = useMemo(() => {
+    if (!wardsGeo?.features?.length) {
+      return riskSummary?.countsByLevel || { critical: 25, high: 68, moderate: 75, low: 82 };
+    }
+    const c = { critical: 0, high: 0, moderate: 0, low: 0 };
+    wardsGeo.features.forEach((f) => {
+      const lvl = String(f.properties?.riskLevel || f.properties?.current_risk_level || 'MODERATE').toUpperCase();
+      if (lvl === 'CRITICAL') c.critical++;
+      else if (lvl === 'HIGH') c.high++;
+      else if (lvl === 'LOW' || lvl === 'SAFE') c.low++;
+      else c.moderate++;
+    });
+    return c;
+  }, [wardsGeo, riskSummary]);
 
-  const filteredWards = (wardsGeo?.features || [])
-    .filter((f) => {
+  const filteredWards = useMemo(() => {
+    const list = (wardsGeo?.features || []).filter((f) => {
       const p = f.properties || {};
       const name = (p.ward_name || p.name || '').toLowerCase();
       const code = (p.ward_code || p.id || '').toLowerCase();
+      const zone = (p.zone || '').toLowerCase();
       const level = String(p.riskLevel || p.current_risk_level || 'MODERATE').toUpperCase();
-      const q = searchQuery.toLowerCase();
-      const matchesSearch = !q || name.includes(q) || code.includes(q);
-      const matchesLevel = levelFilter === 'ALL' || level === levelFilter;
+      const q = searchQuery.toLowerCase().trim();
+
+      const matchesSearch = !q || name.includes(q) || code.includes(q) || zone.includes(q);
+      const matchesLevel =
+        levelFilter === 'ALL' ||
+        level === levelFilter ||
+        (levelFilter === 'LOW' && (level === 'LOW' || level === 'SAFE')) ||
+        (levelFilter === 'MODERATE' && (level === 'MODERATE' || level === 'MEDIUM'));
+
       return matchesSearch && matchesLevel;
-    })
-    .slice(0, 20);
+    });
+
+    list.sort((a, b) => {
+      const pa = a.properties || {};
+      const pb = b.properties || {};
+      let valA, valB;
+      if (sortField === 'score') {
+        valA = pa.riskScore ?? pa.current_risk_score ?? 50;
+        valB = pb.riskScore ?? pb.current_risk_score ?? 50;
+      } else if (sortField === 'drainage') {
+        valA = pa.drainageCapacity ?? pa.drainage_capacity ?? 50;
+        valB = pb.drainageCapacity ?? pb.drainage_capacity ?? 50;
+      } else if (sortField === 'name') {
+        valA = (pa.ward_name || pa.name || '').toLowerCase();
+        valB = (pb.ward_name || pb.name || '').toLowerCase();
+      } else {
+        valA = pa.ward_code || pa.id || '';
+        valB = pb.ward_code || pb.id || '';
+      }
+
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [wardsGeo, searchQuery, levelFilter, sortField, sortOrder]);
+
+  const toggleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
 
   const avgScore = riskSummary?.cityAverageRiskScore ?? riskSummary?.avgRiskScore;
 
@@ -612,17 +668,22 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Municipal Ward Directory (Compact Scrollable Viewport) ── */}
+      {/* ── Municipal Ward Directory (Interactive Sortable Viewport) ── */}
       <div className="surface-card rounded-none p-3.5 sm:p-4 border border-[var(--border)]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
           <div>
-            <h3 className="text-sm font-bold text-[var(--text-primary)]">Municipal Ward Vulnerability Directory</h3>
-            <p className="text-[10px] text-[var(--text-muted)]">
-              Balanced hydrological risk distribution across all 250 administrative wards in Delhi
+            <div className="flex items-center space-x-2">
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">Municipal Ward Vulnerability Directory</h3>
+              <span className="px-2 py-0.5 bg-[var(--surface-soft)] text-[10px] font-mono text-[var(--text-muted)] border border-[var(--border)]">
+                {filteredWards.length} of 250 wards
+              </span>
+            </div>
+            <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+              Click any column header to sort · Click ward to inspect telemetry on map
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            {/* Filter Tabs with Live Counts */}
+            {/* Filter Tabs with Live Dynamic Counts */}
             <div className="inline-flex rounded-none border border-[var(--border)] bg-[var(--surface-soft)] p-0.5">
               {[
                 { id: 'ALL', label: 'All (250)' },
@@ -646,36 +707,86 @@ export default function Dashboard() {
             </div>
 
             {/* Search Input */}
-            <div className="relative w-full sm:w-56">
+            <div className="relative w-full sm:w-60">
               <Search className="w-3 h-3 text-[var(--text-muted)] absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search ward or code…"
+                placeholder="Search ward, code, or zone…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] pl-8 pr-2.5 py-1 text-xs rounded-none focus:outline-none focus:border-[var(--brand)]"
+                className="w-full bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] pl-8 pr-7 py-1 text-xs rounded-none focus:outline-none focus:border-[var(--brand)]"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         {/* Scrollable Compact Table Viewport (Non-bloated) */}
-        <div className="overflow-x-auto max-h-[280px] overflow-y-auto border border-[var(--border)]">
+        <div className="overflow-x-auto max-h-[300px] overflow-y-auto border border-[var(--border)]">
           <table className="w-full text-left text-xs text-[var(--text-secondary)]">
-            <thead className="bg-[var(--surface-soft)] text-[var(--text-muted)] uppercase font-semibold tracking-wider border-b border-[var(--border)] text-[9px] sticky top-0 z-10">
+            <thead className="bg-[var(--surface-soft)] text-[var(--text-muted)] uppercase font-semibold tracking-wider border-b border-[var(--border)] text-[9px] sticky top-0 z-10 select-none">
               <tr>
-                <th className="px-3 py-1.5">Code</th>
-                <th className="px-3 py-1.5">Ward Name</th>
-                <th className="px-3 py-1.5 hidden md:table-cell">Drainage</th>
+                <th
+                  onClick={() => toggleSort('code')}
+                  className="px-3 py-1.5 cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Code
+                  {sortField === 'code' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
+                <th
+                  onClick={() => toggleSort('name')}
+                  className="px-3 py-1.5 cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Ward Name
+                  {sortField === 'name' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
+                <th className="px-3 py-1.5 hidden sm:table-cell">Zone</th>
+                <th
+                  onClick={() => toggleSort('drainage')}
+                  className="px-3 py-1.5 hidden md:table-cell cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Drainage
+                  {sortField === 'drainage' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
                 <th className="px-3 py-1.5">Risk Level</th>
-                <th className="px-3 py-1.5">Score</th>
+                <th
+                  onClick={() => toggleSort('score')}
+                  className="px-3 py-1.5 cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Score
+                  {sortField === 'score' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
                 <th className="px-3 py-1.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
               {filteredWards.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-3 py-6 text-center text-[var(--text-muted)] text-[11px]">
+                  <td colSpan={7} className="px-3 py-6 text-center text-[var(--text-muted)] text-[11px]">
                     {loading ? 'Loading ward data…' : 'No matching wards found.'}
                   </td>
                 </tr>
@@ -690,20 +801,27 @@ export default function Dashboard() {
                       key={p.ward_code || p.id}
                       onClick={() => handleSelectWard(p)}
                       className={`cursor-pointer transition-colors ${
-                        isSelected ? 'bg-[var(--surface-soft)]' : 'hover:bg-[var(--surface-soft)]/50'
+                        isSelected ? 'bg-[var(--surface-soft)] ring-1 ring-[var(--brand)]/50' : 'hover:bg-[var(--surface-soft)]/50'
                       }`}
                     >
                       <td className="px-3 py-1.5 font-mono font-bold text-[var(--brand)] text-[11px]">
                         {p.ward_code || p.id}
                       </td>
-                      <td className="px-3 py-1.5 font-semibold text-[var(--text-primary)] text-[11px]">{p.ward_name || p.name}</td>
+                      <td className="px-3 py-1.5 font-semibold text-[var(--text-primary)] text-[11px]">
+                        {p.ward_name || p.name}
+                      </td>
+                      <td className="px-3 py-1.5 text-[var(--text-muted)] text-[10px] hidden sm:table-cell">
+                        {p.zone || 'Central'}
+                      </td>
                       <td className="px-3 py-1.5 text-[var(--text-muted)] hidden md:table-cell text-[10px]">
                         {p.drainageCapacity ?? p.drainage_capacity ?? 50}%
                       </td>
                       <td className="px-3 py-1.5">
                         <RiskBadge level={level} />
                       </td>
-                      <td className="px-3 py-1.5 font-bold text-[var(--text-primary)] text-[11px]">{score} / 100</td>
+                      <td className="px-3 py-1.5 font-bold text-[var(--text-primary)] text-[11px]">
+                        {score} / 100
+                      </td>
                       <td className="px-3 py-1.5 text-right">
                         <button
                           onClick={(e) => {
