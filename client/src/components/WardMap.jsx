@@ -6,6 +6,11 @@ import {
   Eye, EyeOff, ShieldAlert, Waves
 } from 'lucide-react';
 import fallbackWards from '../data/fallback-wards.json';
+import {
+  extractWardRiskLevel,
+  extractWardDrainage,
+  extractWardRiskScore,
+} from '../utils/ward-utils';
 
 /** Delhi Chronic Hydrological Hotspots officially monitored by MCD & Delhi Police */
 const CHRONIC_HOTSPOTS = [
@@ -73,9 +78,9 @@ export default function WardMap({
       const p = feature.properties || {};
       const code = p.ward_code || p.id || `W${String(idx + 1).padStart(3, '0')}`;
       const name = p.ward_name || p.name || `Ward ${code}`;
-      const level = normalizeLevel(p.riskLevel || p.current_risk_level || 'MODERATE');
-      const score = p.riskScore ?? p.current_risk_score ?? 50;
-      const drainage = p.drainageCapacity ?? p.drainage_capacity ?? 50;
+      const level = normalizeLevel(extractWardRiskLevel(p));
+      const score = extractWardRiskScore(p);
+      const drainage = extractWardDrainage(p);
       const rainfall = p.rainfall ?? 28.5;
       const zone = p.zone || 'Central Delhi';
 

@@ -50,7 +50,7 @@ export default function Landing() {
     });
   }, []);
 
-  const counts = riskSummary?.countsByLevel || { critical: 12, high: 38, moderate: 110, low: 90 };
+  const counts = riskSummary?.countsByLevel || { critical: 25, high: 68, moderate: 75, low: 82 };
   const totalWardsCount = wardsGeoJSON?.features?.length || 250;
   const currentRainfall = weather?.rainfallMm?.toFixed(1) ?? '42.0';
   const avgRiskScore = riskSummary?.avgRiskScore?.toFixed(1) ?? '58.4';

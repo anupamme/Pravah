@@ -14,6 +14,12 @@ import {
   getWardsGeoJSON, getCityRiskSummary,
   getCityForecast, getCurrentWeather, getWardRiskDetails,
 } from '../services/api';
+import {
+  extractWardRiskLevel,
+  extractWardDrainage,
+  extractWardRiskScore,
+  computeWardCounts,
+} from '../utils/ward-utils';
 
 /** Live Situational Incident Telemetry Stream */
 const SITUATIONAL_FEED = [
@@ -194,18 +200,7 @@ export default function Dashboard() {
   useEffect(() => { loadData(); }, [loadData]);
 
   const counts = useMemo(() => {
-    if (!wardsGeo?.features?.length) {
-      return riskSummary?.countsByLevel || { critical: 25, high: 68, moderate: 75, low: 82 };
-    }
-    const c = { critical: 0, high: 0, moderate: 0, low: 0 };
-    wardsGeo.features.forEach((f) => {
-      const lvl = String(f.properties?.riskLevel || f.properties?.current_risk_level || 'MODERATE').toUpperCase();
-      if (lvl === 'CRITICAL') c.critical++;
-      else if (lvl === 'HIGH') c.high++;
-      else if (lvl === 'LOW' || lvl === 'SAFE') c.low++;
-      else c.moderate++;
-    });
-    return c;
+    return computeWardCounts(wardsGeo?.features, riskSummary?.countsByLevel);
   }, [wardsGeo, riskSummary]);
 
   const filteredWards = useMemo(() => {
@@ -214,7 +209,7 @@ export default function Dashboard() {
       const name = (p.ward_name || p.name || '').toLowerCase();
       const code = (p.ward_code || p.id || '').toLowerCase();
       const zone = (p.zone || '').toLowerCase();
-      const level = String(p.riskLevel || p.current_risk_level || 'MODERATE').toUpperCase();
+      const level = extractWardRiskLevel(p);
       const q = searchQuery.toLowerCase().trim();
 
       const matchesSearch = !q || name.includes(q) || code.includes(q) || zone.includes(q);
@@ -232,11 +227,11 @@ export default function Dashboard() {
       const pb = b.properties || {};
       let valA, valB;
       if (sortField === 'score') {
-        valA = pa.riskScore ?? pa.current_risk_score ?? 50;
-        valB = pb.riskScore ?? pb.current_risk_score ?? 50;
+        valA = extractWardRiskScore(pa);
+        valB = extractWardRiskScore(pb);
       } else if (sortField === 'drainage') {
-        valA = pa.drainageCapacity ?? pa.drainage_capacity ?? 50;
-        valB = pb.drainageCapacity ?? pb.drainage_capacity ?? 50;
+        valA = extractWardDrainage(pa);
+        valB = extractWardDrainage(pb);
       } else if (sortField === 'name') {
         valA = (pa.ward_name || pa.name || '').toLowerCase();
         valB = (pb.ward_name || pb.name || '').toLowerCase();
@@ -265,13 +260,13 @@ export default function Dashboard() {
   const avgScore = riskSummary?.cityAverageRiskScore ?? riskSummary?.avgRiskScore;
 
   const kpiCards = [
-    { label: 'Critical Zones',  value: counts.critical ?? 25,
+    { label: 'Critical Zones',  value: counts.critical || 25,
       unit: '', icon: AlertCircle, color: 'rose',    sub: 'Immediate pump staging' },
-    { label: 'High Alert',      value: counts.high ?? 68,
+    { label: 'High Alert',      value: counts.high || 68,
       unit: '', icon: AlertCircle, color: 'orange',  sub: 'Drainage bottleneck' },
-    { label: 'Moderate Watch',  value: counts.moderate ?? 75,
+    { label: 'Moderate Watch',  value: counts.moderate || 75,
       unit: '', icon: Activity,    color: 'amber',   sub: 'Monitored catchments' },
-    { label: 'Safe / Low Risk', value: counts.low ?? 82,
+    { label: 'Safe / Low Risk', value: counts.low || 82,
       unit: '', icon: ShieldCheck, color: 'emerald', sub: 'High natural gradient' },
     { label: 'Precipitation',   value: weather?.rainfallMm != null ? weather.rainfallMm : 0,
       unit: 'mm/h', icon: CloudRain, color: 'cyan',  sub: 'Open-Meteo feed' },
@@ -514,18 +509,12 @@ export default function Dashboard() {
                       <div className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest mb-1 font-semibold">Composite Flood Risk</div>
                       <div className="flex items-end justify-between">
                         <div className="text-2xl font-black text-[var(--text-primary)]">
-                          {selectedWard.riskScore
-                            ?? selectedWard.current_risk_score
-                            ?? evalData?.riskScore
-                            ?? '50'}
+                          {evalData?.riskScore ?? extractWardRiskScore(selectedWard)}
                           <span className="text-xs font-normal text-[var(--text-muted)] ml-1">/ 100</span>
                         </div>
                         <RiskBadge
                           level={
-                            selectedWard.riskLevel
-                            || selectedWard.current_risk_level
-                            || evalData?.riskLevel
-                            || 'MODERATE'
+                            evalData?.riskLevel || extractWardRiskLevel(selectedWard)
                           }
                         />
                       </div>
@@ -536,7 +525,7 @@ export default function Dashboard() {
                       <div className="p-2 rounded-none bg-[var(--surface-soft)] border border-[var(--border)] text-center">
                         <div className="text-[9px] text-[var(--text-muted)] mb-0.5">Drainage Flow</div>
                         <div className="text-xs font-black text-[var(--text-primary)]">
-                          {selectedWard.drainageCapacity ?? selectedWard.drainage_capacity ?? '50'}%
+                          {extractWardDrainage(selectedWard)}%
                         </div>
                       </div>
                       <div className="p-2 rounded-none bg-[var(--surface-soft)] border border-[var(--border)] text-center">
@@ -550,7 +539,7 @@ export default function Dashboard() {
                     {/* Deterministic factor bars */}
                     <div className="space-y-1.5">
                       {[
-                        { label: 'Drainage Deficit (40%)', score: evalData?.components?.drainageDeficitScore ?? (100 - (selectedWard.drainageCapacity ?? 50)), bar: 'bg-blue-500' },
+                        { label: 'Drainage Deficit (40%)', score: evalData?.components?.drainageDeficitScore ?? (100 - extractWardDrainage(selectedWard)), bar: 'bg-blue-500' },
                         { label: 'Rainfall Surge (35%)',   score: evalData?.components?.rainfallSurgeScore ?? (selectedWard.rainfall ? selectedWard.rainfall * 1.5 : 45), bar: 'bg-sky-500' },
                         { label: 'Citizen Urgency (25%)',  score: evalData?.components?.complaintScore ?? 35, bar: 'bg-amber-500' },
                       ].map((f) => (
@@ -687,10 +676,10 @@ export default function Dashboard() {
             <div className="inline-flex rounded-none border border-[var(--border)] bg-[var(--surface-soft)] p-0.5">
               {[
                 { id: 'ALL', label: 'All (250)' },
-                { id: 'CRITICAL', label: `Critical (${counts.critical ?? 25})` },
-                { id: 'HIGH', label: `High (${counts.high ?? 68})` },
-                { id: 'MODERATE', label: `Moderate (${counts.moderate ?? 75})` },
-                { id: 'LOW', label: `Safe (${counts.low ?? 82})` },
+                { id: 'CRITICAL', label: `Critical (${counts.critical || 25})` },
+                { id: 'HIGH', label: `High (${counts.high || 68})` },
+                { id: 'MODERATE', label: `Moderate (${counts.moderate || 75})` },
+                { id: 'LOW', label: `Safe (${counts.low || 82})` },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -793,8 +782,8 @@ export default function Dashboard() {
               ) : (
                 filteredWards.map((w) => {
                   const p = w.properties || {};
-                  const level = String(p.riskLevel || p.current_risk_level || 'MODERATE').toUpperCase();
-                  const score = p.riskScore ?? p.current_risk_score ?? 50;
+                  const level = extractWardRiskLevel(p);
+                  const score = extractWardRiskScore(p);
                   const isSelected = selectedWard?.ward_code === p.ward_code || selectedWard?.id === p.id;
                   return (
                     <tr
@@ -815,7 +804,7 @@ export default function Dashboard() {
                       </td>
                       <td className="px-3 py-1.5 hidden md:table-cell text-[10px]">
                         {(() => {
-                          const cap = p.drainageCapacity ?? p.drainage_capacity ?? 50;
+                          const cap = extractWardDrainage(p);
                           const colorClass = cap >= 70 ? 'text-emerald-400 font-bold' : cap >= 45 ? 'text-yellow-400 font-bold' : 'text-rose-400 font-bold';
                           const barClass = cap >= 70 ? 'bg-emerald-500' : cap >= 45 ? 'bg-yellow-500' : 'bg-rose-500';
                           return (

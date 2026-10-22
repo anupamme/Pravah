@@ -60,9 +60,9 @@ router.get('/overview', authenticate, authorize('ADMIN', 'ANALYST'), async (req,
         wardCode: p.ward_code,
         wardName: p.ward_name,
         zone: p.zone || 'Central',
-        drainageCapacity: p.drainage_capacity || 50.0,
-        currentRiskScore: p.current_risk_score || 50.0,
-        currentRiskLevel: p.current_risk_level || 'MODERATE',
+        drainageCapacity: p.drainageCapacity ?? p.drainage_capacity ?? 65.0,
+        currentRiskScore: p.riskScore ?? p.current_risk_score ?? 50.0,
+        currentRiskLevel: p.riskLevel ?? p.current_risk_level ?? 'MODERATE',
       };
     });
 
