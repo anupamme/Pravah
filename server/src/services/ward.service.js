@@ -121,26 +121,33 @@ async function getAllWardsGeoJSON() {
     `;
 
     if (rawWards && rawWards.length > 0) {
-      const features = rawWards.map((w) => ({
-        type: 'Feature',
-        id: w.id,
-        geometry: JSON.parse(w.boundaryGeoJSON),
-        properties: {
+      const features = rawWards.map((w, idx) => {
+        const prof = getWardRiskProfile(w.wardCode, w.wardName, null, idx);
+        const drainage = (w.drainageCapacity && w.drainageCapacity !== 50.0) ? w.drainageCapacity : prof.drainage;
+        const score = (w.currentRiskScore && w.currentRiskScore !== 45.0 && w.currentRiskScore !== 52.5) ? w.currentRiskScore : prof.score;
+        const level = (w.currentRiskLevel && w.currentRiskLevel !== 'MODERATE') ? w.currentRiskLevel : prof.level;
+
+        return {
+          type: 'Feature',
           id: w.id,
-          ward_code: w.wardCode,
-          ward_name: w.wardName,
-          name: w.wardName,
-          drainage_capacity: w.drainageCapacity,
-          drainageCapacity: w.drainageCapacity,
-          population_density: w.populationDensity,
-          current_risk_score: w.currentRiskScore,
-          riskScore: w.currentRiskScore,
-          current_risk_level: w.currentRiskLevel,
-          riskLevel: w.currentRiskLevel,
-          rainfall: 28.5,
-          is_synthetic: false,
-        },
-      }));
+          geometry: JSON.parse(w.boundaryGeoJSON),
+          properties: {
+            id: w.id,
+            ward_code: w.wardCode,
+            ward_name: w.wardName,
+            name: w.wardName,
+            drainage_capacity: drainage,
+            drainageCapacity: drainage,
+            population_density: w.populationDensity,
+            current_risk_score: score,
+            riskScore: score,
+            current_risk_level: level,
+            riskLevel: level,
+            rainfall: prof.rainfall,
+            is_synthetic: false,
+          },
+        };
+      });
 
       return {
         type: 'FeatureCollection',

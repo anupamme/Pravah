@@ -813,8 +813,20 @@ export default function Dashboard() {
                       <td className="px-3 py-1.5 text-[var(--text-muted)] text-[10px] hidden sm:table-cell">
                         {p.zone || 'Central'}
                       </td>
-                      <td className="px-3 py-1.5 text-[var(--text-muted)] hidden md:table-cell text-[10px]">
-                        {p.drainageCapacity ?? p.drainage_capacity ?? 50}%
+                      <td className="px-3 py-1.5 hidden md:table-cell text-[10px]">
+                        {(() => {
+                          const cap = p.drainageCapacity ?? p.drainage_capacity ?? 50;
+                          const colorClass = cap >= 70 ? 'text-emerald-400 font-bold' : cap >= 45 ? 'text-yellow-400 font-bold' : 'text-rose-400 font-bold';
+                          const barClass = cap >= 70 ? 'bg-emerald-500' : cap >= 45 ? 'bg-yellow-500' : 'bg-rose-500';
+                          return (
+                            <div className="flex items-center space-x-2">
+                              <div className="w-12 bg-white/10 h-1 rounded-none overflow-hidden hidden lg:block">
+                                <div className={`${barClass} h-full`} style={{ width: `${cap}%` }} />
+                              </div>
+                              <span className={colorClass}>{cap}%</span>
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td className="px-3 py-1.5">
                         <RiskBadge level={level} />
