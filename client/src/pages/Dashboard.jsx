@@ -458,17 +458,17 @@ export default function Dashboard() {
                       <div className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest mb-1 font-semibold">Composite Flood Risk</div>
                       <div className="flex items-end justify-between">
                         <div className="text-2xl font-black text-[var(--text-primary)]">
-                          {evalData?.riskScore
-                            ?? selectedWard.riskScore
+                          {selectedWard.riskScore
                             ?? selectedWard.current_risk_score
+                            ?? evalData?.riskScore
                             ?? '50'}
                           <span className="text-xs font-normal text-[var(--text-muted)] ml-1">/ 100</span>
                         </div>
                         <RiskBadge
                           level={
-                            evalData?.riskLevel
-                            || selectedWard.riskLevel
+                            selectedWard.riskLevel
                             || selectedWard.current_risk_level
+                            || evalData?.riskLevel
                             || 'MODERATE'
                           }
                         />
@@ -518,7 +518,7 @@ export default function Dashboard() {
                       <div className="text-[9px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider mb-0.5">Protocol</div>
                       <p className="text-[10px] text-[var(--text-secondary)] leading-tight">
                         {(() => {
-                          const lvl = String(evalData?.riskLevel || selectedWard?.riskLevel || 'MODERATE').toUpperCase();
+                          const lvl = String(selectedWard?.riskLevel || evalData?.riskLevel || 'MODERATE').toUpperCase();
                           if (lvl === 'CRITICAL') return 'Emergency response active. Staging pumps and flood barriers.';
                           if (lvl === 'HIGH')     return 'High alert. Inspect drainage network & pre-stage mobile pumps.';
                           if (lvl === 'MODERATE') return 'Standard watch. Increase patrol frequency and monitor outfalls.';
