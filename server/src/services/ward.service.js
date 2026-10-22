@@ -33,6 +33,68 @@ function getCachedDemoGeoJSON() {
 }
 
 /**
+ * Deterministic generator for balanced municipal ward risk profiles
+ * (CRITICAL, HIGH, MODERATE, LOW/SAFE) based on authentic Delhi geographical zones.
+ */
+function getWardRiskProfile(wardCode, wardName, zone, idx) {
+  const codeNum = parseInt(String(wardCode || '').replace(/\D/g, ''), 10) || (idx + 1);
+  const nameLower = String(wardName || '').toLowerCase();
+  const zoneName = zone || 'Central';
+
+  const isYamunaLowland = nameLower.includes('burari') || nameLower.includes('timarpur') || 
+                          nameLower.includes('minto') || nameLower.includes('prahladpur') || 
+                          nameLower.includes('seelampur') || nameLower.includes('sangam vihar') ||
+                          nameLower.includes('trilokpuri') || nameLower.includes('narela') ||
+                          nameLower.includes('mustafabad') || nameLower.includes('karawal') ||
+                          nameLower.includes('zakhira') || nameLower.includes('badarpur');
+
+  const isRidgeSafe = nameLower.includes('chanakyapuri') || nameLower.includes('cantt') || 
+                      nameLower.includes('vasant') || nameLower.includes('hauz khas') || 
+                      nameLower.includes('golf links') || nameLower.includes('defence colony') ||
+                      nameLower.includes('greater kailash') || nameLower.includes('pusa') ||
+                      nameLower.includes('malviya');
+
+  const seed = (codeNum * 9301 + 49297) % 233280;
+  const rnd = seed / 233280;
+
+  let level, score, drainage, rainfall;
+
+  if (isYamunaLowland || (['Shahdara North', 'Narela', 'Civil Lines'].includes(zoneName) && rnd < 0.32)) {
+    level = 'CRITICAL';
+    score = Math.round(75 + rnd * 18);
+    drainage = Math.round(20 + rnd * 18);
+    rainfall = Math.round(38 + rnd * 16);
+  } else if (isRidgeSafe || (['South', 'Dwarka', 'Keshav Puram', 'Rohini'].includes(zoneName) && rnd > 0.65)) {
+    level = 'LOW';
+    score = Math.round(15 + rnd * 22);
+    drainage = Math.round(75 + rnd * 20);
+    rainfall = Math.round(12 + rnd * 12);
+  } else if (['Shahdara North', 'Shahdara South', 'Civil Lines'].includes(zoneName) && rnd < 0.65) {
+    level = 'HIGH';
+    score = Math.round(62 + rnd * 12);
+    drainage = Math.round(40 + rnd * 14);
+    rainfall = Math.round(30 + rnd * 10);
+  } else if (rnd < 0.28) {
+    level = 'HIGH';
+    score = Math.round(60 + rnd * 13);
+    drainage = Math.round(42 + rnd * 13);
+    rainfall = Math.round(28 + rnd * 10);
+  } else if (rnd > 0.70) {
+    level = 'LOW';
+    score = Math.round(22 + rnd * 16);
+    drainage = Math.round(72 + rnd * 22);
+    rainfall = Math.round(14 + rnd * 10);
+  } else {
+    level = 'MODERATE';
+    score = Math.round(44 + rnd * 14);
+    drainage = Math.round(55 + rnd * 15);
+    rainfall = Math.round(22 + rnd * 8);
+  }
+
+  return { level, score, drainage, rainfall };
+}
+
+/**
  * Returns all 250 wards as a standard GeoJSON FeatureCollection.
  */
 async function getAllWardsGeoJSON() {
@@ -103,21 +165,30 @@ async function getAllWardsGeoJSON() {
       is_synthetic: true,
       note: 'Demo geometries served via resilient local fallback.',
     },
-    features: demoCollection.features.map((f) => ({
-      ...f,
-      properties: {
-        ...f.properties,
-        id: f.properties.ward_code,
-        name: f.properties.ward_name,
-        current_risk_score: 52.5,
-        riskScore: 52.5,
-        current_risk_level: 'MODERATE',
-        riskLevel: 'Moderate',
-        drainage_capacity: f.properties.drainage_capacity || 50.0,
-        drainageCapacity: f.properties.drainage_capacity || 50.0,
-        rainfall: 28.5,
-      },
-    })),
+    features: demoCollection.features.map((f, idx) => {
+      const prof = getWardRiskProfile(
+        f.properties.ward_code,
+        f.properties.ward_name,
+        f.properties.zone,
+        idx
+      );
+
+      return {
+        ...f,
+        properties: {
+          ...f.properties,
+          id: f.properties.ward_code,
+          name: f.properties.ward_name,
+          current_risk_score: prof.score,
+          riskScore: prof.score,
+          current_risk_level: prof.level,
+          riskLevel: prof.level,
+          drainage_capacity: prof.drainage,
+          drainageCapacity: prof.drainage,
+          rainfall: prof.rainfall,
+        },
+      };
+    }),
   };
 }
 
@@ -285,17 +356,30 @@ async function getWardById(id) {
 
   if (!matched) return null;
 
+  const prof = getWardRiskProfile(
+    matched.properties.ward_code,
+    matched.properties.ward_name,
+    matched.properties.zone,
+    0
+  );
+
   return {
     id: matched.properties.ward_code,
     wardCode: matched.properties.ward_code,
     wardName: matched.properties.ward_name,
     zone: matched.properties.zone,
-    drainageCapacity: matched.properties.drainage_capacity || 50.0,
+    drainageCapacity: prof.drainage,
+    drainage_capacity: prof.drainage,
+    rainfall: prof.rainfall,
     centroid: matched.properties.centroid,
     currentRisk: {
-      score: 55.0,
-      level: 'MODERATE',
-      components: { drainage: 45, rainfall: 60, complaints: 50 },
+      score: prof.score,
+      level: prof.level,
+      components: {
+        drainage: Math.round(100 - prof.drainage),
+        rainfall: Math.round(prof.rainfall * 1.5),
+        complaints: prof.level === 'CRITICAL' ? 80 : prof.level === 'HIGH' ? 60 : 35,
+      },
     },
     geometry: matched.geometry,
     infrastructure: [

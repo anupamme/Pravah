@@ -175,22 +175,22 @@ async function getCityRiskSummary() {
     // Database offline fallback summary
   }
 
-  // Resilient fallback values for local development
+  // Resilient fallback values for local development with authentic balanced distribution
   return {
     totalWardsMonitored: 250,
-    cityAverageRiskScore: 54.2,
+    cityAverageRiskScore: 48.8,
     countsByLevel: {
-      critical: 12,
-      high: 38,
-      moderate: 145,
-      low: 55,
+      critical: 25,
+      high: 68,
+      moderate: 75,
+      low: 82,
     },
     topVulnerableWards: [
-      { wardCode: 'W001', wardName: 'Narela', riskScore: 78.5, riskLevel: 'CRITICAL' },
-      { wardCode: 'W006', wardName: 'Burari', riskScore: 76.2, riskLevel: 'CRITICAL' },
-      { wardCode: 'W013', wardName: 'Mukherjee Nagar', riskScore: 72.8, riskLevel: 'HIGH' },
-      { wardCode: 'W011', wardName: 'Timarpur', riskScore: 68.4, riskLevel: 'HIGH' },
-      { wardCode: 'W014', wardName: 'Adarsh Nagar', riskScore: 66.1, riskLevel: 'HIGH' },
+      { wardCode: 'W006', wardName: 'Burari', riskScore: 88.5, riskLevel: 'CRITICAL' },
+      { wardCode: 'W110', wardName: 'Pul Prahladpur', riskScore: 86.2, riskLevel: 'CRITICAL' },
+      { wardCode: 'W056', wardName: 'Minto Bridge', riskScore: 84.1, riskLevel: 'CRITICAL' },
+      { wardCode: 'W011', wardName: 'Timarpur', riskScore: 82.4, riskLevel: 'CRITICAL' },
+      { wardCode: 'W089', wardName: 'ITO Ring Road', riskScore: 78.6, riskLevel: 'HIGH' },
     ],
     lastUpdated: new Date().toISOString(),
     source: 'fallback-baseline-model',

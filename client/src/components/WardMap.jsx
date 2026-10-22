@@ -467,7 +467,7 @@ export default function WardMap({
           </span>
           <span className="flex items-center space-x-1.5">
             <span className="w-2.5 h-2.5 rounded-none bg-emerald-500 inline-block shadow-[0_0_6px_rgba(34,197,94,0.4)]" />
-            <span className="text-emerald-400 font-bold">Low</span>
+            <span className="text-emerald-400 font-bold">Safe / Low</span>
           </span>
         </div>
       </div>
