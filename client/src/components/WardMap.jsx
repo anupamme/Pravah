@@ -1,7 +1,9 @@
-import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
-  ZoomIn, ZoomOut, RotateCcw, MapPin, AlertTriangle,
-  Waves, Layers, Navigation, Compass
+  MapPin, AlertTriangle, Layers, Droplets, ZoomIn, ZoomOut, RotateCcw,
+  Eye, EyeOff, ShieldAlert, Waves
 } from 'lucide-react';
 import fallbackWards from '../data/fallback-wards.json';
 
@@ -16,147 +18,31 @@ const CHRONIC_HOTSPOTS = [
   { id: 'h7', name: 'AIIMS Ring Road Underpass', lng: 77.210, lat: 28.568, type: 'TRANSIT ARTERIAL', depth: '22 cm', status: 'STANDARD MONITORING', severity: 'MODERATE', ward: 'W142' },
 ];
 
-/** Authentic Delhi Geographic Arterial Networks (Real Coordinates) */
-const DELHI_ARTERIALS = [
-  // Inner Ring Road (Mahatma Gandhi Marg - Complete Loop)
-  {
-    name: 'Inner Ring Road',
-    type: 'RING_ROAD',
-    coords: [
-      [77.210, 28.568], [77.235, 28.570], [77.255, 28.585], [77.252, 28.620],
-      [77.245, 28.635], [77.232, 28.665], [77.195, 28.705], [77.155, 28.690],
-      [77.132, 28.665], [77.120, 28.635], [77.145, 28.605], [77.165, 28.588],
-      [77.185, 28.575], [77.210, 28.568]
-    ]
-  },
-  // Outer Ring Road Bypass Loop
-  {
-    name: 'Outer Ring Road',
-    type: 'OUTER_RING',
-    coords: [
-      [77.190, 28.540], [77.240, 28.542], [77.280, 28.550], [77.275, 28.610],
-      [77.260, 28.660], [77.225, 28.720], [77.165, 28.750], [77.115, 28.710],
-      [77.085, 28.650], [77.100, 28.580], [77.140, 28.550], [77.190, 28.540]
-    ]
-  },
-  // NH-48 (Delhi-Gurugram Expressway)
-  {
-    name: 'NH-48 (Delhi-Gurugram Expy)',
-    type: 'EXPRESSWAY',
-    coords: [
-      [77.165, 28.590], [77.135, 28.565], [77.110, 28.545], [77.085, 28.515], [77.065, 28.490]
-    ]
-  },
-  // NH-44 (GT Karnal Road Spine)
-  {
-    name: 'NH-44 (GT Karnal Road)',
-    type: 'HIGHWAY',
-    coords: [
-      [77.228, 28.668], [77.195, 28.710], [77.165, 28.750], [77.140, 28.810], [77.125, 28.870]
-    ]
-  },
-  // Delhi-Meerut Expressway (NH-9)
-  {
-    name: 'Delhi-Meerut Expressway',
-    type: 'EXPRESSWAY',
-    coords: [
-      [77.255, 28.585], [77.275, 28.610], [77.300, 28.625], [77.338, 28.635]
-    ]
-  },
-  // Barapullah Elevated Corridor
-  {
-    name: 'Barapullah Corridor',
-    type: 'ARTERIAL',
-    coords: [
-      [77.210, 28.570], [77.235, 28.580], [77.255, 28.585]
-    ]
-  },
-  // Rohtak Road (West Delhi Spine)
-  {
-    name: 'Rohtak Road',
-    type: 'HIGHWAY',
-    coords: [
-      [77.195, 28.655], [77.156, 28.665], [77.115, 28.675], [77.075, 28.680], [76.980, 28.685]
-    ]
-  },
-  // Mathura Road (South Delhi Arterial)
-  {
-    name: 'Mathura Road',
-    type: 'HIGHWAY',
-    coords: [
-      [77.255, 28.585], [77.270, 28.550], [77.295, 28.515], [77.305, 28.480]
-    ]
-  },
-];
-
-/** Real Major Hydrological Canals & Drainage Basins */
-const DELHI_HYDROLOGY = [
-  // Najafgarh Storm Basin Drain (Delhi's Largest Drainage Canal)
-  {
-    name: 'Najafgarh Basin Drain',
-    type: 'CANAL',
-    coords: [
-      [76.920, 28.550], [76.985, 28.585], [77.045, 28.620], [77.105, 28.655],
-      [77.155, 28.685], [77.200, 28.715], [77.225, 28.725]
-    ]
-  },
-  // Shahdara Drainage Canal (East Delhi)
-  {
-    name: 'Shahdara Outfall Canal',
-    type: 'CANAL',
-    coords: [
-      [77.290, 28.720], [77.305, 28.670], [77.315, 28.620], [77.310, 28.560]
-    ]
-  }
-];
-
-/** Key Delhi Geographic Landmarks */
-const DELHI_LANDMARKS = [
-  { name: 'CONNAUGHT PLACE', lng: 77.216, lat: 28.632, type: 'HUB', isCircle: true },
-  { name: 'INDIA GATE', lng: 77.229, lat: 28.613, type: 'MONUMENT', isCircle: true },
-  { name: 'RED FORT', lng: 77.241, lat: 28.656, type: 'HISTORIC', isCircle: true },
-  { name: 'IGI AIRPORT (T3)', lng: 77.085, lat: 28.555, type: 'AIRPORT', isRunway: true },
-  { name: 'DHAULA KUAN', lng: 77.162, lat: 28.592, type: 'JUNCTION', isCircle: false },
-  { name: 'MUKARBA CHOWK', lng: 77.160, lat: 28.750, type: 'JUNCTION', isCircle: false },
-  { name: 'ROHINI BASIN', lng: 77.105, lat: 28.725, type: 'SUB_CITY', isCircle: false },
-  { name: 'DWARKA SUB-CITY', lng: 77.035, lat: 28.585, type: 'SUB_CITY', isCircle: false },
-];
-
-/** Authentic NCT Delhi Boundary Outline (Closed Polygon) */
-const DELHI_NCT_BOUNDARY = [
-  [77.12, 28.87], [77.19, 28.85], [77.24, 28.79], [77.31, 28.74],
-  [77.34, 28.65], [77.33, 28.55], [77.31, 28.48], [77.24, 28.44],
-  [77.16, 28.43], [77.08, 28.46], [76.95, 28.51], [76.88, 28.58],
-  [76.84, 28.67], [76.89, 28.76], [77.02, 28.84], [77.12, 28.87]
-];
-
 /**
- * WardMap — 100% Keyless, High-Performance Aerospace Vector GIS Engine.
- * Features realistic Delhi road grids, Ring Road, Yamuna river, airport runways,
- * landmark labels, circular beacons, smooth organic ward paths, and NO broken tiles.
+ * WardMap — High-Performance Leaflet GIS Engine for Delhi Municipal Flood Intelligence.
+ * 100% Free & Keyless OpenStreetMap Base Tiles (NO API Keys Required).
+ * Renders interactive circular flood zones that scale, zoom, and separate naturally across Delhi.
  */
 export default function WardMap({
   wardsData,
   selectedWardId,
   onSelectWard,
-  height = '480px',
+  height = '500px',
 }) {
-  const containerRef = useRef(null);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const wardCirclesGroupRef = useRef(null);
+  const hotspotsGroupRef = useRef(null);
+  const tileLayerRef = useRef(null);
+
+  // Map Controls State
+  const [mapTheme, setMapTheme] = useState('street'); // 'street' | 'dark'
+  const [showHotspots, setShowHotspots] = useState(true);
+  const [showCircles, setShowCircles] = useState(true);
   const [hoveredWard, setHoveredWard] = useState(null);
   const [hoveredHotspot, setHoveredHotspot] = useState(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
-  // Layer Toggles
-  const [showRoads, setShowRoads] = useState(true);
-  const [showHotspots, setShowHotspots] = useState(true);
-  const [showYamunaGauge, setShowYamunaGauge] = useState(true);
-  const [showLandmarks, setShowLandmarks] = useState(true);
-
-  // Wards Data
+  // Wards GeoJSON Features with resilient fallback
   const data = useMemo(() => {
     if (wardsData && wardsData.features && wardsData.features.length > 0) {
       return wardsData;
@@ -164,92 +50,25 @@ export default function WardMap({
     return fallbackWards;
   }, [wardsData]);
 
-  // Delhi coordinate bounds with margin
-  const bounds = useMemo(() => {
-    return {
-      minLng: 76.82,
-      maxLng: 77.36,
-      minLat: 28.42,
-      maxLat: 28.89,
-    };
-  }, []);
-
-  const svgWidth = 920;
-  const svgHeight = 760;
-
-  // Projection: [lng, lat] -> [svgX, svgY]
-  const project = useCallback(
-    (lng, lat) => {
-      const padLng = (bounds.maxLng - bounds.minLng) * 0.03;
-      const padLat = (bounds.maxLat - bounds.minLat) * 0.03;
-      const minX = bounds.minLng - padLng;
-      const maxX = bounds.maxLng + padLng;
-      const minY = bounds.minLat - padLat;
-      const maxY = bounds.maxLat + padLat;
-
-      const x = ((lng - minX) / (maxX - minX)) * svgWidth;
-      const y = ((maxY - lat) / (maxY - minY)) * svgHeight;
-      return [x, y];
-    },
-    [bounds, svgWidth, svgHeight]
-  );
-
   const normalizeLevel = (level) => String(level || '').toUpperCase().trim();
 
-  const getRiskColors = (level) => {
+  const getRiskColor = (level) => {
     switch (normalizeLevel(level)) {
       case 'CRITICAL':
-        return { fill: '#ef4444', stroke: '#dc2626', opacity: 0.60 };
+        return { fill: '#ef4444', stroke: '#b91c1c', opacity: 0.55 };
       case 'HIGH':
-        return { fill: '#f97316', stroke: '#ea580c', opacity: 0.48 };
+        return { fill: '#f97316', stroke: '#c2410c', opacity: 0.45 };
       case 'MODERATE':
       case 'MEDIUM':
-        return { fill: '#eab308', stroke: '#ca8a04', opacity: 0.36 };
+        return { fill: '#eab308', stroke: '#a16207', opacity: 0.35 };
       case 'LOW':
       default:
-        return { fill: '#22c55e', stroke: '#16a34a', opacity: 0.25 };
+        return { fill: '#22c55e', stroke: '#15803d', opacity: 0.28 };
     }
   };
 
-  // Convert coordinate ring into smooth organic rounded curves (NO HEXAGONS)
-  const buildSmoothPath = useCallback((ring) => {
-    if (!ring || ring.length < 3) return '';
-    const pts = ring.map((pt) => project(pt[0], pt[1]));
-    if (
-      pts.length > 3 &&
-      Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 0.1
-    ) {
-      pts.pop();
-    }
-    const n = pts.length;
-    if (n < 3) return '';
-
-    const midpoints = [];
-    for (let i = 0; i < n; i++) {
-      const next = pts[(i + 1) % n];
-      midpoints.push([(pts[i][0] + next[0]) / 2, (pts[i][1] + next[1]) / 2]);
-    }
-
-    let str = `M ${midpoints[0][0].toFixed(1)} ${midpoints[0][1].toFixed(1)}`;
-    for (let i = 0; i < n; i++) {
-      const ctrl = pts[(i + 1) % n];
-      const nextMid = midpoints[(i + 1) % n];
-      str += ` Q ${ctrl[0].toFixed(1)} ${ctrl[1].toFixed(1)} ${nextMid[0].toFixed(1)} ${nextMid[1].toFixed(1)}`;
-    }
-    return str + ' Z ';
-  }, [project]);
-
-  // Project coordinates into line path
-  const buildLinePath = useCallback((coords) => {
-    if (!coords || coords.length < 2) return '';
-    return coords.reduce((acc, pt, i) => {
-      const [x, y] = project(pt[0], pt[1]);
-      return `${acc} ${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
-    }, '');
-  }, [project]);
-
-  // Convert Wards GeoJSON features
-  const wardPaths = useMemo(() => {
+  // Compute Lat/Lng centroid for all 250 wards
+  const wardCentroids = useMemo(() => {
     return (data.features || []).map((feature, idx) => {
       const p = feature.properties || {};
       const code = p.ward_code || p.id || `W${String(idx + 1).padStart(3, '0')}`;
@@ -258,35 +77,21 @@ export default function WardMap({
       const score = p.riskScore ?? p.current_risk_score ?? 50;
       const drainage = p.drainageCapacity ?? p.drainage_capacity ?? 50;
       const rainfall = p.rainfall ?? 28.5;
+      const zone = p.zone || 'Central Delhi';
 
-      let pathStr = '';
+      let lat = 28.6139;
+      let lng = 77.2090;
       const coords = feature.geometry?.coordinates || [];
 
-      if (feature.geometry?.type === 'Polygon') {
-        for (const ring of coords) {
-          pathStr += buildSmoothPath(ring);
-        }
-      } else {
-        for (const polygon of coords) {
-          for (const ring of polygon) {
-            pathStr += buildSmoothPath(ring);
-          }
-        }
-      }
-
-      // Compute centroid for circular pulse beacons
-      let centroid = null;
       try {
-        const ring0 = feature.geometry?.type === 'Polygon' ? coords[0] : coords[0]?.[0];
-        if (ring0 && ring0.length > 0) {
-          const sum = ring0.reduce((acc, c) => [acc[0] + c[0], acc[1] + c[1]], [0, 0]);
-          const cLng = sum[0] / ring0.length;
-          const cLat = sum[1] / ring0.length;
-          const [cx, cy] = project(cLng, cLat);
-          centroid = { x: cx, y: cy };
+        const ring = feature.geometry?.type === 'Polygon' ? coords[0] : coords[0]?.[0];
+        if (ring && ring.length > 0) {
+          const sum = ring.reduce((acc, pt) => [acc[0] + pt[0], acc[1] + pt[1]], [0, 0]);
+          lng = sum[0] / ring.length;
+          lat = sum[1] / ring.length;
         }
       } catch {
-        centroid = null;
+        // use fallback center
       }
 
       return {
@@ -296,598 +101,363 @@ export default function WardMap({
         score,
         drainage,
         rainfall,
-        path: pathStr,
-        centroid,
+        zone,
+        lat,
+        lng,
         rawProperties: p,
       };
     });
-  }, [data, project, buildSmoothPath]);
+  }, [data]);
 
-  // River Yamuna Curved Path
-  const yamunaPath = useMemo(() => {
-    const yamunaCoords = [
-      [77.200, 28.880], [77.210, 28.840], [77.218, 28.790], [77.225, 28.740],
-      [77.230, 28.690], [77.235, 28.665], [77.248, 28.635], [77.260, 28.605],
-      [77.265, 28.580], [77.285, 28.555], [77.305, 28.530], [77.325, 28.480],
-      [77.335, 28.430]
-    ];
-    return buildLinePath(yamunaCoords);
-  }, [buildLinePath]);
+  // ── 1. Initialize Leaflet Map Instance ────────────────────
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
 
-  // Projected Arterial Roads
-  const projectedArterials = useMemo(() => {
-    return DELHI_ARTERIALS.map((road) => ({
-      ...road,
-      path: buildLinePath(road.coords),
-    }));
-  }, [buildLinePath]);
-
-  // Projected Storm Canals
-  const projectedCanals = useMemo(() => {
-    return DELHI_HYDROLOGY.map((canal) => ({
-      ...canal,
-      path: buildLinePath(canal.coords),
-    }));
-  }, [buildLinePath]);
-
-  // Projected Landmarks
-  const projectedLandmarks = useMemo(() => {
-    return DELHI_LANDMARKS.map((lm) => {
-      const [x, y] = project(lm.lng, lm.lat);
-      return { ...lm, x, y };
-    });
-  }, [project]);
-
-  // Projected Chronic Hotspots (Circles)
-  const projectedHotspots = useMemo(() => {
-    return CHRONIC_HOTSPOTS.map((h) => {
-      const [x, y] = project(h.lng, h.lat);
-      return { ...h, x, y };
-    });
-  }, [project]);
-
-  // Delhi NCT State Border Path
-  const nctBorderPath = useMemo(() => {
-    return buildLinePath(DELHI_NCT_BOUNDARY) + ' Z';
-  }, [buildLinePath]);
-
-  // Mouse wheel zoom
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-    setZoom((prev) => Math.min(Math.max(0.8, prev * zoomFactor), 4.5));
-  };
-
-  // Drag to pan
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return;
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-  };
-
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      setPan({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
+    if (!mapInstanceRef.current) {
+      // Create Leaflet Map centered on Delhi
+      const map = L.map(mapContainerRef.current, {
+        center: [28.625, 77.200],
+        zoom: 11,
+        minZoom: 10,
+        maxZoom: 17,
+        zoomControl: false,
+        attributionControl: false,
       });
+
+      // Strict Delhi Municipal Boundary Constraints
+      const delhiBounds = L.latLngBounds([28.38, 76.80], [28.92, 77.40]);
+      map.setMaxBounds(delhiBounds);
+
+      // Official Keyless OpenStreetMap Tiles (100% Free & No API Key Needed)
+      const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+
+      tileLayerRef.current = tileLayer;
+      wardCirclesGroupRef.current = L.layerGroup().addTo(map);
+      hotspotsGroupRef.current = L.layerGroup().addTo(map);
+      mapInstanceRef.current = map;
+
+      // Ensure tiles render immediately without gray blank areas
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 350);
     }
 
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setTooltipPos({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  // ── 2. Render Interactive Circles for Zones (Zoom & Separate) ─
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const group = wardCirclesGroupRef.current;
+    if (!map || !group) return;
+
+    group.clearLayers();
+    if (!showCircles) return;
+
+    wardCentroids.forEach((ward) => {
+      const isSelected = selectedWardId && String(ward.code) === String(selectedWardId);
+      const colors = getRiskColor(ward.level);
+
+      // In Leaflet, L.circle radius is defined in METERS on the real earth!
+      // This means as the user zooms in, the circles zoom and SEPARATE across the street grid!
+      const circle = L.circle([ward.lat, ward.lng], {
+        radius: isSelected ? 850 : 650, // 650 meters radius
+        color: isSelected ? '#38bdf8' : colors.stroke,
+        weight: isSelected ? 3.5 : 1.5,
+        fillColor: isSelected ? '#0284c7' : colors.fill,
+        fillOpacity: isSelected ? 0.80 : colors.opacity,
+        className: 'interactive-ward-circle',
+      });
+
+      // Interactive Events
+      circle.on({
+        mouseover: (e) => {
+          const target = e.target;
+          target.setStyle({
+            weight: 3.0,
+            color: '#38bdf8',
+            fillOpacity: 0.75,
+          });
+          target.bringToFront();
+          setHoveredWard(ward);
+        },
+        mouseout: (e) => {
+          const target = e.target;
+          if (!isSelected) {
+            target.setStyle({
+              weight: 1.5,
+              color: colors.stroke,
+              fillOpacity: colors.opacity,
+            });
+          }
+          setHoveredWard(null);
+        },
+        click: () => {
+          if (onSelectWard) {
+            onSelectWard(ward.rawProperties);
+          }
+          map.flyTo([ward.lat, ward.lng], Math.max(map.getZoom(), 13), {
+            duration: 0.8,
+          });
+        },
+      });
+
+      // Bind clean tooltip popup
+      circle.bindTooltip(
+        `<div style="font-family: monospace; font-size: 11px; padding: 2px;">
+          <b>${ward.name}</b> (${ward.code})<br/>
+          Risk Score: <b>${ward.score}/100</b> · ${ward.level}
+        </div>`,
+        { sticky: true, className: 'ward-circle-tooltip' }
+      );
+
+      group.addLayer(circle);
+    });
+  }, [wardCentroids, selectedWardId, showCircles, onSelectWard]);
+
+  // ── 3. Render Circular Chronic Flood Hotspots (Beacons) ──
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const group = hotspotsGroupRef.current;
+    if (!map || !group) return;
+
+    group.clearLayers();
+    if (!showHotspots) return;
+
+    CHRONIC_HOTSPOTS.forEach((spot) => {
+      const isCrit = spot.severity === 'CRITICAL';
+      const color = isCrit ? '#ef4444' : '#f97316';
+
+      // Outer Radar Ripple Circle (400 meters radius)
+      const rippleCircle = L.circle([spot.lat, spot.lng], {
+        radius: 400,
+        color: color,
+        weight: 1.5,
+        fillColor: color,
+        fillOpacity: 0.20,
+        dashArray: '4 4',
+      });
+
+      // Center Core CircleMarker (Fixed pixel circle beacon)
+      const coreMarker = L.circleMarker([spot.lat, spot.lng], {
+        radius: 7,
+        color: '#ffffff',
+        weight: 2,
+        fillColor: color,
+        fillOpacity: 1,
+      });
+
+      coreMarker.on({
+        mouseover: () => setHoveredHotspot(spot),
+        mouseout: () => setHoveredHotspot(null),
+        click: () => {
+          const matchedWard = wardCentroids.find((w) => w.code === spot.ward);
+          if (matchedWard && onSelectWard) {
+            onSelectWard(matchedWard.rawProperties);
+          }
+          map.flyTo([spot.lat, spot.lng], 14, { duration: 0.8 });
+        },
+      });
+
+      // Popup with emergency depth telemetry
+      coreMarker.bindPopup(
+        `<div style="font-family: monospace; font-size: 11px; min-width: 170px; padding: 4px; color: #0f172a;">
+          <div style="font-weight: bold; color: ${color}; font-size: 12px; margin-bottom: 2px;">${spot.name}</div>
+          <div style="color: #64748b; font-size: 10px;">${spot.type} · ${spot.ward}</div>
+          <div style="margin-top: 5px; font-size: 11px;">Waterlogging Depth: <b style="color: #dc2626;">${spot.depth}</b></div>
+          <div style="color: #0284c7; font-size: 10px; margin-top: 2px; font-weight: bold;">${spot.status}</div>
+        </div>`
+      );
+
+      group.addLayer(rippleCircle);
+      group.addLayer(coreMarker);
+    });
+  }, [showHotspots, wardCentroids, onSelectWard]);
+
+  // ── 4. Center on Selected Ward ────────────────────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !selectedWardId) return;
+
+    const target = wardCentroids.find(
+      (w) => String(w.code) === String(selectedWardId)
+    );
+
+    if (target) {
+      map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 12), {
+        duration: 0.8,
       });
     }
-  };
+  }, [selectedWardId, wardCentroids]);
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const resetView = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
+  // Map Navigation Handlers
+  const handleZoomIn = () => mapInstanceRef.current?.zoomIn();
+  const handleZoomOut = () => mapInstanceRef.current?.zoomOut();
+  const handleReset = () => {
+    mapInstanceRef.current?.setView([28.625, 77.200], 11, { animate: true });
   };
 
   return (
     <div
-      ref={containerRef}
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={() => {
-        setIsDragging(false);
-        setHoveredWard(null);
-        setHoveredHotspot(null);
-      }}
       style={{ height, width: '100%' }}
-      className={`relative select-none overflow-hidden rounded-none border border-[var(--border)] bg-[#040812] ${
-        isDragging ? 'cursor-grabbing' : 'cursor-grab'
+      className={`relative select-none overflow-hidden rounded-none border border-[var(--border)] shadow-sm font-mono text-xs ${
+        mapTheme === 'dark' ? 'leaflet-dark-mode' : ''
       }`}
     >
-      {/* ── Background GIS Cartographic Texture ─────────────── */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-25">
-        <defs>
-          <pattern id="gis-grid-fine" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(56, 189, 248, 0.35)" strokeWidth="0.5" />
-            <circle cx="0" cy="0" r="1" fill="rgba(56, 189, 248, 0.7)" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#gis-grid-fine)" />
-      </svg>
+      {/* ── Leaflet Map Container ─────────────────────────────── */}
+      <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-      {/* ── Main Dynamic Vector GIS Canvas ────────────────────── */}
-      <svg
-        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-        className="w-full h-full transition-transform duration-75 ease-out"
-        style={{
-          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-          transformOrigin: 'center center',
-        }}
-      >
-        <defs>
-          <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#38bdf8" floodOpacity="0.85" />
-          </filter>
-          <filter id="glow-red" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#ef4444" floodOpacity="0.8" />
-          </filter>
-        </defs>
-
-        {/* 1. NCT Delhi Landmass Outline & Elevation Fill */}
-        <g pointerEvents="none">
-          {/* Delhi National Capital Territory Landmass */}
-          <path
-            d={nctBorderPath}
-            fill="#091322"
-            stroke="#1e3a5f"
-            strokeWidth="2.5"
-            strokeDasharray="6 3"
-            opacity="0.8"
-          />
-
-          {/* Regional Borders Labeling */}
-          <text x="80" y="380" fill="#475569" fontSize="11" fontFamily="monospace" fontWeight="bold" letterSpacing="2">
-            HARYANA · GURUGRAM
-          </text>
-          <text x="730" y="440" fill="#475569" fontSize="11" fontFamily="monospace" fontWeight="bold" letterSpacing="2">
-            UTTAR PRADESH · NOIDA
-          </text>
-          <text x="120" y="100" fill="#475569" fontSize="11" fontFamily="monospace" fontWeight="bold" letterSpacing="2">
-            NCR NORTH · SONIPAT
-          </text>
-        </g>
-
-        {/* 2. Hydrological Infrastructure: Yamuna River & Storm Canals */}
-        <g opacity="0.85" pointerEvents="none">
-          {/* River Yamuna Floodplain Corridor (Outer Bank) */}
-          <path
-            d={yamunaPath}
-            fill="none"
-            stroke="#0369a1"
-            strokeWidth="16"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.35"
-          />
-          {/* River Yamuna Flowing Waterway */}
-          <path
-            d={yamunaPath}
-            fill="none"
-            stroke="#0284c7"
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {/* River Yamuna Center Stream Highlight */}
-          <path
-            d={yamunaPath}
-            fill="none"
-            stroke="#38bdf8"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.9"
-          />
-
-          {/* Najafgarh Basin Storm Canal */}
-          {projectedCanals.map((canal, idx) => (
-            <path
-              key={idx}
-              d={canal.path}
-              fill="none"
-              stroke="#0891b2"
-              strokeWidth="2.2"
-              strokeDasharray="4 2"
-              strokeLinecap="round"
-              opacity="0.6"
-            />
-          ))}
-        </g>
-
-        {/* 3. Real Delhi Arterial Highway & Expressway Network */}
-        {showRoads && (
-          <g pointerEvents="none" opacity="0.65">
-            {projectedArterials.map((road, idx) => {
-              const isRing = road.type === 'RING_ROAD' || road.type === 'OUTER_RING';
-              const isExpy = road.type === 'EXPRESSWAY';
-              return (
-                <g key={idx}>
-                  {/* Road Underlay Track */}
-                  <path
-                    d={road.path}
-                    fill="none"
-                    stroke="#020617"
-                    strokeWidth={isRing ? 4.5 : isExpy ? 4.0 : 3.0}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  {/* Road Centerline */}
-                  <path
-                    d={road.path}
-                    fill="none"
-                    stroke={isRing ? '#94a3b8' : isExpy ? '#64748b' : '#475569'}
-                    strokeWidth={isRing ? 2.2 : isExpy ? 1.8 : 1.2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </g>
-              );
-            })}
-          </g>
-        )}
-
-        {/* 4. Real Geographic Landmarks (Runways & Circles) */}
-        {showLandmarks && (
-          <g pointerEvents="none" opacity="0.75">
-            {/* IGI Airport Runways Outline */}
-            <g transform={`translate(${project(77.085, 28.555)[0]}, ${project(77.085, 28.555)[1]})`}>
-              <rect x="-35" y="-18" width="70" height="36" fill="#0f172a" stroke="#334155" strokeWidth="1" />
-              {/* Primary Runway 09/27 */}
-              <line x1="-30" y1="-6" x2="30" y2="-6" stroke="#94a3b8" strokeWidth="2.2" />
-              <line x1="-28" y1="-6" x2="28" y2="-6" stroke="#ffffff" strokeWidth="0.8" strokeDasharray="3 3" />
-              {/* Parallel Runway 11/29 */}
-              <line x1="-28" y1="8" x2="28" y2="8" stroke="#94a3b8" strokeWidth="2.2" />
-              <text x="0" y="24" fill="#94a3b8" fontSize="8" fontFamily="monospace" textAnchor="middle">IGI AIRPORT (DEL)</text>
-            </g>
-
-            {/* Connaught Place Concentric Circular Hub */}
-            {(() => {
-              const [cpx, cpy] = project(77.216, 28.632);
-              return (
-                <g transform={`translate(${cpx}, ${cpy})`}>
-                  <circle cx="0" cy="0" r="14" fill="none" stroke="#64748b" strokeWidth="1.8" />
-                  <circle cx="0" cy="0" r="8" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
-                  <circle cx="0" cy="0" r="3" fill="#38bdf8" />
-                  <text x="0" y="-18" fill="#cbd5e1" fontSize="9" fontFamily="monospace" fontWeight="bold" textAnchor="middle">CONNAUGHT PLACE</text>
-                </g>
-              );
-            })()}
-
-            {/* India Gate Circular Monument */}
-            {(() => {
-              const [igx, igy] = project(77.229, 28.613);
-              return (
-                <g transform={`translate(${igx}, ${igy})`}>
-                  <circle cx="0" cy="0" r="9" fill="none" stroke="#e2e8f0" strokeWidth="1.2" />
-                  <circle cx="0" cy="0" r="3" fill="#f59e0b" />
-                  <text x="0" y="18" fill="#cbd5e1" fontSize="8" fontFamily="monospace" textAnchor="middle">INDIA GATE</text>
-                </g>
-              );
-            })()}
-          </g>
-        )}
-
-        {/* 5. 250 Municipal Ward Polygons (Smooth Organic Curves, NO HEXAGONS) */}
-        <g>
-          {wardPaths.map((ward) => {
-            const isSelected =
-              ward.code === selectedWardId ||
-              String(ward.code) === String(selectedWardId);
-            const isHovered = hoveredWard?.code === ward.code;
-            const colors = getRiskColors(ward.level);
-
-            return (
-              <path
-                key={ward.code}
-                d={ward.path}
-                fill={isSelected ? '#0284c7' : colors.fill}
-                fillOpacity={isSelected ? 0.75 : isHovered ? 0.70 : colors.opacity}
-                stroke={isSelected ? '#38bdf8' : isHovered ? '#38bdf8' : colors.stroke}
-                strokeWidth={isSelected ? 2.6 : isHovered ? 1.8 : 0.8}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter={isSelected || isHovered ? 'url(#glow-cyan)' : undefined}
-                className="transition-colors duration-150 cursor-pointer"
-                onMouseEnter={() => {
-                  setHoveredHotspot(null);
-                  setHoveredWard(ward);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setHoveredHotspot(null);
-                  setHoveredWard(null);
-                  if (onSelectWard) onSelectWard(ward.rawProperties);
-                }}
-              />
-            );
-          })}
-        </g>
-
-        {/* 6. Centroid Pulse Beacons for Critical & High Wards (CIRCLES) */}
-        <g pointerEvents="none">
-          {wardPaths
-            .filter((w) => (w.level === 'CRITICAL' || w.level === 'HIGH') && w.centroid)
-            .map((w) => {
-              const isCrit = w.level === 'CRITICAL';
-              const color = isCrit ? '#ef4444' : '#f97316';
-              return (
-                <g key={`pulse-${w.code}`}>
-                  {/* Expanding circular radar ring */}
-                  <circle
-                    cx={w.centroid.x}
-                    cy={w.centroid.y}
-                    r={isCrit ? 9 : 7}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    opacity="0.8"
-                  >
-                    <animate
-                      attributeName="r"
-                      values={isCrit ? '4;16;4' : '3;12;3'}
-                      dur={isCrit ? '1.8s' : '2.4s'}
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="opacity"
-                      values="0.9;0.1;0.9"
-                      dur={isCrit ? '1.8s' : '2.4s'}
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                  {/* Core Circle Dot */}
-                  <circle
-                    cx={w.centroid.x}
-                    cy={w.centroid.y}
-                    r={isCrit ? 3.5 : 2.5}
-                    fill={color}
-                    stroke="#ffffff"
-                    strokeWidth="0.8"
-                  />
-                </g>
-              );
-            })}
-        </g>
-
-        {/* 7. Chronic Hydrological Flood Hotspots (CIRCLES WITH RADAR RIPPLES) */}
-        {showHotspots && (
-          <g>
-            {projectedHotspots.map((h) => {
-              const isCrit = h.severity === 'CRITICAL';
-              const col = isCrit ? '#ef4444' : '#f97316';
-              return (
-                <g
-                  key={h.id}
-                  className="cursor-pointer"
-                  onMouseEnter={() => {
-                    setHoveredWard(null);
-                    setHoveredHotspot(h);
-                  }}
-                  onMouseLeave={() => setHoveredHotspot(null)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setHoveredHotspot(null);
-                    setHoveredWard(null);
-                    const targetWard = wardPaths.find((w) => w.code === h.ward);
-                    if (targetWard && onSelectWard) onSelectWard(targetWard.rawProperties);
-                  }}
-                >
-                  {/* Circular Radar Ripple */}
-                  <circle cx={h.x} cy={h.y} r="14" fill="none" stroke={col} strokeWidth="1.5" opacity="0.85">
-                    <animate attributeName="r" values="6;22;6" dur="2s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2s" repeatCount="indefinite" />
-                  </circle>
-
-                  {/* Circular Beacon Badge */}
-                  <circle
-                    cx={h.x}
-                    cy={h.y}
-                    r="8.5"
-                    fill={isCrit ? '#7f1d1d' : '#7c2d12'}
-                    stroke={col}
-                    strokeWidth="1.8"
-                  />
-                  {/* Inner Warning Core Circle */}
-                  <circle cx={h.x} cy={h.y} r="3.5" fill="#ffffff" />
-                </g>
-              );
-            })}
-          </g>
-        )}
-      </svg>
-
-      {/* ── Top-Left: Operational GIS Layers (Strict Rectangles) ── */}
-      <div className="absolute top-2.5 left-2.5 z-20 flex flex-wrap items-center gap-1.5 pointer-events-auto">
-        <div className="px-2 py-1 bg-[#091220]/90 backdrop-blur-md border border-slate-800 text-[10px] font-mono text-slate-300 flex items-center space-x-1.5 shadow-sm rounded-none">
-          <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none animate-pulse" />
-          <span>Real Delhi GIS · Keyless</span>
+      {/* ── Top-Left: Map Controls & Telemetry Header (Strict Rectangles) ── */}
+      <div className="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-1.5 pointer-events-auto">
+        {/* Real Map Indicator */}
+        <div className="px-2.5 py-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--border)] text-[10px] font-mono text-[var(--text-primary)] flex items-center space-x-1.5 shadow-md rounded-none">
+          <span className="w-2 h-2 rounded-none bg-emerald-500 animate-pulse" />
+          <span className="font-bold">OpenStreetMap Live GIS</span>
         </div>
 
-        {showYamunaGauge && (
-          <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-[#091220]/95 backdrop-blur-md border border-rose-500/40 text-[10px] font-mono shadow-sm rounded-none">
-            <Waves className="w-3 h-3 text-sky-400 flex-shrink-0 animate-pulse" />
-            <span className="text-slate-300 hidden md:inline">Yamuna Gauge:</span>
-            <span className="font-bold text-rose-400">205.38m</span>
-            <span className="text-rose-400 font-bold uppercase text-[9px] px-1 bg-rose-500/15 border border-rose-500/30 hidden sm:inline rounded-none">
-              DANGER +5cm
-            </span>
-          </div>
-        )}
-
-        <div className="flex items-center space-x-1 bg-[#091220]/90 backdrop-blur-md p-0.5 border border-slate-800 text-[10px] font-mono shadow-sm rounded-none">
+        {/* Theme Switcher (Street View vs Dark Tactical) */}
+        <div className="flex items-center space-x-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-0.5 border border-[var(--border)] rounded-none shadow-md">
           <button
-            onClick={() => setShowRoads(!showRoads)}
-            className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
-              showRoads ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40' : 'text-slate-400 hover:text-slate-200'
+            type="button"
+            onClick={() => setMapTheme('street')}
+            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer ${
+              mapTheme === 'street'
+                ? 'bg-[var(--brand)] text-white border-[var(--brand)] shadow-sm'
+                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
             }`}
-            title="Toggle Delhi Arterial Highways & Ring Road"
           >
-            <span>Arterials</span>
+            Street Map
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapTheme('dark')}
+            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer ${
+              mapTheme === 'dark'
+                ? 'bg-[var(--brand)] text-white border-[var(--brand)] shadow-sm'
+                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            Dark Tactical
+          </button>
+        </div>
+
+        {/* Layer Toggles */}
+        <div className="flex items-center space-x-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-0.5 border border-[var(--border)] rounded-none shadow-md">
+          <button
+            type="button"
+            onClick={() => setShowCircles(!showCircles)}
+            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer flex items-center space-x-1 ${
+              showCircles
+                ? 'bg-sky-500/20 text-sky-400 border-sky-500/40'
+                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <span>Zone Circles ({wardCentroids.length})</span>
           </button>
 
           <button
+            type="button"
             onClick={() => setShowHotspots(!showHotspots)}
-            className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
-              showHotspots ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'text-slate-400 hover:text-slate-200'
+            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer flex items-center space-x-1 ${
+              showHotspots
+                ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
             }`}
-            title="Toggle Chronic Flood Hotspots"
           >
-            <AlertTriangle className="w-3 h-3 text-rose-400" />
-            <span>Hotspots</span>
+            <AlertTriangle className="w-3 h-3 text-rose-500" />
+            <span>Hotspots ({CHRONIC_HOTSPOTS.length})</span>
           </button>
         </div>
       </div>
 
-      {/* ── Top-Right: Zoom & Reset Controls (Strict Rectangles) ── */}
-      <div className="absolute top-2.5 right-2.5 z-20 flex items-center space-x-1 bg-[#091220]/90 backdrop-blur-md p-0.5 border border-slate-800 text-[10px] font-mono shadow-sm rounded-none pointer-events-auto">
+      {/* ── Top-Right: Zoom & Reset Navigation (Strict Rectangles) ── */}
+      <div className="absolute top-3 right-3 z-[400] flex flex-col space-y-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-1 border border-[var(--border)] rounded-none shadow-md pointer-events-auto">
         <button
-          onClick={() => setZoom((z) => Math.min(z * 1.25, 4.5))}
-          className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-none cursor-pointer"
-          title="Zoom In"
+          onClick={handleZoomIn}
+          title="Zoom In (Circles will separate)"
+          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] rounded-none cursor-pointer"
         >
-          <ZoomIn className="w-3.5 h-3.5" />
+          <ZoomIn className="w-4 h-4" />
         </button>
         <button
-          onClick={() => setZoom((z) => Math.max(z * 0.8, 0.8))}
-          className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-none cursor-pointer"
+          onClick={handleZoomOut}
           title="Zoom Out"
+          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] rounded-none cursor-pointer"
         >
-          <ZoomOut className="w-3.5 h-3.5" />
+          <ZoomOut className="w-4 h-4" />
         </button>
         <button
-          onClick={resetView}
-          className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-none cursor-pointer"
-          title="Reset View"
+          onClick={handleReset}
+          title="Reset Delhi Overview"
+          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] rounded-none cursor-pointer"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <RotateCcw className="w-4 h-4" />
         </button>
       </div>
 
-      {/* ── Hovered Hotspot Telemetry HUD (Strict Rectangle) ───── */}
-      {hoveredHotspot ? (
-        <div
-          className="absolute z-50 pointer-events-none p-3 rounded-none bg-[#0a1222]/95 backdrop-blur-md border border-rose-500/50 text-xs shadow-2xl max-w-[240px]"
-          style={{
-            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 250))}px`,
-            top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 150))}px`,
-          }}
-        >
-          <div className="flex items-center space-x-1.5 text-rose-400 font-mono text-[10px] font-bold uppercase mb-1">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Chronic Vulnerability Choke</span>
-          </div>
-          <div className="font-bold text-white text-[13px] mb-0.5">
-            {hoveredHotspot.name}
-          </div>
-          <div className="text-[10px] text-slate-400 font-mono mb-2">
-            Classification: {hoveredHotspot.type} · Ward {hoveredHotspot.ward}
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-slate-800 pt-2 mb-2">
-            <div>
-              Water Depth: <b className="text-rose-400">{hoveredHotspot.depth}</b>
-            </div>
-            <div>
-              Severity: <b className="text-rose-400">{hoveredHotspot.severity}</b>
-            </div>
-          </div>
-          <div className="p-1.5 bg-rose-500/10 border border-rose-500/30 text-[10px] text-rose-300 font-mono rounded-none">
-            STATUS: {hoveredHotspot.status}
-          </div>
-        </div>
-      ) : hoveredWard ? (
-        <div
-          className="absolute z-50 pointer-events-none p-3 rounded-none bg-[#0a1222]/95 backdrop-blur-md border border-cyan-500/40 text-xs shadow-2xl max-w-[220px]"
-          style={{
-            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 230))}px`,
-            top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 130))}px`,
-          }}
-        >
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <span className="font-bold text-white text-[12px] truncate">
-              {hoveredWard.name}
+      {/* ── Bottom-Left: Real-Time Ward Telemetry HUD (Strict Rectangle) ── */}
+      {hoveredWard && (
+        <div className="absolute bottom-3 left-3 z-[400] max-w-sm bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--brand)] p-3 rounded-none shadow-xl space-y-1.5 animate-in fade-in pointer-events-none">
+          <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-1">
+            <span className="font-bold text-[var(--text-primary)] text-xs flex items-center space-x-1">
+              <MapPin className="w-3.5 h-3.5 text-[var(--brand)]" />
+              <span>{hoveredWard.name}</span>
             </span>
-            <span className="font-mono text-[10px] text-sky-400 font-bold">
+            <span className="px-1.5 py-0.2 bg-[var(--surface)] text-[var(--text-muted)] border border-[var(--border)] text-[9px] uppercase">
               {hoveredWard.code}
             </span>
           </div>
 
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider">
-              Composite Risk
-            </span>
-            <span
-              className={`px-1.5 py-0.2 text-[10px] font-bold uppercase rounded-none ${
-                hoveredWard.level === 'CRITICAL'
-                  ? 'bg-red-500/20 text-red-400 border border-red-500/40'
-                  : hoveredWard.level === 'HIGH'
-                  ? 'bg-orange-500/20 text-orange-400 border border-orange-500/40'
-                  : hoveredWard.level === 'MODERATE'
-                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40'
-                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-              }`}
-            >
-              {hoveredWard.level} ({hoveredWard.score})
-            </span>
+          <div className="grid grid-cols-2 gap-2 text-[10px]">
+            <div>Risk Score: <b className="text-[var(--brand)]">{hoveredWard.score}/100</b></div>
+            <div>Severity: <b className={
+              hoveredWard.level === 'CRITICAL' ? 'text-rose-400 font-bold' :
+              hoveredWard.level === 'HIGH' ? 'text-orange-400 font-bold' :
+              hoveredWard.level === 'MODERATE' ? 'text-yellow-400 font-bold' : 'text-emerald-400 font-bold'
+            }>{hoveredWard.level}</b></div>
+            <div>Drainage: <b className="text-[var(--text-primary)]">{hoveredWard.drainage}%</b></div>
+            <div>Rainfall: <b className="text-sky-400">{hoveredWard.rainfall} mm</b></div>
           </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-300 border-t border-slate-800 pt-1.5">
-            <div>
-              Drainage: <b className="text-white">{hoveredWard.drainage}%</b>
-            </div>
-            <div>
-              Rainfall: <b className="text-white">{hoveredWard.rainfall} mm</b>
-            </div>
-          </div>
-          <div className="text-[9px] text-sky-400 mt-1.5 font-medium">
-            Click polygon to view live telemetry →
+          <div className="text-[9px] text-[var(--brand)] pt-0.5 border-t border-[var(--border)] font-medium">
+            Click circle to lock ward telemetry & zoom in →
           </div>
         </div>
-      ) : null}
+      )}
 
-      {/* ── Bottom-Left: Risk Legend (Strict Rectangle) ───────── */}
-      <div className="absolute bottom-3 left-3 z-20 bg-[#091220]/95 backdrop-blur-md p-2.5 rounded-none border border-slate-800 text-xs shadow-md">
-        <div className="font-bold text-white mb-1.5 text-[10px] uppercase tracking-wider flex items-center space-x-1.5">
-          <Layers className="w-3 h-3 text-sky-400" />
-          <span>Delhi Ward Risk Index</span>
+      {/* ── Bottom-Right: Color Risk Choropleth Legend (Strict Rectangle) ── */}
+      <div className="absolute bottom-3 right-3 z-[400] bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--border)] p-2.5 rounded-none shadow-md space-y-1 text-[10px] pointer-events-auto">
+        <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-muted)] font-mono">
+          Flood Risk Zone Legend
         </div>
-        <div className="flex items-center space-x-3 text-[10px] font-medium font-mono">
-          <div className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 bg-red-500 animate-pulse rounded-none" />
-            <span className="text-red-400">Critical</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 bg-orange-500 rounded-none" />
-            <span className="text-orange-400">High</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 bg-yellow-500 rounded-none" />
-            <span className="text-yellow-400">Mod</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 bg-emerald-500 rounded-none" />
-            <span className="text-emerald-400">Low</span>
-          </div>
+        <div className="flex items-center space-x-3 font-mono">
+          <span className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-none bg-rose-500 inline-block animate-pulse" />
+            <span className="text-rose-400 font-bold">Critical</span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-none bg-orange-500 inline-block" />
+            <span className="text-orange-400 font-bold">High</span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-none bg-yellow-500 inline-block" />
+            <span className="text-yellow-400 font-bold">Mod</span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-none bg-emerald-500 inline-block" />
+            <span className="text-emerald-400 font-bold">Low</span>
+          </span>
         </div>
-      </div>
-
-      {/* ── Bottom-Right: Navigation Instruction (Strict Rectangle) */}
-      <div className="absolute bottom-3 right-3 z-20 hidden sm:flex items-center space-x-1.5 px-2 py-1 bg-[#091220]/80 backdrop-blur-sm border border-slate-800 text-[9px] font-mono text-slate-400 rounded-none">
-        <MapPin className="w-2.5 h-2.5 text-sky-400" />
-        <span>Drag to pan · Scroll to zoom · Click to inspect</span>
       </div>
     </div>
   );
