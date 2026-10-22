@@ -270,13 +270,13 @@ export default function WardMap({
         },
       });
 
-      // Popup with emergency depth telemetry
+      // Popup with emergency depth telemetry in matching glassmorphism styling
       coreMarker.bindPopup(
-        `<div style="font-family: monospace; font-size: 11px; min-width: 170px; padding: 4px; color: #0f172a;">
-          <div style="font-weight: bold; color: ${color}; font-size: 12px; margin-bottom: 2px;">${spot.name}</div>
-          <div style="color: #64748b; font-size: 10px;">${spot.type} · ${spot.ward}</div>
-          <div style="margin-top: 5px; font-size: 11px;">Waterlogging Depth: <b style="color: #dc2626;">${spot.depth}</b></div>
-          <div style="color: #0284c7; font-size: 10px; margin-top: 2px; font-weight: bold;">${spot.status}</div>
+        `<div class="font-mono text-xs select-none">
+          <div class="font-bold text-xs" style="color: ${color}; margin-bottom: 2px;">${spot.name}</div>
+          <div class="text-[10px] opacity-75 font-mono">${spot.type} · Ward ${spot.ward}</div>
+          <div class="mt-1.5 text-[11px] font-mono">Waterlogging Depth: <b class="text-rose-400 font-bold">${spot.depth}</b></div>
+          <div class="text-[10px] font-bold text-sky-400 mt-1 uppercase tracking-wider">${spot.status}</div>
         </div>`
       );
 
@@ -318,23 +318,23 @@ export default function WardMap({
       {/* ── Leaflet Map Container ─────────────────────────────── */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-      {/* ── Top-Left: Map Controls & Telemetry Header (Strict Rectangles) ── */}
+      {/* ── Top-Left: Map Controls & Telemetry Header (Strict Glassmorphism Rectangles) ── */}
       <div className="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-1.5 pointer-events-auto">
         {/* Real Map Indicator */}
-        <div className="px-2.5 py-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--border)] text-[10px] font-mono text-[var(--text-primary)] flex items-center space-x-1.5 shadow-md rounded-none">
+        <div className="map-glass-box px-2.5 py-1.5 text-[10px] font-mono flex items-center space-x-1.5">
           <span className="w-2 h-2 rounded-none bg-emerald-500 animate-pulse" />
-          <span className="font-bold">OpenStreetMap Live GIS</span>
+          <span className="font-bold tracking-wide">OpenStreetMap Live GIS</span>
         </div>
 
         {/* Theme Switcher (Street View vs Dark Tactical) */}
-        <div className="flex items-center space-x-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-0.5 border border-[var(--border)] rounded-none shadow-md">
+        <div className="map-glass-box flex items-center space-x-1 p-1">
           <button
             type="button"
             onClick={() => setMapTheme('street')}
-            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer ${
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer ${
               mapTheme === 'street'
-                ? 'bg-[var(--brand)] text-white border-[var(--brand)] shadow-sm'
-                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
+                ? 'map-glass-btn-active'
+                : 'map-glass-btn'
             }`}
           >
             Street Map
@@ -342,10 +342,10 @@ export default function WardMap({
           <button
             type="button"
             onClick={() => setMapTheme('dark')}
-            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer ${
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer ${
               mapTheme === 'dark'
-                ? 'bg-[var(--brand)] text-white border-[var(--brand)] shadow-sm'
-                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
+                ? 'map-glass-btn-active'
+                : 'map-glass-btn'
             }`}
           >
             Dark Tactical
@@ -353,14 +353,14 @@ export default function WardMap({
         </div>
 
         {/* Layer Toggles */}
-        <div className="flex items-center space-x-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-0.5 border border-[var(--border)] rounded-none shadow-md">
+        <div className="map-glass-box flex items-center space-x-1 p-1">
           <button
             type="button"
             onClick={() => setShowCircles(!showCircles)}
-            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer flex items-center space-x-1 ${
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer flex items-center space-x-1 ${
               showCircles
-                ? 'bg-sky-500/20 text-sky-400 border-sky-500/40'
-                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
+                ? 'map-glass-btn-active'
+                : 'map-glass-btn'
             }`}
           >
             <span>Zone Circles ({wardCentroids.length})</span>
@@ -369,92 +369,104 @@ export default function WardMap({
           <button
             type="button"
             onClick={() => setShowHotspots(!showHotspots)}
-            className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none border transition-colors cursor-pointer flex items-center space-x-1 ${
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer flex items-center space-x-1 ${
               showHotspots
-                ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
-                : 'bg-[var(--surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]'
+                ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50 shadow-sm'
+                : 'map-glass-btn'
             }`}
           >
-            <AlertTriangle className="w-3 h-3 text-rose-500" />
+            <AlertTriangle className="w-3 h-3 text-rose-400" />
             <span>Hotspots ({CHRONIC_HOTSPOTS.length})</span>
           </button>
         </div>
       </div>
 
-      {/* ── Top-Right: Zoom & Reset Navigation (Strict Rectangles) ── */}
-      <div className="absolute top-3 right-3 z-[400] flex flex-col space-y-1 bg-[var(--surface-elevated)]/95 backdrop-blur-md p-1 border border-[var(--border)] rounded-none shadow-md pointer-events-auto">
+      {/* ── Top-Right: Zoom & Reset Navigation (Strict Glassmorphism Rectangles) ── */}
+      <div className="absolute top-3 right-3 z-[400] flex flex-col space-y-1 map-glass-box p-1 pointer-events-auto">
         <button
           onClick={handleZoomIn}
           title="Zoom In (Circles will separate)"
-          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] rounded-none cursor-pointer"
+          className="map-glass-btn p-1.5 flex items-center justify-center cursor-pointer"
         >
           <ZoomIn className="w-4 h-4" />
         </button>
         <button
           onClick={handleZoomOut}
           title="Zoom Out"
-          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] rounded-none cursor-pointer"
+          className="map-glass-btn p-1.5 flex items-center justify-center cursor-pointer"
         >
           <ZoomOut className="w-4 h-4" />
         </button>
         <button
           onClick={handleReset}
           title="Reset Delhi Overview"
-          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)] rounded-none cursor-pointer"
+          className="map-glass-btn p-1.5 flex items-center justify-center cursor-pointer"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
       </div>
 
-      {/* ── Bottom-Left: Real-Time Ward Telemetry HUD (Strict Rectangle) ── */}
+      {/* ── Bottom-Left: Real-Time Ward Telemetry HUD (Strict Glassmorphism Rectangle) ── */}
       {hoveredWard && (
-        <div className="absolute bottom-3 left-3 z-[400] max-w-sm bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--brand)] p-3 rounded-none shadow-xl space-y-1.5 animate-in fade-in pointer-events-none">
-          <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-1">
-            <span className="font-bold text-[var(--text-primary)] text-xs flex items-center space-x-1">
+        <div className="absolute bottom-3 left-3 z-[400] max-w-sm map-glass-box border-l-4 border-l-[var(--brand)] p-3 space-y-2 animate-in fade-in pointer-events-none">
+          <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-1.5">
+            <span className="font-bold text-[var(--text-primary)] text-xs flex items-center space-x-1.5">
               <MapPin className="w-3.5 h-3.5 text-[var(--brand)]" />
               <span>{hoveredWard.name}</span>
             </span>
-            <span className="px-1.5 py-0.2 bg-[var(--surface)] text-[var(--text-muted)] border border-[var(--border)] text-[9px] uppercase">
+            <span className="px-1.5 py-0.5 bg-white/10 text-[var(--text-primary)] border border-white/15 text-[9px] uppercase font-bold">
               {hoveredWard.code}
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-[10px]">
-            <div>Risk Score: <b className="text-[var(--brand)]">{hoveredWard.score}/100</b></div>
-            <div>Severity: <b className={
-              hoveredWard.level === 'CRITICAL' ? 'text-rose-400 font-bold' :
-              hoveredWard.level === 'HIGH' ? 'text-orange-400 font-bold' :
-              hoveredWard.level === 'MODERATE' ? 'text-yellow-400 font-bold' : 'text-emerald-400 font-bold'
-            }>{hoveredWard.level}</b></div>
-            <div>Drainage: <b className="text-[var(--text-primary)]">{hoveredWard.drainage}%</b></div>
-            <div>Rainfall: <b className="text-sky-400">{hoveredWard.rainfall} mm</b></div>
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Risk Score</span>
+              <b className="text-[var(--brand)] text-xs">{hoveredWard.score}/100</b>
+            </div>
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Severity Status</span>
+              <b className={
+                hoveredWard.level === 'CRITICAL' ? 'text-rose-400 font-bold' :
+                hoveredWard.level === 'HIGH' ? 'text-orange-400 font-bold' :
+                hoveredWard.level === 'MODERATE' ? 'text-yellow-400 font-bold' : 'text-emerald-400 font-bold'
+              }>{hoveredWard.level}</b>
+            </div>
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Drainage Capacity</span>
+              <b className="text-[var(--text-primary)]">{hoveredWard.drainage}%</b>
+            </div>
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Rainfall Rate</span>
+              <b className="text-sky-400">{hoveredWard.rainfall} mm</b>
+            </div>
           </div>
-          <div className="text-[9px] text-[var(--brand)] pt-0.5 border-t border-[var(--border)] font-medium">
+          <div className="text-[9px] text-[var(--brand)] pt-1 border-t border-white/10 font-semibold tracking-wide">
             Click circle to lock ward telemetry & zoom in →
           </div>
         </div>
       )}
 
-      {/* ── Bottom-Right: Color Risk Choropleth Legend (Strict Rectangle) ── */}
-      <div className="absolute bottom-3 right-3 z-[400] bg-[var(--surface-elevated)]/95 backdrop-blur-md border border-[var(--border)] p-2.5 rounded-none shadow-md space-y-1 text-[10px] pointer-events-auto">
-        <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-muted)] font-mono">
+      {/* ── Bottom-Right: Color Risk Choropleth Legend (Strict Glassmorphism Rectangle) ── */}
+      <div className="absolute bottom-3 right-3 z-[400] map-glass-box p-2.5 space-y-1.5 text-[10px] pointer-events-auto">
+        <div className="text-[9px] font-bold uppercase tracking-wider opacity-75 font-mono">
           Flood Risk Zone Legend
         </div>
         <div className="flex items-center space-x-3 font-mono">
-          <span className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-none bg-rose-500 inline-block animate-pulse" />
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-rose-500 inline-block animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
             <span className="text-rose-400 font-bold">Critical</span>
           </span>
-          <span className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-none bg-orange-500 inline-block" />
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-orange-500 inline-block shadow-[0_0_6px_rgba(249,115,22,0.4)]" />
             <span className="text-orange-400 font-bold">High</span>
           </span>
-          <span className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-none bg-yellow-500 inline-block" />
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-yellow-500 inline-block shadow-[0_0_6px_rgba(234,179,8,0.4)]" />
             <span className="text-yellow-400 font-bold">Mod</span>
           </span>
-          <span className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-none bg-emerald-500 inline-block" />
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-emerald-500 inline-block shadow-[0_0_6px_rgba(34,197,94,0.4)]" />
             <span className="text-emerald-400 font-bold">Low</span>
           </span>
         </div>

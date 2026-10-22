@@ -394,7 +394,7 @@ export default function Dashboard() {
                     <span>Retry</span>
                   </button>
                 )}
-                <span className="text-[11px] text-[var(--text-muted)] hidden sm:inline">Click ward polygon to inspect</span>
+                <span className="text-[11px] text-[var(--text-muted)] hidden sm:inline">Click ward circle to inspect</span>
               </div>
             </div>
 
