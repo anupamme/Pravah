@@ -4,10 +4,11 @@
   "private": true,
   "description": "Pravah V2 — Municipal Flood Intelligence Platform",
   "scripts": {
-    "install:all": "npm install --prefix server && npm install --prefix client",
+    "start": "npm run dev",
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan.bold,magenta.bold\" --kill-others-on-fail \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
+    "install:all": "npm install --prefix server && npm install --prefix client",
     "build": "npm run build --prefix client",
     "test": "npm test --prefix server",
     "verify:phase15": "npm run verify:phase15 --prefix server"

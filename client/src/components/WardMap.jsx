@@ -1,7 +1,9 @@
-import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
-  ZoomIn, ZoomOut, RotateCcw, MapPin, AlertTriangle,
-  Waves, Layers
+  MapPin, AlertTriangle, Layers, Droplets, ZoomIn, ZoomOut, RotateCcw,
+  Eye, EyeOff, ShieldAlert, Waves
 } from 'lucide-react';
 import fallbackWards from '../data/fallback-wards.json';
 
@@ -17,32 +19,30 @@ const CHRONIC_HOTSPOTS = [
 ];
 
 /**
- * WardMap — High-Performance Interactive Vector GIS Engine for Delhi Municipal Flood Intelligence.
- *
- * Designed as a 100% keyless, offline-first vector choropleth map.
- * Operates without external tile servers, API keys, or third-party map SDKs.
+ * WardMap — High-Performance Leaflet GIS Engine for Delhi Municipal Flood Intelligence.
+ * 100% Free & Keyless OpenStreetMap Base Tiles (NO API Keys Required).
+ * Renders interactive circular flood zones that scale, zoom, and separate naturally across Delhi.
  */
 export default function WardMap({
   wardsData,
   selectedWardId,
   onSelectWard,
-  height = '480px',
+  height = '500px',
 }) {
-  const containerRef = useRef(null);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const wardCirclesGroupRef = useRef(null);
+  const hotspotsGroupRef = useRef(null);
+  const tileLayerRef = useRef(null);
+
+  // Map Controls State
+  const [mapTheme, setMapTheme] = useState('street'); // 'street' | 'dark'
+  const [showHotspots, setShowHotspots] = useState(true);
+  const [showCircles, setShowCircles] = useState(true);
   const [hoveredWard, setHoveredWard] = useState(null);
   const [hoveredHotspot, setHoveredHotspot] = useState(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
-  // Layer Toggles
-  const [showHotspots, setShowHotspots] = useState(true);
-  const [showYamunaGauge, setShowYamunaGauge] = useState(true);
-  const [showRadarSweep, setShowRadarSweep] = useState(true);
-
-  // Use provided wardsData or fallback directly
+  // Wards GeoJSON Features with resilient fallback
   const data = useMemo(() => {
     if (wardsData && wardsData.features && wardsData.features.length > 0) {
       return wardsData;
@@ -50,87 +50,25 @@ export default function WardMap({
     return fallbackWards;
   }, [wardsData]);
 
-  // Delhi coordinate bounds with margin
-  const bounds = useMemo(() => {
-    return {
-      minLng: 76.82,
-      maxLng: 77.34,
-      minLat: 28.44,
-      maxLat: 28.88,
-    };
-  }, []);
-
-  const svgWidth = 900;
-  const svgHeight = 760;
-
-  // Projection: [lng, lat] -> [svgX, svgY]
-  const project = useCallback(
-    (lng, lat) => {
-      const padLng = (bounds.maxLng - bounds.minLng) * 0.035;
-      const padLat = (bounds.maxLat - bounds.minLat) * 0.035;
-      const minX = bounds.minLng - padLng;
-      const maxX = bounds.maxLng + padLng;
-      const minY = bounds.minLat - padLat;
-      const maxY = bounds.maxLat + padLat;
-
-      const x = ((lng - minX) / (maxX - minX)) * svgWidth;
-      const y = ((maxY - lat) / (maxY - minY)) * svgHeight;
-      return [x, y];
-    },
-    [bounds, svgWidth, svgHeight]
-  );
-
-  /** Helper to normalize risk levels */
   const normalizeLevel = (level) => String(level || '').toUpperCase().trim();
 
-  const getRiskColors = (level) => {
+  const getRiskColor = (level) => {
     switch (normalizeLevel(level)) {
       case 'CRITICAL':
-        return { fill: '#ef4444', stroke: '#b91c1c', opacity: 0.65 };
+        return { fill: '#ef4444', stroke: '#b91c1c', opacity: 0.55 };
       case 'HIGH':
-        return { fill: '#f97316', stroke: '#c2410c', opacity: 0.52 };
+        return { fill: '#f97316', stroke: '#c2410c', opacity: 0.45 };
       case 'MODERATE':
       case 'MEDIUM':
-        return { fill: '#eab308', stroke: '#a16207', opacity: 0.40 };
+        return { fill: '#eab308', stroke: '#a16207', opacity: 0.35 };
       case 'LOW':
       default:
         return { fill: '#22c55e', stroke: '#15803d', opacity: 0.28 };
     }
   };
 
-  // Helper to convert ring coordinates into a smooth organic SVG path
-  const buildSmoothPath = useCallback((ring) => {
-    if (!ring || ring.length < 3) return '';
-    const pts = ring.map((pt) => project(pt[0], pt[1]));
-    // Remove duplicate trailing point if closed
-    if (
-      pts.length > 3 &&
-      Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 0.1
-    ) {
-      pts.pop();
-    }
-    const n = pts.length;
-    if (n < 3) return '';
-
-    // Calculate midpoints between each consecutive vertex
-    const midpoints = [];
-    for (let i = 0; i < n; i++) {
-      const next = pts[(i + 1) % n];
-      midpoints.push([(pts[i][0] + next[0]) / 2, (pts[i][1] + next[1]) / 2]);
-    }
-
-    // Smooth path using quadratic Bezier curves through midpoints
-    let str = `M ${midpoints[0][0].toFixed(1)} ${midpoints[0][1].toFixed(1)}`;
-    for (let i = 0; i < n; i++) {
-      const ctrl = pts[(i + 1) % n];
-      const nextMid = midpoints[(i + 1) % n];
-      str += ` Q ${ctrl[0].toFixed(1)} ${ctrl[1].toFixed(1)} ${nextMid[0].toFixed(1)} ${nextMid[1].toFixed(1)}`;
-    }
-    return str + ' Z ';
-  }, [project]);
-
-  // Convert GeoJSON MultiPolygons into SVG path elements
-  const wardPaths = useMemo(() => {
+  // Compute Lat/Lng centroid for all 250 wards
+  const wardCentroids = useMemo(() => {
     return (data.features || []).map((feature, idx) => {
       const p = feature.properties || {};
       const code = p.ward_code || p.id || `W${String(idx + 1).padStart(3, '0')}`;
@@ -139,28 +77,21 @@ export default function WardMap({
       const score = p.riskScore ?? p.current_risk_score ?? 50;
       const drainage = p.drainageCapacity ?? p.drainage_capacity ?? 50;
       const rainfall = p.rainfall ?? 28.5;
+      const zone = p.zone || 'Central Delhi';
 
-      let pathStr = '';
+      let lat = 28.6139;
+      let lng = 77.2090;
       const coords = feature.geometry?.coordinates || [];
 
-      if (feature.geometry?.type === 'Polygon') {
-        for (const ring of coords) {
-          pathStr += buildSmoothPath(ring);
+      try {
+        const ring = feature.geometry?.type === 'Polygon' ? coords[0] : coords[0]?.[0];
+        if (ring && ring.length > 0) {
+          const sum = ring.reduce((acc, pt) => [acc[0] + pt[0], acc[1] + pt[1]], [0, 0]);
+          lng = sum[0] / ring.length;
+          lat = sum[1] / ring.length;
         }
-      } else {
-        // MultiPolygon
-        for (const polygon of coords) {
-          for (const ring of polygon) {
-            pathStr += buildSmoothPath(ring);
-          }
-        }
-      }
-
-      // Compute or retrieve centroid
-      let centroid = null;
-      if (p.centroid && typeof p.centroid.latitude === 'number') {
-        const [cx, cy] = project(p.centroid.longitude, p.centroid.latitude);
-        centroid = { x: cx, y: cy };
+      } catch {
+        // use fallback center
       }
 
       return {
@@ -170,494 +101,375 @@ export default function WardMap({
         score,
         drainage,
         rainfall,
-        path: pathStr.trim(),
-        centroid,
+        zone,
+        lat,
+        lng,
         rawProperties: p,
       };
     });
-  }, [data, project, buildSmoothPath]);
+  }, [data]);
 
-  // Stylized Yamuna River path across Delhi
-  const yamunaPath = useMemo(() => {
-    const yamunaPoints = [
-      [77.20, 28.87],
-      [77.22, 28.80],
-      [77.23, 28.74],
-      [77.24, 28.69],
-      [77.25, 28.65],
-      [77.27, 28.60],
-      [77.29, 28.55],
-      [77.31, 28.48],
-      [77.32, 28.45],
-    ];
-    return yamunaPoints
-      .map((pt, i) => {
-        const [x, y] = project(pt[0], pt[1]);
-        return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
-      })
-      .join(' ');
-  }, [project]);
-
-  // Projected coordinates for the 7 Delhi Chronic Flood Hotspots
-  const projectedHotspots = useMemo(() => {
-    return CHRONIC_HOTSPOTS.map((h) => {
-      const [x, y] = project(h.lng, h.lat);
-      return { ...h, x, y };
-    });
-  }, [project]);
-
-  // Mouse wheel zoom
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-    setZoom((prev) => Math.min(Math.max(0.8, prev * zoomFactor), 4.5));
-  };
-
-  // Drag to pan
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return; // Only left click
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-  };
-
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      setPan({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setTooltipPos({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const resetView = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
-
-  // Center on selected ward if selected from outside
+  // ── 1. Initialize Leaflet Map Instance ────────────────────
   useEffect(() => {
-    if (!selectedWardId) return;
-    const target = wardPaths.find(
-      (w) => w.code === selectedWardId || String(w.code) === String(selectedWardId)
+    if (!mapContainerRef.current) return;
+
+    if (!mapInstanceRef.current) {
+      // Create Leaflet Map centered on Delhi
+      const map = L.map(mapContainerRef.current, {
+        center: [28.625, 77.200],
+        zoom: 11,
+        minZoom: 10,
+        maxZoom: 17,
+        zoomControl: false,
+        attributionControl: false,
+      });
+
+      // Strict Delhi Municipal Boundary Constraints
+      const delhiBounds = L.latLngBounds([28.38, 76.80], [28.92, 77.40]);
+      map.setMaxBounds(delhiBounds);
+
+      // Official Keyless OpenStreetMap Tiles (100% Free & No API Key Needed)
+      const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+
+      tileLayerRef.current = tileLayer;
+      wardCirclesGroupRef.current = L.layerGroup().addTo(map);
+      hotspotsGroupRef.current = L.layerGroup().addTo(map);
+      mapInstanceRef.current = map;
+
+      // Ensure tiles render immediately without gray blank areas
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 350);
+    }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  // ── 2. Render Interactive Circles for Zones (Zoom & Separate) ─
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const group = wardCirclesGroupRef.current;
+    if (!map || !group) return;
+
+    group.clearLayers();
+    if (!showCircles) return;
+
+    wardCentroids.forEach((ward) => {
+      const isSelected = selectedWardId && String(ward.code) === String(selectedWardId);
+      const colors = getRiskColor(ward.level);
+
+      // In Leaflet, L.circle radius is defined in METERS on the real earth!
+      // This means as the user zooms in, the circles zoom and SEPARATE across the street grid!
+      const circle = L.circle([ward.lat, ward.lng], {
+        radius: isSelected ? 850 : 650, // 650 meters radius
+        color: isSelected ? '#38bdf8' : colors.stroke,
+        weight: isSelected ? 3.5 : 1.5,
+        fillColor: isSelected ? '#0284c7' : colors.fill,
+        fillOpacity: isSelected ? 0.80 : colors.opacity,
+        className: 'interactive-ward-circle',
+      });
+
+      // Interactive Events
+      circle.on({
+        mouseover: (e) => {
+          const target = e.target;
+          target.setStyle({
+            weight: 3.0,
+            color: '#38bdf8',
+            fillOpacity: 0.75,
+          });
+          target.bringToFront();
+          setHoveredWard(ward);
+        },
+        mouseout: (e) => {
+          const target = e.target;
+          if (!isSelected) {
+            target.setStyle({
+              weight: 1.5,
+              color: colors.stroke,
+              fillOpacity: colors.opacity,
+            });
+          }
+          setHoveredWard(null);
+        },
+        click: () => {
+          if (onSelectWard) {
+            onSelectWard(ward.rawProperties);
+          }
+          map.flyTo([ward.lat, ward.lng], Math.max(map.getZoom(), 13), {
+            duration: 0.8,
+          });
+        },
+      });
+
+      // Bind clean tooltip popup
+      circle.bindTooltip(
+        `<div style="font-family: monospace; font-size: 11px; padding: 2px;">
+          <b>${ward.name}</b> (${ward.code})<br/>
+          Risk Score: <b>${ward.score}/100</b> · ${ward.level}
+        </div>`,
+        { sticky: true, className: 'ward-circle-tooltip' }
+      );
+
+      group.addLayer(circle);
+    });
+  }, [wardCentroids, selectedWardId, showCircles, onSelectWard]);
+
+  // ── 3. Render Circular Chronic Flood Hotspots (Beacons) ──
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const group = hotspotsGroupRef.current;
+    if (!map || !group) return;
+
+    group.clearLayers();
+    if (!showHotspots) return;
+
+    CHRONIC_HOTSPOTS.forEach((spot) => {
+      const isCrit = spot.severity === 'CRITICAL';
+      const color = isCrit ? '#ef4444' : '#f97316';
+
+      // Outer Radar Ripple Circle (400 meters radius)
+      const rippleCircle = L.circle([spot.lat, spot.lng], {
+        radius: 400,
+        color: color,
+        weight: 1.5,
+        fillColor: color,
+        fillOpacity: 0.20,
+        dashArray: '4 4',
+      });
+
+      // Center Core CircleMarker (Fixed pixel circle beacon)
+      const coreMarker = L.circleMarker([spot.lat, spot.lng], {
+        radius: 7,
+        color: '#ffffff',
+        weight: 2,
+        fillColor: color,
+        fillOpacity: 1,
+      });
+
+      coreMarker.on({
+        mouseover: () => setHoveredHotspot(spot),
+        mouseout: () => setHoveredHotspot(null),
+        click: () => {
+          const matchedWard = wardCentroids.find((w) => w.code === spot.ward);
+          if (matchedWard && onSelectWard) {
+            onSelectWard(matchedWard.rawProperties);
+          }
+          map.flyTo([spot.lat, spot.lng], 14, { duration: 0.8 });
+        },
+      });
+
+      // Popup with emergency depth telemetry in matching glassmorphism styling
+      coreMarker.bindPopup(
+        `<div class="font-mono text-xs select-none">
+          <div class="font-bold text-xs" style="color: ${color}; margin-bottom: 2px;">${spot.name}</div>
+          <div class="text-[10px] opacity-75 font-mono">${spot.type} · Ward ${spot.ward}</div>
+          <div class="mt-1.5 text-[11px] font-mono">Waterlogging Depth: <b class="text-rose-400 font-bold">${spot.depth}</b></div>
+          <div class="text-[10px] font-bold text-sky-400 mt-1 uppercase tracking-wider">${spot.status}</div>
+        </div>`
+      );
+
+      group.addLayer(rippleCircle);
+      group.addLayer(coreMarker);
+    });
+  }, [showHotspots, wardCentroids, onSelectWard]);
+
+  // ── 4. Center on Selected Ward ────────────────────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !selectedWardId) return;
+
+    const target = wardCentroids.find(
+      (w) => String(w.code) === String(selectedWardId)
     );
-    if (target && target.centroid) {
-      // Smoothly offset pan toward center
-      const centerX = svgWidth / 2;
-      const centerY = svgHeight / 2;
-      setPan({
-        x: (centerX - target.centroid.x) * (zoom * 0.4),
-        y: (centerY - target.centroid.y) * (zoom * 0.4),
+
+    if (target) {
+      map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 12), {
+        duration: 0.8,
       });
     }
-  }, [selectedWardId, wardPaths, svgWidth, svgHeight, zoom]);
+  }, [selectedWardId, wardCentroids]);
+
+  // Map Navigation Handlers
+  const handleZoomIn = () => mapInstanceRef.current?.zoomIn();
+  const handleZoomOut = () => mapInstanceRef.current?.zoomOut();
+  const handleReset = () => {
+    mapInstanceRef.current?.setView([28.625, 77.200], 11, { animate: true });
+  };
 
   return (
     <div
-      ref={containerRef}
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={() => {
-        setIsDragging(false);
-        setHoveredWard(null);
-        setHoveredHotspot(null);
-      }}
       style={{ height, width: '100%' }}
-      className={`relative select-none overflow-hidden rounded-none border border-[var(--border)] bg-[#030712] ${
-        isDragging ? 'cursor-grabbing' : 'cursor-grab'
+      className={`relative select-none overflow-hidden rounded-none border border-[var(--border)] shadow-sm font-mono text-xs ${
+        mapTheme === 'dark' ? 'leaflet-dark-mode' : ''
       }`}
     >
-      {/* Background GIS Grid Pattern */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
-        <defs>
-          <pattern id="gis-grid" width="36" height="36" patternUnits="userSpaceOnUse">
-            <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(56, 189, 248, 0.4)" strokeWidth="0.5" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#gis-grid)" />
-      </svg>
+      {/* ── Leaflet Map Container ─────────────────────────────── */}
+      <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-      {/* Main Vector Map Layer */}
-      <svg
-        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-        className="w-full h-full transition-transform duration-75 ease-out"
-        style={{
-          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-          transformOrigin: 'center center',
-        }}
-      >
-        <defs>
-          {/* Glowing filter for selected ward */}
-          <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#38bdf8" floodOpacity="0.8" />
-          </filter>
-          <filter id="glow-red" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#ef4444" floodOpacity="0.7" />
-          </filter>
-        </defs>
-
-        {/* River Yamuna Corridor */}
-        <g opacity="0.45">
-          <path
-            d={yamunaPath}
-            fill="none"
-            stroke="#0284c7"
-            strokeWidth="14"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d={yamunaPath}
-            fill="none"
-            stroke="#38bdf8"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </g>
-
-        {/* 250 Municipal Ward Polygons */}
-        <g>
-          {wardPaths.map((ward) => {
-            const isSelected =
-              ward.code === selectedWardId ||
-              String(ward.code) === String(selectedWardId);
-            const isHovered = hoveredWard?.code === ward.code;
-            const colors = getRiskColors(ward.level);
-
-            return (
-              <path
-                key={ward.code}
-                d={ward.path}
-                fill={isSelected ? '#0284c7' : colors.fill}
-                fillOpacity={isSelected ? 0.80 : isHovered ? 0.72 : colors.opacity}
-                stroke={isSelected ? '#38bdf8' : isHovered ? '#38bdf8' : colors.stroke}
-                strokeWidth={isSelected ? 2.8 : isHovered ? 2.0 : 0.8}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter={isSelected || isHovered ? 'url(#glow-cyan)' : undefined}
-                className="transition-colors duration-150 cursor-pointer"
-                onMouseEnter={() => {
-                  setHoveredHotspot(null);
-                  setHoveredWard(ward);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setHoveredHotspot(null);
-                  setHoveredWard(null);
-                  if (onSelectWard) onSelectWard(ward.rawProperties);
-                }}
-              />
-            );
-          })}
-        </g>
-
-        {/* Centroid Pulse Beacons for Critical & High Risk Wards */}
-        <g pointerEvents="none">
-          {wardPaths
-            .filter((w) => (w.level === 'CRITICAL' || w.level === 'HIGH') && w.centroid)
-            .map((w) => {
-              const isCrit = w.level === 'CRITICAL';
-              const color = isCrit ? '#ef4444' : '#f97316';
-              return (
-                <g key={`pulse-${w.code}`}>
-                  {/* Expanding radar ring */}
-                  <circle
-                    cx={w.centroid.x}
-                    cy={w.centroid.y}
-                    r={isCrit ? 9 : 7}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    opacity="0.8"
-                  >
-                    <animate
-                      attributeName="r"
-                      values={isCrit ? '4;16;4' : '3;12;3'}
-                      dur={isCrit ? '1.8s' : '2.4s'}
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="opacity"
-                      values="0.9;0.1;0.9"
-                      dur={isCrit ? '1.8s' : '2.4s'}
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                  {/* Core dot */}
-                  <circle
-                    cx={w.centroid.x}
-                    cy={w.centroid.y}
-                    r={isCrit ? 3.5 : 2.5}
-                    fill={color}
-                    stroke="#ffffff"
-                    strokeWidth="0.8"
-                  />
-                </g>
-              );
-            })}
-        </g>
-
-        {/* Chronic Hydrological Flood Hotspots Layer */}
-        {showHotspots && (
-          <g>
-            {projectedHotspots.map((h) => {
-              const isCrit = h.severity === 'CRITICAL';
-              const col = isCrit ? '#ef4444' : '#f97316';
-              return (
-                <g
-                  key={h.id}
-                  className="cursor-pointer"
-                  onMouseEnter={() => {
-                    setHoveredWard(null);
-                    setHoveredHotspot(h);
-                  }}
-                  onMouseLeave={() => setHoveredHotspot(null)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setHoveredHotspot(null);
-                    setHoveredWard(null);
-                    const targetWard = wardPaths.find((w) => w.code === h.ward);
-                    if (targetWard && onSelectWard) onSelectWard(targetWard.rawProperties);
-                  }}
-                >
-                  {/* Circular Radar Ripple */}
-                  <circle cx={h.x} cy={h.y} r="14" fill="none" stroke={col} strokeWidth="1.5" opacity="0.85">
-                    <animate attributeName="r" values="6;22;6" dur="2s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2s" repeatCount="indefinite" />
-                  </circle>
-                  {/* Simple Circular Beacon Badge */}
-                  <circle
-                    cx={h.x}
-                    cy={h.y}
-                    r="8.5"
-                    fill="#030712"
-                    stroke={col}
-                    strokeWidth="2.2"
-                  />
-                  {/* Inner Warning Core */}
-                  <circle cx={h.x} cy={h.y} r="3.5" fill={col} />
-                </g>
-              );
-            })}
-          </g>
-        )}
-
-        {/* River Label */}
-        <text
-          x={project(77.27, 28.61)[0] + 12}
-          y={project(77.27, 28.61)[1]}
-          fill="#38bdf8"
-          fontSize="11"
-          fontWeight="600"
-          letterSpacing="0.1em"
-          opacity="0.75"
-          className="font-mono uppercase pointer-events-none"
-        >
-          River Yamuna
-        </text>
-      </svg>
-
-      {/* ── Top Command Bar (Non-Colliding Unified Layout) ─────── */}
-      <div className="absolute top-2.5 inset-x-2.5 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-        {/* Left: Vector Badge & Hydrological Gauge */}
-        <div className="flex items-center gap-1.5 pointer-events-auto flex-wrap">
-          <div className="px-2 py-1 bg-[#091220]/90 backdrop-blur-md border border-slate-800 text-[10px] font-mono text-slate-400 flex items-center space-x-1.5 shadow-sm">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none animate-pulse" />
-            <span className="hidden sm:inline">Vector GIS · Keyless</span>
-            <span className="sm:hidden">GIS</span>
-          </div>
-
-          {showYamunaGauge && (
-            <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-[#091220]/95 backdrop-blur-md border border-rose-500/40 text-[10px] font-mono shadow-sm">
-              <Waves className="w-3 h-3 text-sky-400 flex-shrink-0 animate-pulse" />
-              <span className="text-slate-300 hidden md:inline">Yamuna Gauge:</span>
-              <span className="font-bold text-rose-400">205.38m</span>
-              <span className="text-rose-400 font-bold uppercase text-[9px] px-1 bg-rose-500/15 border border-rose-500/30 hidden sm:inline">
-                DANGER +5cm
-              </span>
-            </div>
-          )}
+      {/* ── Top-Left: Map Controls & Telemetry Header (Strict Glassmorphism Rectangles) ── */}
+      <div className="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-1.5 pointer-events-auto">
+        {/* Real Map Indicator */}
+        <div className="map-glass-box px-2.5 py-1.5 text-[10px] font-mono flex items-center space-x-1.5">
+          <span className="w-2 h-2 rounded-none bg-emerald-500 animate-pulse" />
+          <span className="font-bold tracking-wide">OpenStreetMap Live GIS</span>
         </div>
 
-        {/* Right: Layer Toggles & Zoom Controls */}
-        <div className="flex items-center gap-1.5 pointer-events-auto ml-auto">
-          {/* Layer Toggles */}
-          <div className="flex items-center space-x-1 bg-[#091220]/90 backdrop-blur-md p-0.5 border border-slate-800 text-[10px] font-mono shadow-sm">
-            <button
-              onClick={() => setShowHotspots(!showHotspots)}
-              className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
-                showHotspots
-                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Toggle Chronic Flood Hotspots"
-            >
-              <AlertTriangle className="w-3 h-3 text-rose-400" />
-              <span className="hidden sm:inline">Hotspots</span>
-              <span>({CHRONIC_HOTSPOTS.length})</span>
-            </button>
-            <button
-              onClick={() => setShowYamunaGauge(!showYamunaGauge)}
-              className={`px-2 py-0.5 rounded-none flex items-center space-x-1 transition-colors cursor-pointer ${
-                showYamunaGauge
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Toggle River Yamuna Water Level Gauge"
-            >
-              <Waves className="w-3 h-3 text-sky-400" />
-              <span className="hidden sm:inline">Yamuna</span>
-            </button>
-          </div>
+        {/* Theme Switcher (Street View vs Dark Tactical) */}
+        <div className="map-glass-box flex items-center space-x-1 p-1">
+          <button
+            type="button"
+            onClick={() => setMapTheme('street')}
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer ${
+              mapTheme === 'street'
+                ? 'map-glass-btn-active'
+                : 'map-glass-btn'
+            }`}
+          >
+            Street Map
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapTheme('dark')}
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer ${
+              mapTheme === 'dark'
+                ? 'map-glass-btn-active'
+                : 'map-glass-btn'
+            }`}
+          >
+            Dark Tactical
+          </button>
+        </div>
 
-          {/* Zoom Buttons */}
-          <div className="flex items-center space-x-0.5 bg-[#091220]/90 backdrop-blur-md p-0.5 border border-slate-800 shadow-sm">
-            <button
-              onClick={() => setZoom((z) => Math.min(z * 1.25, 4.5))}
-              className="p-1 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
-              title="Zoom In"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setZoom((z) => Math.max(z * 0.8, 0.8))}
-              className="p-1 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
-              title="Zoom Out"
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={resetView}
-              className="p-1 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
-              title="Reset Overview"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-          </div>
+        {/* Layer Toggles */}
+        <div className="map-glass-box flex items-center space-x-1 p-1">
+          <button
+            type="button"
+            onClick={() => setShowCircles(!showCircles)}
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer flex items-center space-x-1 ${
+              showCircles
+                ? 'map-glass-btn-active'
+                : 'map-glass-btn'
+            }`}
+          >
+            <span>Zone Circles ({wardCentroids.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowHotspots(!showHotspots)}
+            className={`px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-bold rounded-none cursor-pointer flex items-center space-x-1 ${
+              showHotspots
+                ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50 shadow-sm'
+                : 'map-glass-btn'
+            }`}
+          >
+            <AlertTriangle className="w-3 h-3 text-rose-400" />
+            <span>Hotspots ({CHRONIC_HOTSPOTS.length})</span>
+          </button>
         </div>
       </div>
 
-      {/* ── Mutually Exclusive Tooltips (Sleek Dark Aerospace Glass) ── */}
-      {hoveredHotspot ? (
-        <div
-          className="absolute z-50 pointer-events-none p-3.5 rounded-none bg-[#0a1222]/95 backdrop-blur-md border border-rose-500/50 text-xs shadow-2xl transition-opacity duration-75 max-w-[240px]"
-          style={{
-            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 250))}px`,
-            top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 160))}px`,
-          }}
+      {/* ── Top-Right: Zoom & Reset Navigation (Strict Glassmorphism Rectangles) ── */}
+      <div className="absolute top-3 right-3 z-[400] flex flex-col space-y-1 map-glass-box p-1 pointer-events-auto">
+        <button
+          onClick={handleZoomIn}
+          title="Zoom In (Circles will separate)"
+          className="map-glass-btn p-1.5 flex items-center justify-center cursor-pointer"
         >
-          <div className="flex items-center space-x-1.5 text-rose-400 font-bold text-[10px] uppercase tracking-wider mb-1">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Chronic Vulnerability Choke</span>
-          </div>
-          <div className="font-bold text-white text-[13px] mb-0.5">
-            {hoveredHotspot.name}
-          </div>
-          <div className="text-[10px] text-slate-400 font-mono mb-2">
-            Classification: {hoveredHotspot.type} · Ward {hoveredHotspot.ward}
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-slate-800 pt-2 mb-2">
-            <div>
-              Water Depth: <b className="text-rose-400">{hoveredHotspot.depth}</b>
-            </div>
-            <div>
-              Severity: <b className="text-rose-400">{hoveredHotspot.severity}</b>
-            </div>
-          </div>
-          <div className="p-1.5 bg-rose-500/10 border border-rose-500/30 text-[10px] text-rose-300 font-mono">
-            STATUS: {hoveredHotspot.status}
-          </div>
-        </div>
-      ) : hoveredWard ? (
-        <div
-          className="absolute z-50 pointer-events-none p-3 rounded-none bg-[#0a1222]/95 backdrop-blur-md border border-cyan-500/40 text-xs shadow-2xl transition-opacity duration-75 max-w-[220px]"
-          style={{
-            left: `${Math.max(10, Math.min(tooltipPos.x + 14, (containerRef.current?.clientWidth || 800) - 230))}px`,
-            top: `${Math.max(10, Math.min(tooltipPos.y + 14, (containerRef.current?.clientHeight || 480) - 130))}px`,
-          }}
+          <ZoomIn className="w-4 h-4" />
+        </button>
+        <button
+          onClick={handleZoomOut}
+          title="Zoom Out"
+          className="map-glass-btn p-1.5 flex items-center justify-center cursor-pointer"
         >
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <span className="font-bold text-white text-[12px] truncate">
-              {hoveredWard.name}
+          <ZoomOut className="w-4 h-4" />
+        </button>
+        <button
+          onClick={handleReset}
+          title="Reset Delhi Overview"
+          className="map-glass-btn p-1.5 flex items-center justify-center cursor-pointer"
+        >
+          <RotateCcw className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* ── Bottom-Left: Real-Time Ward Telemetry HUD (Strict Glassmorphism Rectangle) ── */}
+      {hoveredWard && (
+        <div className="absolute bottom-3 left-3 z-[400] max-w-sm map-glass-box border-l-4 border-l-[var(--brand)] p-3 space-y-2 animate-in fade-in pointer-events-none">
+          <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-1.5">
+            <span className="font-bold text-[var(--text-primary)] text-xs flex items-center space-x-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[var(--brand)]" />
+              <span>{hoveredWard.name}</span>
             </span>
-            <span className="font-mono text-[10px] text-sky-400 font-bold">
+            <span className="px-1.5 py-0.5 bg-white/10 text-[var(--text-primary)] border border-white/15 text-[9px] uppercase font-bold">
               {hoveredWard.code}
             </span>
           </div>
 
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider">
-              Composite Risk
-            </span>
-            <span
-              className={`px-1.5 py-0.5 text-[10px] font-bold uppercase rounded-none ${
-                hoveredWard.level === 'CRITICAL'
-                  ? 'bg-red-500/20 text-red-400 border border-red-500/40'
-                  : hoveredWard.level === 'HIGH'
-                  ? 'bg-orange-500/20 text-orange-400 border border-orange-500/40'
-                  : hoveredWard.level === 'MODERATE'
-                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40'
-                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-              }`}
-            >
-              {hoveredWard.level} ({hoveredWard.score})
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-300 border-t border-slate-800 pt-1.5">
-            <div>
-              Drainage: <b className="text-white">{hoveredWard.drainage}%</b>
+          <div className="grid grid-cols-2 gap-2 text-[10px]">
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Risk Score</span>
+              <b className="text-[var(--brand)] text-xs">{hoveredWard.score}/100</b>
             </div>
-            <div>
-              Rainfall: <b className="text-white">{hoveredWard.rainfall} mm</b>
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Severity Status</span>
+              <b className={
+                hoveredWard.level === 'CRITICAL' ? 'text-rose-400 font-bold' :
+                hoveredWard.level === 'HIGH' ? 'text-orange-400 font-bold' :
+                hoveredWard.level === 'MODERATE' ? 'text-yellow-400 font-bold' : 'text-emerald-400 font-bold'
+              }>{hoveredWard.level}</b>
+            </div>
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Drainage Capacity</span>
+              <b className="text-[var(--text-primary)]">{hoveredWard.drainage}%</b>
+            </div>
+            <div className="flex flex-col">
+              <span className="opacity-70 text-[9px]">Rainfall Rate</span>
+              <b className="text-sky-400">{hoveredWard.rainfall} mm</b>
             </div>
           </div>
-          <div className="text-[9px] text-sky-400 mt-1.5 font-medium">
-            Click polygon to view live telemetry →
+          <div className="text-[9px] text-[var(--brand)] pt-1 border-t border-white/10 font-semibold tracking-wide">
+            Click circle to lock ward telemetry & zoom in →
           </div>
         </div>
-      ) : null}
+      )}
 
-      {/* Theme-Adaptive Risk Legend (Bottom Left - Dark Telemetry Panel) */}
-      <div className="absolute bottom-3 left-3 z-20 bg-[#091220]/95 backdrop-blur-md p-3 rounded-none border border-slate-800 text-xs shadow-md">
-        <div className="font-bold text-white mb-2 text-[10px] uppercase tracking-wider flex items-center space-x-1.5">
-          <Layers className="w-3 h-3 text-sky-400" />
-          <span>Delhi Ward Risk Index</span>
+      {/* ── Bottom-Right: Color Risk Choropleth Legend (Strict Glassmorphism Rectangle) ── */}
+      <div className="absolute bottom-3 right-3 z-[400] map-glass-box p-2.5 space-y-1.5 text-[10px] pointer-events-auto">
+        <div className="text-[9px] font-bold uppercase tracking-wider opacity-75 font-mono">
+          Flood Risk Zone Legend
         </div>
-        <div className="space-y-1 text-[11px] font-medium">
-          {[
-            { color: 'bg-red-500', label: 'Critical', range: '75 – 100', pulse: true },
-            { color: 'bg-orange-500', label: 'High', range: '60 – 74', pulse: true },
-            { color: 'bg-yellow-500', label: 'Moderate', range: '40 – 59', pulse: false },
-            { color: 'bg-emerald-500', label: 'Low', range: '< 40', pulse: false },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center space-x-2">
-              <span className={`w-2.5 h-2.5 ${item.color} ${item.pulse ? 'animate-pulse' : ''}`} />
-              <span className="text-slate-300">{item.label}</span>
-              <span className="text-slate-500 text-[9px] font-mono">({item.range})</span>
-            </div>
-          ))}
+        <div className="flex items-center space-x-3 font-mono">
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-rose-500 inline-block animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+            <span className="text-rose-400 font-bold">Critical</span>
+          </span>
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-orange-500 inline-block shadow-[0_0_6px_rgba(249,115,22,0.4)]" />
+            <span className="text-orange-400 font-bold">High</span>
+          </span>
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-yellow-500 inline-block shadow-[0_0_6px_rgba(234,179,8,0.4)]" />
+            <span className="text-yellow-400 font-bold">Mod</span>
+          </span>
+          <span className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-none bg-emerald-500 inline-block shadow-[0_0_6px_rgba(34,197,94,0.4)]" />
+            <span className="text-emerald-400 font-bold">Safe / Low</span>
+          </span>
         </div>
-      </div>
-
-      {/* Drag & Zoom Instruction Badge (Bottom Right) */}
-      <div className="absolute bottom-3 right-3 z-20 hidden sm:flex items-center space-x-1.5 px-2 py-1 bg-[#091220]/80 backdrop-blur-sm border border-slate-800 text-[9px] font-mono text-slate-400">
-        <MapPin className="w-2.5 h-2.5 text-sky-400" />
-        <span>Drag to pan · Scroll to zoom · Click to select</span>
       </div>
     </div>
   );

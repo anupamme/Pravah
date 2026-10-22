@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle, CloudRain, ShieldCheck, Activity, TrendingUp,
   Search, Eye, RefreshCw, X, ArrowRight, MapPin,
-  Clock, Radio, ChevronRight, ChevronLeft,
+  Clock, Radio, ChevronRight, ChevronLeft, ArrowUpDown, ChevronUp, ChevronDown,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
@@ -68,10 +68,11 @@ function RiskBadge({ level }) {
     MODERATE: 'badge-risk-moderate',
     MEDIUM:   'badge-risk-moderate',
     LOW:      'badge-risk-low',
+    SAFE:     'badge-risk-low',
   }[normalized] || 'badge-risk-moderate';
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide rounded-none ${cls}`}>
-      {normalized || 'MODERATE'}
+    <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-none ${cls}`}>
+      {normalized === 'LOW' ? 'SAFE' : normalized || 'MODERATE'}
     </span>
   );
 }
@@ -83,6 +84,8 @@ export default function Dashboard() {
   const [forecastData, setForecastData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [levelFilter, setLevelFilter] = useState('ALL');
+  const [sortField,   setSortField]   = useState('score'); // 'score' | 'code' | 'name' | 'drainage'
+  const [sortOrder,   setSortOrder]   = useState('desc');  // 'asc' | 'desc'
   const [loading,     setLoading]     = useState(true);
   const [refreshing,  setRefreshing]  = useState(false);
   const [mapError,    setMapError]    = useState(null);
@@ -190,34 +193,88 @@ export default function Dashboard() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const counts = riskSummary?.countsByLevel || { critical: 12, high: 38, moderate: 110, low: 90 };
+  const counts = useMemo(() => {
+    if (!wardsGeo?.features?.length) {
+      return riskSummary?.countsByLevel || { critical: 25, high: 68, moderate: 75, low: 82 };
+    }
+    const c = { critical: 0, high: 0, moderate: 0, low: 0 };
+    wardsGeo.features.forEach((f) => {
+      const lvl = String(f.properties?.riskLevel || f.properties?.current_risk_level || 'MODERATE').toUpperCase();
+      if (lvl === 'CRITICAL') c.critical++;
+      else if (lvl === 'HIGH') c.high++;
+      else if (lvl === 'LOW' || lvl === 'SAFE') c.low++;
+      else c.moderate++;
+    });
+    return c;
+  }, [wardsGeo, riskSummary]);
 
-  const filteredWards = (wardsGeo?.features || [])
-    .filter((f) => {
+  const filteredWards = useMemo(() => {
+    const list = (wardsGeo?.features || []).filter((f) => {
       const p = f.properties || {};
       const name = (p.ward_name || p.name || '').toLowerCase();
       const code = (p.ward_code || p.id || '').toLowerCase();
+      const zone = (p.zone || '').toLowerCase();
       const level = String(p.riskLevel || p.current_risk_level || 'MODERATE').toUpperCase();
-      const q = searchQuery.toLowerCase();
-      const matchesSearch = !q || name.includes(q) || code.includes(q);
-      const matchesLevel = levelFilter === 'ALL' || level === levelFilter;
+      const q = searchQuery.toLowerCase().trim();
+
+      const matchesSearch = !q || name.includes(q) || code.includes(q) || zone.includes(q);
+      const matchesLevel =
+        levelFilter === 'ALL' ||
+        level === levelFilter ||
+        (levelFilter === 'LOW' && (level === 'LOW' || level === 'SAFE')) ||
+        (levelFilter === 'MODERATE' && (level === 'MODERATE' || level === 'MEDIUM'));
+
       return matchesSearch && matchesLevel;
-    })
-    .slice(0, 20);
+    });
+
+    list.sort((a, b) => {
+      const pa = a.properties || {};
+      const pb = b.properties || {};
+      let valA, valB;
+      if (sortField === 'score') {
+        valA = pa.riskScore ?? pa.current_risk_score ?? 50;
+        valB = pb.riskScore ?? pb.current_risk_score ?? 50;
+      } else if (sortField === 'drainage') {
+        valA = pa.drainageCapacity ?? pa.drainage_capacity ?? 50;
+        valB = pb.drainageCapacity ?? pb.drainage_capacity ?? 50;
+      } else if (sortField === 'name') {
+        valA = (pa.ward_name || pa.name || '').toLowerCase();
+        valB = (pb.ward_name || pb.name || '').toLowerCase();
+      } else {
+        valA = pa.ward_code || pa.id || '';
+        valB = pb.ward_code || pb.id || '';
+      }
+
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [wardsGeo, searchQuery, levelFilter, sortField, sortOrder]);
+
+  const toggleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
 
   const avgScore = riskSummary?.cityAverageRiskScore ?? riskSummary?.avgRiskScore;
 
   const kpiCards = [
-    { label: 'Critical Wards',  value: counts.critical ?? 12,
+    { label: 'Critical Zones',  value: counts.critical ?? 25,
       unit: '', icon: AlertCircle, color: 'rose',    sub: 'Immediate pump staging' },
-    { label: 'High Risk',       value: counts.high ?? 38,
+    { label: 'High Alert',      value: counts.high ?? 68,
       unit: '', icon: AlertCircle, color: 'orange',  sub: 'Drainage bottleneck' },
+    { label: 'Moderate Watch',  value: counts.moderate ?? 75,
+      unit: '', icon: Activity,    color: 'amber',   sub: 'Monitored catchments' },
+    { label: 'Safe / Low Risk', value: counts.low ?? 82,
+      unit: '', icon: ShieldCheck, color: 'emerald', sub: 'High natural gradient' },
     { label: 'Precipitation',   value: weather?.rainfallMm != null ? weather.rainfallMm : 0,
-      unit: 'mm/h', icon: CloudRain, color: 'cyan', sub: 'Open-Meteo feed' },
-    { label: 'City Avg Risk',   value: avgScore != null ? parseFloat(avgScore).toFixed(1) : '54.2',
-      unit: '/100', icon: Activity, color: 'amber',  sub: 'Mass-balance index' },
-    { label: 'Total Wards',     value: riskSummary?.totalWardsMonitored ?? 250,
-      unit: '', icon: ShieldCheck, color: 'emerald', sub: 'PostGIS SRID 4326' },
+      unit: 'mm/h', icon: CloudRain, color: 'cyan',  sub: 'Open-Meteo feed' },
   ];
 
   const palette = {
@@ -231,81 +288,77 @@ export default function Dashboard() {
   const evalData = wardDetails?.evaluation;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 page-enter font-inter">
+    <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 py-4 space-y-3.5 page-enter font-inter">
 
-      {/* ── Operational Command Header ──────────────────────────── */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[var(--border)] pb-6">
+      {/* ── Operational Command Header (Compact) ────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[var(--border)] pb-3">
         <div>
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 bg-rose-500/15 border border-rose-500/40 text-rose-400 font-mono text-[10px] font-bold tracking-wider uppercase flex items-center space-x-1.5">
+          <div className="flex flex-wrap items-center gap-1.5 mb-1">
+            <span className="px-2 py-0.5 bg-rose-500/15 border border-rose-500/40 text-rose-400 font-mono text-[9px] font-bold tracking-wider uppercase flex items-center space-x-1.5">
               <span className="w-1.5 h-1.5 bg-rose-500 rounded-none animate-ping" />
-              <span>OPCON-1: ACTIVE MONSOON SURVEILLANCE</span>
+              <span>OPCON-1: MONSOON SURVEILLANCE</span>
             </span>
-            <span className="px-2 py-0.5 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-muted)] font-mono text-[10px] font-semibold flex items-center space-x-1.5">
-              <Clock className="w-3 h-3 text-[var(--brand)]" />
-              <span>{currentTime || 'LIVE TELEMETRY IST'}</span>
-              <span className="opacity-50">(UTC+5:30)</span>
+            <span className="px-2 py-0.5 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-muted)] font-mono text-[9px] font-semibold flex items-center space-x-1">
+              <Clock className="w-2.5 h-2.5 text-[var(--brand)]" />
+              <span>{currentTime || 'LIVE IST'}</span>
             </span>
-            <span className="px-2 py-0.5 bg-sky-500/10 border border-sky-500/30 text-sky-400 font-mono text-[10px] font-semibold">
-              MCD · DDMA JOINT SURVEILLANCE
+            <span className="px-2 py-0.5 bg-sky-500/10 border border-sky-500/30 text-sky-400 font-mono text-[9px] font-semibold">
+              250 MCD WARDS
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-serif text-[var(--text-primary)] tracking-tight">
             Delhi Flood Operations Command
           </h1>
-          <p className="text-[var(--text-muted)] text-xs mt-1 font-sans">
-            Real-time multi-source telemetry · 250 municipal wards · Hydrological mass-balance risk engine
-          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {weather && (
-            <div className="px-3 py-1.5 rounded-none glass-panel text-[11px] text-[var(--text-secondary)] flex items-center space-x-1.5 border border-[var(--border)]">
+            <div className="px-2.5 py-1 rounded-none glass-panel text-[11px] text-[var(--text-secondary)] flex items-center space-x-1.5 border border-[var(--border)]">
               <CloudRain className="w-3.5 h-3.5 text-[var(--brand)]" />
               <span className="text-[var(--text-muted)]">Precip:</span>
               <span className="font-bold text-[var(--brand)]">{weather.rainfallMm ?? 0} mm/h</span>
             </div>
           )}
-          <div className="px-3 py-1.5 rounded-none bg-sky-500/10 border border-sky-500/25 text-[11px] text-[var(--brand)] font-bold flex items-center space-x-1.5 font-mono">
+          <div className="px-2.5 py-1 rounded-none bg-sky-500/10 border border-sky-500/25 text-[10px] text-[var(--brand)] font-bold flex items-center space-x-1 font-mono">
             <span className="w-1.5 h-1.5 rounded-none bg-sky-500 animate-ping" />
             <span>RADAR LIVE</span>
           </div>
           <button
             onClick={() => loadData(true)}
             disabled={refreshing || loading}
-            className="px-3 py-1.5 rounded-none border border-[var(--border)] bg-[var(--surface-soft)] hover:bg-[var(--surface)] text-[var(--text-primary)] text-[11px] font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
+            className="px-2.5 py-1 rounded-none border border-[var(--border)] bg-[var(--surface-soft)] hover:bg-[var(--surface)] text-[var(--text-primary)] text-[11px] font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
             title="Refresh live telemetry"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[var(--brand)] ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3 h-3 text-[var(--brand)] ${refreshing ? 'animate-spin' : ''}`} />
             <span>Sync</span>
           </button>
         </div>
       </div>
 
-      {/* ── KPI Cards (Rectangular) ─────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* ── KPI Cards (Compact High-Density Rectangular) ──────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
         {kpiCards.map((card) => {
           const Icon = card.icon;
           const c    = palette[card.color];
           return (
             <div
               key={card.label}
-              className={`surface-card p-4 sm:p-5 rounded-none ${c.hover} transition-all border border-[var(--border)]`}
+              className={`surface-card p-3 rounded-none ${c.hover} transition-all border border-[var(--border)]`}
             >
-              <div className="flex items-center justify-between text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-wider mb-2">
+              <div className="flex items-center justify-between text-[var(--text-muted)] text-[9px] font-bold uppercase tracking-wider mb-1">
                 <span>{card.label}</span>
-                <div className={`p-1.5 rounded-none ${c.bg} border ${c.border} ${c.text}`}>
-                  <Icon className="w-3.5 h-3.5" />
+                <div className={`p-1 rounded-none ${c.bg} border ${c.border} ${c.text}`}>
+                  <Icon className="w-3 h-3" />
                 </div>
               </div>
-              <div className={`text-3xl sm:text-4xl font-black ${c.text} stat-live`}>
+              <div className={`text-2xl font-black ${c.text} stat-live`}>
                 {card.value}
                 {card.unit && (
-                  <span className="text-sm font-normal text-[var(--text-muted)] ml-1">{card.unit}</span>
+                  <span className="text-xs font-normal text-[var(--text-muted)] ml-1">{card.unit}</span>
                 )}
               </div>
-              <p className="text-[10px] text-[var(--text-muted)] mt-1">{card.sub}</p>
+              <p className="text-[9px] text-[var(--text-muted)] mt-0.5 truncate">{card.sub}</p>
             </div>
           );
         })}
@@ -313,14 +366,14 @@ export default function Dashboard() {
 
       {/* ── Live Situational Incident Telemetry Stream Ticker ──── */}
       <div
-        className="surface-card p-3 px-4 border border-[var(--border)] bg-[var(--surface-soft)]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+        className="surface-card py-1.5 px-3 border border-[var(--border)] bg-[var(--surface-soft)]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
         onMouseEnter={() => setIsFeedPaused(true)}
         onMouseLeave={() => setIsFeedPaused(false)}
       >
-        <div className="flex items-center space-x-3 overflow-hidden">
-          <div className="flex items-center space-x-1.5 flex-shrink-0 text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-rose-500/15 text-rose-400 border border-rose-500/30">
-            <Radio className="w-3 h-3 text-rose-400 animate-pulse" />
-            <span>DISPATCH TICKER</span>
+        <div className="flex items-center space-x-2.5 overflow-hidden">
+          <div className="flex items-center space-x-1 flex-shrink-0 text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 bg-rose-500/15 text-rose-400 border border-rose-500/30">
+            <Radio className="w-2.5 h-2.5 text-rose-400 animate-pulse" />
+            <span>DISPATCH</span>
           </div>
 
           <div className="flex items-center space-x-2 font-mono text-[11px] truncate">
@@ -348,7 +401,7 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center space-x-2 flex-shrink-0 self-end sm:self-center">
-          <span className="text-[10px] font-mono text-[var(--text-muted)]">
+          <span className="text-[9px] font-mono text-[var(--text-muted)]">
             {feedIndex + 1}/{SITUATIONAL_FEED.length}
           </span>
           <div className="flex items-center space-x-0.5 border border-[var(--border)]">
@@ -357,59 +410,59 @@ export default function Dashboard() {
               className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
               title="Previous Incident"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3 h-3" />
             </button>
             <button
               onClick={() => setFeedIndex((i) => (i + 1) % SITUATIONAL_FEED.length)}
               className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
               title="Next Incident"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── Map + Ward Panel (Rectangular) ───────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      {/* ── Map + Ward Panel (Compact Rectangular) ───────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
 
         {/* Map */}
         <div className="lg:col-span-8">
-          <div className="surface-card rounded-none p-4 border border-[var(--border)] h-full">
-            <div className="flex items-center justify-between mb-3 px-1">
+          <div className="surface-card rounded-none p-3 border border-[var(--border)] h-full flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2 px-0.5">
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 rounded-none bg-[var(--brand)]" />
-                <span className="text-[13px] font-bold text-[var(--text-primary)]">Interactive Ward Risk Map</span>
+                <span className="text-xs font-bold text-[var(--text-primary)]">Interactive Ward Risk Map (250 Wards)</span>
                 {loading && !mapError && (
-                  <span className="text-[11px] text-[var(--text-muted)] ml-1">Loading…</span>
+                  <span className="text-[10px] text-[var(--text-muted)] ml-1">Loading…</span>
                 )}
               </div>
               <div className="flex items-center space-x-2">
                 {mapError && (
                   <button
                     onClick={loadData}
-                    className="flex items-center space-x-1 text-[11px] text-[var(--brand)] hover:opacity-80 transition-colors"
+                    className="flex items-center space-x-1 text-[10px] text-[var(--brand)] hover:opacity-80 transition-colors"
                   >
                     <RefreshCw className="w-3 h-3" />
                     <span>Retry</span>
                   </button>
                 )}
-                <span className="text-[11px] text-[var(--text-muted)] hidden sm:inline">Click ward polygon to inspect</span>
+                <span className="text-[10px] text-[var(--text-muted)] hidden sm:inline">Click ward circle to inspect</span>
               </div>
             </div>
 
             {mapError ? (
-              <div className="flex flex-col items-center justify-center h-[480px] text-[var(--text-muted)] space-y-4">
-                <AlertCircle className="w-9 h-9 text-rose-500" />
+              <div className="flex flex-col items-center justify-center h-[390px] text-[var(--text-muted)] space-y-3">
+                <AlertCircle className="w-8 h-8 text-rose-500" />
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">Map data unavailable</p>
-                  <p className="text-xs text-[var(--text-muted)] max-w-xs">{mapError}</p>
+                  <p className="text-xs font-semibold text-[var(--text-primary)] mb-1">Map data unavailable</p>
+                  <p className="text-[11px] text-[var(--text-muted)] max-w-xs">{mapError}</p>
                 </div>
                 <button
                   onClick={loadData}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-none bg-[var(--brand)] text-white text-xs font-bold transition-all border border-[var(--brand)]"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-none bg-[var(--brand)] text-white text-xs font-bold transition-all border border-[var(--brand)]"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3 h-3" />
                   <span>Retry Loading Map</span>
                 </button>
               </div>
@@ -418,147 +471,114 @@ export default function Dashboard() {
                 wardsData={wardsGeo}
                 selectedWardId={selectedWard?.ward_code || selectedWard?.id}
                 onSelectWard={handleSelectWard}
-                height="480px"
+                height="390px"
               />
             )}
           </div>
         </div>
 
-        {/* Ward Intelligence Panel */}
+        {/* Ward Intelligence Panel (Fitted to Map Height) */}
         <div className="lg:col-span-4">
           {selectedWard ? (
-            <div className="surface-card rounded-none p-5 border border-[var(--border)] h-full flex flex-col justify-between">
+            <div className="surface-card rounded-none p-3.5 border border-[var(--border)] h-full max-h-[435px] flex flex-col justify-between overflow-y-auto">
               {/* Panel header */}
               <div>
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-2.5">
                   <div>
-                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-0.5">Ward Intelligence</div>
-                    <h3 className="text-base font-black text-[var(--text-primary)] leading-tight">
+                    <div className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest mb-0.5">Ward Telemetry</div>
+                    <h3 className="text-sm font-black text-[var(--text-primary)] leading-tight">
                       {selectedWard.ward_name || selectedWard.name || `Ward ${selectedWard.ward_code || selectedWard.id}`}
                     </h3>
-                    <span className="text-[11px] font-mono text-[var(--brand)] font-bold">
-                      {selectedWard.ward_code || selectedWard.id}
+                    <span className="text-[10px] font-mono text-[var(--brand)] font-bold">
+                      {selectedWard.ward_code || selectedWard.id} · {selectedWard.zone || 'Central Delhi'}
                     </span>
                   </div>
                   <button
                     onClick={() => { setSelectedWard(null); setWardDetails(null); }}
-                    className="p-1.5 rounded-none hover:bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors border border-[var(--border)]"
+                    className="p-1 rounded-none hover:bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors border border-[var(--border)]"
                     title="Close selection"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 {loadingWard ? (
-                  <div className="py-16 flex flex-col items-center justify-center space-y-2">
-                    <div className="w-6 h-6 border-2 border-[var(--brand)]/30 border-t-[var(--brand)] rounded-none animate-spin" />
-                    <span className="text-xs text-[var(--text-muted)]">Calculating mass-balance risk...</span>
+                  <div className="py-12 flex flex-col items-center justify-center space-y-1.5">
+                    <div className="w-5 h-5 border-2 border-[var(--brand)]/30 border-t-[var(--brand)] rounded-none animate-spin" />
+                    <span className="text-[10px] text-[var(--text-muted)]">Calculating mass-balance risk...</span>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-2.5">
                     {/* Risk Score */}
-                    <div className="p-4 rounded-none bg-[var(--surface-soft)] border border-[var(--border)]">
-                      <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-2 font-semibold">Composite Risk Score</div>
+                    <div className="p-2.5 rounded-none bg-[var(--surface-soft)] border border-[var(--border)]">
+                      <div className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest mb-1 font-semibold">Composite Flood Risk</div>
                       <div className="flex items-end justify-between">
-                        <div className="text-4xl font-black text-[var(--text-primary)]">
-                          {evalData?.riskScore
-                            ?? selectedWard.riskScore
+                        <div className="text-2xl font-black text-[var(--text-primary)]">
+                          {selectedWard.riskScore
                             ?? selectedWard.current_risk_score
+                            ?? evalData?.riskScore
                             ?? '50'}
-                          <span className="text-sm font-normal text-[var(--text-muted)] ml-1">/ 100</span>
+                          <span className="text-xs font-normal text-[var(--text-muted)] ml-1">/ 100</span>
                         </div>
                         <RiskBadge
                           level={
-                            evalData?.riskLevel
-                            || selectedWard.riskLevel
+                            selectedWard.riskLevel
                             || selectedWard.current_risk_level
+                            || evalData?.riskLevel
                             || 'MODERATE'
                           }
                         />
                       </div>
                     </div>
 
-                    {/* Risk factor bars */}
-                    {evalData?.components ? (
-                      <div className="space-y-2.5">
-                        <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest font-semibold">Deterministic Weight Drivers</div>
-                        {[
-                          { label: 'Drainage Deficit (40%)', score: evalData.components.drainageDeficitScore, bar: 'bg-blue-500' },
-                          { label: 'Rainfall Surge (35%)',   score: evalData.components.rainfallSurgeScore,   bar: 'bg-sky-500' },
-                          { label: 'Citizen Urgency (25%)',  score: evalData.components.complaintScore,        bar: 'bg-amber-500' },
-                        ].map((f) => (
-                          <div key={f.label}>
-                            <div className="flex justify-between text-[11px] mb-1">
-                              <span className="text-[var(--text-secondary)]">{f.label}</span>
-                              <span className="text-[var(--text-primary)] font-bold">{typeof f.score === 'number' ? f.score.toFixed(1) : '—'}</span>
-                            </div>
-                            <div className="w-full bg-[var(--surface-soft)] border border-[var(--border)] rounded-none h-1.5">
-                              <div
-                                className={`${f.bar} h-1.5 rounded-none transition-all`}
-                                style={{ width: `${Math.min(f.score || 0, 100)}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                    {/* Quick stats grid */}
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="p-2 rounded-none bg-[var(--surface-soft)] border border-[var(--border)] text-center">
+                        <div className="text-[9px] text-[var(--text-muted)] mb-0.5">Drainage Flow</div>
+                        <div className="text-xs font-black text-[var(--text-primary)]">
+                          {selectedWard.drainageCapacity ?? selectedWard.drainage_capacity ?? '50'}%
+                        </div>
                       </div>
-                    ) : (
-                      <div className="space-y-2.5">
-                        <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest font-semibold">Telemetry Drivers</div>
-                        {[
-                          { label: 'Drainage Capacity', score: selectedWard.drainageCapacity ?? 60, bar: 'bg-blue-500' },
-                          { label: 'Precipitation Index', score: 45, bar: 'bg-sky-500' },
-                          { label: 'Civic Priority', score: 30, bar: 'bg-amber-500' },
-                        ].map((f) => (
-                          <div key={f.label}>
-                            <div className="flex justify-between text-[11px] mb-1">
-                              <span className="text-[var(--text-secondary)]">{f.label}</span>
-                              <span className="text-[var(--text-primary)] font-bold">{f.score}</span>
-                            </div>
-                            <div className="w-full bg-[var(--surface-soft)] border border-[var(--border)] rounded-none h-1.5">
-                              <div
-                                className={`${f.bar} h-1.5 rounded-none transition-all`}
-                                style={{ width: `${Math.min(f.score || 0, 100)}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                      <div className="p-2 rounded-none bg-[var(--surface-soft)] border border-[var(--border)] text-center">
+                        <div className="text-[9px] text-[var(--text-muted)] mb-0.5">Precipitation</div>
+                        <div className="text-xs font-black text-sky-400">
+                          {selectedWard.rainfall ?? '28.5'} mm
+                        </div>
                       </div>
-                    )}
+                    </div>
 
-                    {/* Quick stats */}
-                    <div className="grid grid-cols-2 gap-2">
+                    {/* Deterministic factor bars */}
+                    <div className="space-y-1.5">
                       {[
-                        {
-                          label: 'Drainage Flow',
-                          value: `${selectedWard.drainageCapacity ?? selectedWard.drainage_capacity ?? '50'}`,
-                          unit: 'm³/s',
-                        },
-                        {
-                          label: 'Rainfall Surge',
-                          value: `${selectedWard.rainfall ?? '28.5'}`,
-                          unit: 'mm',
-                        },
-                      ].map((s) => (
-                        <div key={s.label} className="p-3 rounded-none bg-[var(--surface-soft)] border border-[var(--border)] text-center">
-                          <div className="text-[10px] text-[var(--text-muted)] mb-1">{s.label}</div>
-                          <div className="text-sm font-black text-[var(--text-primary)]">
-                            {s.value}
-                            <span className="text-[10px] font-normal text-[var(--text-muted)] ml-0.5">{s.unit}</span>
+                        { label: 'Drainage Deficit (40%)', score: evalData?.components?.drainageDeficitScore ?? (100 - (selectedWard.drainageCapacity ?? 50)), bar: 'bg-blue-500' },
+                        { label: 'Rainfall Surge (35%)',   score: evalData?.components?.rainfallSurgeScore ?? (selectedWard.rainfall ? selectedWard.rainfall * 1.5 : 45), bar: 'bg-sky-500' },
+                        { label: 'Citizen Urgency (25%)',  score: evalData?.components?.complaintScore ?? 35, bar: 'bg-amber-500' },
+                      ].map((f) => (
+                        <div key={f.label}>
+                          <div className="flex justify-between text-[10px] mb-0.5">
+                            <span className="text-[var(--text-secondary)]">{f.label}</span>
+                            <span className="text-[var(--text-primary)] font-bold">{typeof f.score === 'number' ? f.score.toFixed(0) : '—'}</span>
+                          </div>
+                          <div className="w-full bg-[var(--surface-soft)] border border-[var(--border)] rounded-none h-1">
+                            <div
+                              className={`${f.bar} h-1 rounded-none transition-all`}
+                              style={{ width: `${Math.min(f.score || 0, 100)}%` }}
+                            />
                           </div>
                         </div>
                       ))}
                     </div>
 
                     {/* Recommended action */}
-                    <div className="p-3 rounded-none border border-amber-500/30 bg-amber-500/10">
-                      <div className="text-[10px] text-amber-600 dark:text-amber-400 font-bold mb-1 uppercase tracking-wider">Recommended Action</div>
-                      <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                    <div className="p-2 rounded-none border border-amber-500/30 bg-amber-500/10">
+                      <div className="text-[9px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider mb-0.5">Protocol</div>
+                      <p className="text-[10px] text-[var(--text-secondary)] leading-tight">
                         {(() => {
-                          const lvl = String(evalData?.riskLevel || selectedWard?.riskLevel || 'MODERATE').toUpperCase();
-                          if (lvl === 'CRITICAL') return 'Deploy emergency response immediately. Coordinate pump staging and road closures.';
-                          if (lvl === 'HIGH')     return 'Inspect drainage network. Dispatch response team and pre-stage mobile pumps.';
-                          if (lvl === 'MODERATE') return 'Increase patrol frequency. Monitor drainage and complaint volume.';
-                          return 'Continue standard monitoring. No immediate intervention required.';
+                          const lvl = String(selectedWard?.riskLevel || evalData?.riskLevel || 'MODERATE').toUpperCase();
+                          if (lvl === 'CRITICAL') return 'Emergency response active. Staging pumps and flood barriers.';
+                          if (lvl === 'HIGH')     return 'High alert. Inspect drainage network & pre-stage mobile pumps.';
+                          if (lvl === 'MODERATE') return 'Standard watch. Increase patrol frequency and monitor outfalls.';
+                          return 'Safe baseline. Natural elevation and clear drainage channels.';
                         })()}
                       </p>
                     </div>
@@ -567,33 +587,33 @@ export default function Dashboard() {
               </div>
 
               {/* CTA Button */}
-              <div className="pt-4 mt-4 border-t border-[var(--border)]">
+              <div className="pt-2 mt-2 border-t border-[var(--border)]">
                 <button
                   onClick={() => navigate(`/wards/${selectedWard.ward_code || selectedWard.id}`)}
-                  className="w-full py-2.5 rounded-none bg-[var(--brand)] hover:opacity-90 text-white font-bold text-xs transition-all flex items-center justify-center space-x-2"
+                  className="w-full py-1.5 rounded-none bg-[var(--brand)] hover:opacity-90 text-white font-bold text-[11px] transition-all flex items-center justify-center space-x-1.5"
                 >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Full Ward Intelligence Report</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <Eye className="w-3 h-3" />
+                  <span>Full Intelligence Report</span>
+                  <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
             </div>
           ) : (
             /* Default: 24h trend chart */
-            <div className="surface-card rounded-none p-5 border border-[var(--border)] h-full flex flex-col justify-between">
+            <div className="surface-card rounded-none p-3.5 border border-[var(--border)] h-full max-h-[435px] flex flex-col justify-between">
               <div>
-                <div className="flex items-center space-x-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-[var(--brand)]" />
-                  <h3 className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-wider">
+                <div className="flex items-center space-x-1.5 mb-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-[var(--brand)]" />
+                  <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
                     Risk Escalation Trend (24h)
                   </h3>
                 </div>
-                <p className="text-[11px] text-[var(--text-muted)] mb-4">
-                  Select any ward polygon on the map or from the directory below to view detailed telemetry.
+                <p className="text-[10px] text-[var(--text-muted)] mb-2">
+                  Select any ward circle on the map or directory below to view real-time telemetry.
                 </p>
 
                 {forecastData.length > 0 ? (
-                  <div className="h-[220px]">
+                  <div className="h-[230px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={forecastData}>
                         <defs>
@@ -626,14 +646,14 @@ export default function Dashboard() {
                 ) : (
                   <div className="py-12 flex items-center justify-center">
                     <div className="text-center text-[var(--text-muted)]">
-                      <MapPin className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                      <p className="text-[11px]">Click a ward to view intelligence</p>
+                      <MapPin className="w-6 h-6 mx-auto mb-1.5 opacity-30" />
+                      <p className="text-[10px]">Click a ward circle to view telemetry</p>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="pt-3 border-t border-[var(--border)] mt-4 text-[11px] text-[var(--text-muted)] flex items-center justify-between">
+              <div className="pt-2 border-t border-[var(--border)] mt-2 text-[10px] text-[var(--text-muted)] flex items-center justify-between">
                 <span className="flex items-center space-x-1.5">
                   <span className="w-2 h-2 rounded-none bg-sky-500" />
                   <span>Current</span>
@@ -648,29 +668,34 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Ward Directory Table (Rectangular) ───────────────── */}
-      <div className="surface-card rounded-none p-5 sm:p-6 border border-[var(--border)]">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+      {/* ── Municipal Ward Directory (Interactive Sortable Viewport) ── */}
+      <div className="surface-card rounded-none p-3.5 sm:p-4 border border-[var(--border)]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
           <div>
-            <h3 className="text-base font-bold text-[var(--text-primary)]">Municipal Ward Vulnerability Directory</h3>
-            <p className="text-[11px] text-[var(--text-muted)]">
-              Search and filter across all 250 administrative wards in Delhi
+            <div className="flex items-center space-x-2">
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">Municipal Ward Vulnerability Directory</h3>
+              <span className="px-2 py-0.5 bg-[var(--surface-soft)] text-[10px] font-mono text-[var(--text-muted)] border border-[var(--border)]">
+                {filteredWards.length} of 250 wards
+              </span>
+            </div>
+            <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+              Click any column header to sort · Click ward to inspect telemetry on map
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-            {/* Filter Tabs */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            {/* Filter Tabs with Live Dynamic Counts */}
             <div className="inline-flex rounded-none border border-[var(--border)] bg-[var(--surface-soft)] p-0.5">
               {[
                 { id: 'ALL', label: 'All (250)' },
-                { id: 'CRITICAL', label: 'Critical' },
-                { id: 'HIGH', label: 'High' },
-                { id: 'MODERATE', label: 'Moderate' },
-                { id: 'LOW', label: 'Low' },
+                { id: 'CRITICAL', label: `Critical (${counts.critical ?? 25})` },
+                { id: 'HIGH', label: `High (${counts.high ?? 68})` },
+                { id: 'MODERATE', label: `Moderate (${counts.moderate ?? 75})` },
+                { id: 'LOW', label: `Safe (${counts.low ?? 82})` },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setLevelFilter(tab.id)}
-                  className={`px-2.5 py-1 text-[11px] font-semibold transition-colors cursor-pointer ${
+                  className={`px-2 py-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
                     levelFilter === tab.id
                       ? 'bg-[var(--brand)] text-white'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
@@ -682,35 +707,86 @@ export default function Dashboard() {
             </div>
 
             {/* Search Input */}
-            <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3.5 top-3" />
+            <div className="relative w-full sm:w-60">
+              <Search className="w-3 h-3 text-[var(--text-muted)] absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search ward name or code…"
+                placeholder="Search ward, code, or zone…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] pl-10 pr-3 py-2 text-xs rounded-none focus:outline-none focus:border-[var(--brand)]"
+                className="w-full bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] pl-8 pr-7 py-1 text-xs rounded-none focus:outline-none focus:border-[var(--brand)]"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Scrollable Compact Table Viewport (Non-bloated) */}
+        <div className="overflow-x-auto max-h-[300px] overflow-y-auto border border-[var(--border)]">
           <table className="w-full text-left text-xs text-[var(--text-secondary)]">
-            <thead className="bg-[var(--surface-soft)] text-[var(--text-muted)] uppercase font-semibold tracking-wider border-b border-[var(--border)] text-[10px]">
+            <thead className="bg-[var(--surface-soft)] text-[var(--text-muted)] uppercase font-semibold tracking-wider border-b border-[var(--border)] text-[9px] sticky top-0 z-10 select-none">
               <tr>
-                <th className="px-4 py-2.5">Code</th>
-                <th className="px-4 py-2.5">Ward Name</th>
-                <th className="px-4 py-2.5 hidden md:table-cell">Drainage</th>
-                <th className="px-4 py-2.5">Risk Level</th>
-                <th className="px-4 py-2.5">Score</th>
-                <th className="px-4 py-2.5 text-right">Action</th>
+                <th
+                  onClick={() => toggleSort('code')}
+                  className="px-3 py-1.5 cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Code
+                  {sortField === 'code' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
+                <th
+                  onClick={() => toggleSort('name')}
+                  className="px-3 py-1.5 cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Ward Name
+                  {sortField === 'name' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
+                <th className="px-3 py-1.5 hidden sm:table-cell">Zone</th>
+                <th
+                  onClick={() => toggleSort('drainage')}
+                  className="px-3 py-1.5 hidden md:table-cell cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Drainage
+                  {sortField === 'drainage' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
+                <th className="px-3 py-1.5">Risk Level</th>
+                <th
+                  onClick={() => toggleSort('score')}
+                  className="px-3 py-1.5 cursor-pointer hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Score
+                  {sortField === 'score' ? (
+                    sortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-[var(--brand)] inline ml-1" /> : <ChevronUp className="w-3 h-3 text-[var(--brand)] inline ml-1" />
+                  ) : (
+                    <ArrowUpDown className="w-2.5 h-2.5 opacity-40 inline ml-1" />
+                  )}
+                </th>
+                <th className="px-3 py-1.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
               {filteredWards.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-[var(--text-muted)]">
+                  <td colSpan={7} className="px-3 py-6 text-center text-[var(--text-muted)] text-[11px]">
                     {loading ? 'Loading ward data…' : 'No matching wards found.'}
                   </td>
                 </tr>
@@ -725,29 +801,48 @@ export default function Dashboard() {
                       key={p.ward_code || p.id}
                       onClick={() => handleSelectWard(p)}
                       className={`cursor-pointer transition-colors ${
-                        isSelected ? 'bg-[var(--surface-soft)]' : 'hover:bg-[var(--surface-soft)]/50'
+                        isSelected ? 'bg-[var(--surface-soft)] ring-1 ring-[var(--brand)]/50' : 'hover:bg-[var(--surface-soft)]/50'
                       }`}
                     >
-                      <td className="px-4 py-3 font-mono font-bold text-[var(--brand)] text-[11px]">
+                      <td className="px-3 py-1.5 font-mono font-bold text-[var(--brand)] text-[11px]">
                         {p.ward_code || p.id}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-[var(--text-primary)]">{p.ward_name || p.name}</td>
-                      <td className="px-4 py-3 text-[var(--text-muted)] hidden md:table-cell">
-                        {p.drainageCapacity ?? p.drainage_capacity ?? 50} m³/s
+                      <td className="px-3 py-1.5 font-semibold text-[var(--text-primary)] text-[11px]">
+                        {p.ward_name || p.name}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-1.5 text-[var(--text-muted)] text-[10px] hidden sm:table-cell">
+                        {p.zone || 'Central'}
+                      </td>
+                      <td className="px-3 py-1.5 hidden md:table-cell text-[10px]">
+                        {(() => {
+                          const cap = p.drainageCapacity ?? p.drainage_capacity ?? 50;
+                          const colorClass = cap >= 70 ? 'text-emerald-400 font-bold' : cap >= 45 ? 'text-yellow-400 font-bold' : 'text-rose-400 font-bold';
+                          const barClass = cap >= 70 ? 'bg-emerald-500' : cap >= 45 ? 'bg-yellow-500' : 'bg-rose-500';
+                          return (
+                            <div className="flex items-center space-x-2">
+                              <div className="w-12 bg-white/10 h-1 rounded-none overflow-hidden hidden lg:block">
+                                <div className={`${barClass} h-full`} style={{ width: `${cap}%` }} />
+                              </div>
+                              <span className={colorClass}>{cap}%</span>
+                            </div>
+                          );
+                        })()}
+                      </td>
+                      <td className="px-3 py-1.5">
                         <RiskBadge level={level} />
                       </td>
-                      <td className="px-4 py-3 font-bold text-[var(--text-primary)]">{score} / 100</td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-1.5 font-bold text-[var(--text-primary)] text-[11px]">
+                        {score} / 100
+                      </td>
+                      <td className="px-3 py-1.5 text-right">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/wards/${p.ward_code || p.id}`);
                           }}
-                          className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-none bg-[var(--brand)] hover:opacity-90 text-white transition-colors text-[11px] font-semibold"
+                          className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-none bg-[var(--brand)] hover:opacity-90 text-white transition-colors text-[10px] font-semibold"
                         >
-                          <Eye className="w-3 h-3" />
+                          <Eye className="w-2.5 h-2.5" />
                           <span>View</span>
                         </button>
                       </td>

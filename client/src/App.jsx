@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import CitizenPortal from './pages/CitizenPortal';
@@ -37,7 +37,7 @@ function AppLayout() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/wards/:id" element={<WardDetail />} />
           <Route path="/incidents" element={<IncidentCommand />} />
-          <Route path="/simulator" element={<Simulator />} />
+          <Route path="/simulator" element={<Navigate to="/admin" replace />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/admin" element={<AdminPortal />} />
         </Routes>

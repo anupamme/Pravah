@@ -59,31 +59,42 @@ export const searchWards = (query) => fetchApi(`/api/wards/search?q=${encodeURIC
 
 // Risk & Weather with Fallback
 export const getCityRiskSummary = () => fetchApi('/api/risk/summary').catch(() => ({
-  cityAverageRiskScore: 58.4,
-  avgRiskScore: 58.4,
-  highRiskWardsCount: 50,
+  cityAverageRiskScore: 48.8,
+  avgRiskScore: 48.8,
+  highRiskWardsCount: 93,
   totalWardsMonitored: 250,
-  countsByLevel: { critical: 12, high: 38, moderate: 110, low: 90 },
-  maxRiskWard: { id: 'W056', name: 'Connaught Place', score: 88.5 },
+  countsByLevel: { critical: 25, high: 68, moderate: 75, low: 82 },
+  maxRiskWard: { id: 'W006', name: 'Burari', score: 88.5 },
 }));
 
 export const getWardRiskDetails = (wardId) => fetchApi(`/api/risk/ward/${wardId}`).catch(() => {
   const feat = fallbackWards.features?.find(f => f.properties?.ward_code === wardId || f.properties?.id === wardId);
   const p = feat?.properties || {};
+  const score = p.riskScore || p.current_risk_score || 50;
+  const level = p.riskLevel || p.current_risk_level || 'MODERATE';
+  const drainage = p.drainageCapacity || p.drainage_capacity || 50;
+  const rainfall = p.rainfall || 28;
+
   return {
     wardId,
+    wardCode: p.ward_code || wardId,
     wardName: p.ward_name || p.name || 'Delhi Ward',
-    riskScore: p.riskScore || p.current_risk_score || 65,
-    riskLevel: p.riskLevel || p.current_risk_level || 'HIGH',
-    breakdown: {
-      drainage: { score: p.drainageCapacity || p.drainage_capacity || 35, weight: 0.40 },
-      rainfall: { score: p.rainfall || 72, weight: 0.35 },
-      complaints: { score: p.complaintCount || 60, weight: 0.25 },
+    riskScore: score,
+    riskLevel: level,
+    drainageCapacity: drainage,
+    rainfall,
+    evaluation: {
+      riskScore: score,
+      riskLevel: level,
+      components: {
+        drainageDeficitScore: Math.max(0, 100 - drainage),
+        rainfallSurgeScore: Math.min(100, Math.round(rainfall * 1.5)),
+        complaintScore: level === 'CRITICAL' ? 80 : level === 'HIGH' ? 55 : level === 'LOW' ? 10 : 30,
+      },
     },
     recommendations: [
-      'Deploy 5000 GPM Mobile Dewatering Pump',
-      'Clear stormwater siltation accumulation at culverts',
-      'Issue local civic waterlogging advisory',
+      level === 'CRITICAL' ? 'Deploy 5000 GPM Mobile Dewatering Pump' : 'Inspect stormwater culverts',
+      'Monitor live water depth telemetry',
     ],
   };
 });

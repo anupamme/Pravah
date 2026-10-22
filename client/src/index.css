@@ -117,12 +117,157 @@
   --risk-low-bg: #DCFCE7;
   --risk-low-border: #86EFAC;
 
-  /* Minimal Shadows */
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
   --hero-glow: none;
   --button-glow: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LEAFLET & MAP GLASSMORPHISM SUBSYSTEM (STRICT RECTANGLES)
+   ───────────────────────────────────────────────────────────── */
+
+/* Leaflet Dark Tactical Mode Tile Styling (100% Keyless, Inverted OSM) */
+.leaflet-dark-mode .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(110%);
+}
+.leaflet-dark-mode .leaflet-container {
+  background-color: #050B14;
+}
+
+/* Map Glassmorphism Floating Boxes (Over Map Tiles) */
+.map-glass-box {
+  background: rgba(6, 17, 30, 0.85);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  border-radius: 0px !important;
+  color: #F8FAFC;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-glass-box:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(56, 189, 248, 0.25);
+}
+
+:root[data-theme="light"] .map-glass-box {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  border-radius: 0px !important;
+  color: #0F172A;
+}
+
+:root[data-theme="light"] .map-glass-box:hover {
+  border-color: rgba(2, 132, 199, 0.45);
+  box-shadow: 0 12px 30px -5px rgba(15, 23, 42, 0.16), inset 0 1px 0 0 rgba(2, 132, 199, 0.2);
+}
+
+/* Map Glassmorphism Inner Button / Pill Elements */
+.map-glass-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(248, 250, 252, 0.7);
+  transition: all 0.15s ease;
+}
+
+.map-glass-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.map-glass-btn-active {
+  background: #0284C7 !important;
+  border-color: #38BDF8 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+}
+
+:root[data-theme="light"] .map-glass-btn {
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  color: #475569;
+}
+
+:root[data-theme="light"] .map-glass-btn:hover {
+  background: rgba(15, 23, 42, 0.08);
+  color: #0F172A;
+  border-color: #0284C7;
+}
+
+:root[data-theme="light"] .map-glass-btn-active {
+  background: #0284C7 !important;
+  border-color: #0369A1 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+/* Tooltips & Popups */
+.ward-circle-tooltip {
+  background: rgba(8, 20, 36, 0.94) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(56, 189, 248, 0.45) !important;
+  color: #F8FAFC !important;
+  border-radius: 0px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+:root[data-theme="light"] .ward-circle-tooltip {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(2, 132, 199, 0.4) !important;
+  color: #0F172A !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15) !important;
+}
+
+.ward-circle-tooltip::before {
+  display: none !important;
+}
+
+/* Leaflet Native Popup in Pure Glassmorphism & Rectangles */
+.leaflet-popup-content-wrapper {
+  background: rgba(8, 20, 36, 0.92) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  border-radius: 0px !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.12) !important;
+  color: #F8FAFC !important;
+  padding: 2px !important;
+}
+
+:root[data-theme="light"] .leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(2, 132, 199, 0.35) !important;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14), inset 0 1px 0 0 rgba(255, 255, 255, 0.9) !important;
+  color: #0F172A !important;
+}
+
+.leaflet-popup-tip-container {
+  display: none !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  padding: 6px 6px 0 0 !important;
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: #38bdf8 !important;
 }
 
 /* ─────────────────────────────────────────────────────────────

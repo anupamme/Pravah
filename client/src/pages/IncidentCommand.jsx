@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   ShieldAlert, MapPin, Send, AlertTriangle, Radio, RefreshCw,
   Search, Clock, Droplets, Truck, CheckCircle2,
-  ChevronRight, ArrowUpRight, PhoneCall, ShieldCheck
+  ChevronRight, ArrowUpRight, PhoneCall, ShieldCheck,
+  ChevronDown, ChevronUp, Sparkles, SlidersHorizontal, X, Activity
 } from 'lucide-react';
 import {
   listIncidents,
@@ -12,32 +13,44 @@ import {
 } from '../services/api';
 import { subscribeToTelemetry } from '../services/socket';
 
-/** Equipment types available for emergency dispatch */
+/** Equipment types available for emergency dispatch — compact labels & icons */
 const EQUIPMENT_OPTIONS = [
   {
     id: 'MOBILE_PUMP_5000',
-    name: '5000 GPM Mobile Dewatering Pump Trailer',
-    category: 'High-Volume Pumping',
-    suitedFor: 'Railway and arterial underpasses (depth > 35cm)',
+    name: '5000 GPM Mobile Pump',
+    category: 'High-Volume Dewatering',
+    tag: 'Underpasses & Depressions',
+    icon: Droplets,
   },
   {
     id: 'SLUDGE_DREDGER_V3',
-    name: 'High-Capacity Hydraulic Sludge Dredger',
+    name: 'Hydraulic Sludge Dredger',
     category: 'Culvert & Silt Clearing',
-    suitedFor: 'Severely silted trunk drains & culvert blockages',
+    tag: 'Choked Primary Drains',
+    icon: Activity,
   },
   {
     id: 'TRAFFIC_DIVERSION_RIG',
-    name: 'Arterial Traffic Diversion & Barricade Squad',
-    category: 'Traffic Management',
-    suitedFor: 'Flooded junctions & hazardous highway depressions',
+    name: 'Traffic Diversion Squad',
+    category: 'Arterial Barricading',
+    tag: 'Highway & Metro Depressions',
+    icon: Truck,
   },
   {
     id: 'SWIFT_WATER_BOAT',
-    name: 'Inflatable Rescue Boat & Swift Water Rig',
-    category: 'Water Evacuation',
-    suitedFor: 'Floodplain settlements & rapid inundation zones',
+    name: 'Swift Water Rescue Rig',
+    category: 'Evacuation & Rescue',
+    tag: 'Floodplains & Settlements',
+    icon: ShieldAlert,
   },
+];
+
+/** Quick directive preset tags for rapid incident dispatching */
+const QUICK_DIRECTIVES = [
+  'Deploy 5000 GPM sump pump at lowest depression',
+  'Erect arterial traffic barricades & divert vehicles',
+  'Clear choked outfall culvert & silt trap immediately',
+  'Coordinate with Delhi Traffic Police (1095) for perimeter hold',
 ];
 
 export default function IncidentCommand() {
@@ -52,12 +65,15 @@ export default function IncidentCommand() {
   const [isDispatching, setIsDispatching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Search & Filter State
+  // Search, Filter & UI State
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSeverity, setFilterSeverity] = useState('ALL');
+  const [showRoadmap, setShowRoadmap] = useState(true);
+  const [showHotlines, setShowHotlines] = useState(false);
 
   // Ground Registry DOM Ref for auto-scrolling
   const registryRef = useRef(null);
+  const consoleRef = useRef(null);
 
   // Real-time IST Clock
   const [currentTime, setCurrentTime] = useState('');
@@ -124,7 +140,7 @@ export default function IncidentCommand() {
     return () => unsubs.forEach((fn) => fn && fn());
   }, [loadData]);
 
-  // Stage crew and relocate to Ground Incident Registry
+  // Stage crew from AI Tactical Roadmap directly into console
   const handleStageCrew = useCallback((item) => {
     const targetCode = item.wardCode || item.wardId;
     let matched = incidents.find(
@@ -147,19 +163,17 @@ export default function IncidentCommand() {
 
     setSelectedIncident(matched);
 
-    // Auto-select available QRT team if none is selected
     if (!selectedTeamId && teams.length > 0) {
       const avail = teams.find((t) => t.status === 'AVAILABLE' || !t.status);
       setSelectedTeamId(avail ? avail.id : teams[0].id);
     }
 
-    // Reset filters so the matched incident is visible in the registry
     setFilterSeverity('ALL');
     setSearchQuery('');
 
-    // Smoothly relocate/scroll down to Ground Incident Registry
+    // Smooth scroll to console for immediate action
     setTimeout(() => {
-      registryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      consoleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 60);
   }, [incidents, selectedTeamId, teams]);
 
@@ -168,7 +182,7 @@ export default function IncidentCommand() {
     if (!selectedIncident) {
       setDispatchStatus({
         type: 'ERROR',
-        message: 'Please select an incident from the registry below to mobilize response units.',
+        message: 'Please select an incident from the queue to authorize deployment.',
       });
       return;
     }
@@ -196,16 +210,14 @@ export default function IncidentCommand() {
       await dispatchResponseTeam(payload);
       setDispatchStatus({
         type: 'SUCCESS',
-        message: `Deployment authorized. ${teamDisplayName} mobilized with ${selectedEquipment} to ${selectedIncident.wardName || selectedIncident.wardId}.`,
+        message: `Deployment authorized: ${teamDisplayName} dispatched with ${selectedEquipment} to ${selectedIncident.wardName || selectedIncident.wardId}.`,
       });
     } catch (_err) {
-      // Local fallback execution in case of offline backend or auth constraints
       setDispatchStatus({
         type: 'SUCCESS',
         message: `Deployment authorized: ${teamDisplayName} mobilized with ${selectedEquipment} to Ward ${selectedIncident.wardId || selectedIncident.wardCode || 'Site'}.`,
       });
     } finally {
-      // Optimistically update incident & team status
       setIncidents((prev) =>
         prev.map((inc) =>
           inc.id === selectedIncident.id ? { ...inc, status: 'DISPATCHED' } : inc
@@ -219,9 +231,7 @@ export default function IncidentCommand() {
 
       setIsDispatching(false);
       setDispatchNotes('');
-
-      // Smooth scroll up to alert banner
-      window.scrollTo({ top: 80, behavior: 'smooth' });
+      window.scrollTo({ top: 40, behavior: 'smooth' });
     }
   };
 
@@ -264,271 +274,277 @@ export default function IncidentCommand() {
     : tacticalPlan?.topInterventions || tacticalPlan?.topActionPlan || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 page-enter">
-      {/* ── Municipal Command Header & Status Bar ─────────── */}
-      <div className="bg-[var(--surface-elevated)] p-5 shadow-sm rounded-none">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 text-[10px] font-mono font-bold tracking-wider uppercase bg-rose-500/15 text-rose-400">
-                <ShieldAlert className="w-3.5 h-3.5" />
-                <span>EOC OPCON-2: RAPID MOBILIZATION ACTIVE</span>
-              </span>
-              <span className="inline-flex items-center space-x-1 text-[11px] font-mono text-[var(--text-muted)]">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>LIVE TELEMETRY BROADCAST</span>
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
-              Incident Command & Emergency Dispatch
-            </h1>
-            <p className="text-xs text-[var(--text-muted)]">
-              Municipal Corporation of Delhi · Flood Emergency Operations Center · Coordinated QRT Allocation & Dewatering Asset Logistics
-            </p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 page-enter font-inter">
+      {/* ── 1. Clean Operational Header ────────────────────────── */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-6 border-b border-[var(--border)]">
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-rose-500/15 text-rose-500 dark:text-rose-400 border border-rose-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+              <span>OPCON-2 RAPID DISPATCH</span>
+            </span>
+            <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono text-[var(--text-muted)] bg-[var(--surface)] border border-[var(--border)]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>LIVE TELEMETRY STREAM</span>
+            </span>
+            <span className="text-[11px] font-mono text-[var(--text-muted)] pl-1">
+              {currentTime}
+            </span>
           </div>
 
-          {/* Right Header Badges */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="px-3 py-1.5 bg-[var(--surface)] text-right">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
-                Delhi Emergency Clock
-              </div>
-              <div className="text-sm font-mono font-bold text-[var(--brand)]">
-                {currentTime || 'IST ACTIVE'}
-              </div>
-            </div>
+          <h1 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
+            Incident Command & Rapid Dispatch
+          </h1>
+          <p className="text-xs text-[var(--text-muted)]">
+            Ground waterlogging verification, tactical AI intervention ranking, and quick-response asset deployment.
+          </p>
+        </div>
 
-            <button
-              onClick={() => loadData(true)}
-              disabled={isLoading}
-              className="p-2.5 bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-              title="Refresh Incident Feed"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[var(--brand)]' : ''}`} />
-            </button>
+        {/* Header Action Tools */}
+        <div className="flex items-center space-x-2.5 self-start lg:self-auto">
+          <button
+            onClick={() => setShowHotlines(!showHotlines)}
+            className={`inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
+              showHotlines
+                ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+                : 'bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border)] hover:bg-[var(--surface-soft)]'
+            }`}
+          >
+            <PhoneCall className="w-3.5 h-3.5" />
+            <span>Emergency Hotlines</span>
+          </button>
 
-            <div className="hidden sm:flex flex-col text-[10px] font-mono pl-3 text-[var(--text-muted)]">
-              <span>MCD DISPATCH: <b className="text-[var(--text-primary)]">155304</b></span>
-              <span>DDMA CONTROL: <b className="text-[var(--text-primary)]">1077</b></span>
-            </div>
-          </div>
+          <button
+            onClick={() => loadData(true)}
+            disabled={isLoading}
+            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+            title="Refresh feed"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[var(--brand)]' : ''}`} />
+            <span>Sync</span>
+          </button>
         </div>
       </div>
 
-      {/* ── Operational Dispatch Alert Banner ─────────────── */}
+      {/* Emergency Hotlines Drawer (Optional / Collapsible) */}
+      {showHotlines && (
+        <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs animate-in fade-in slide-in-from-top-2">
+          <div className="p-3 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+            <span className="text-[10px] font-mono text-[var(--text-muted)] block uppercase">Delhi Police Traffic</span>
+            <span className="text-sm font-mono font-bold text-[var(--text-primary)]">1095</span>
+          </div>
+          <div className="p-3 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+            <span className="text-[10px] font-mono text-[var(--text-muted)] block uppercase">Irrigation & Flood Control</span>
+            <span className="text-sm font-mono font-bold text-[var(--text-primary)]">2244-4555</span>
+          </div>
+          <div className="p-3 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+            <span className="text-[10px] font-mono text-[var(--text-muted)] block uppercase">Delhi Jal Board (DJB)</span>
+            <span className="text-sm font-mono font-bold text-[var(--text-primary)]">1916</span>
+          </div>
+          <div className="p-3 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+            <span className="text-[10px] font-mono text-[var(--text-muted)] block uppercase">DDMA Disaster Control</span>
+            <span className="text-sm font-mono font-bold text-[var(--text-primary)]">1077</span>
+          </div>
+        </div>
+      )}
+
+      {/* Operational Dispatch Banner Alert */}
       {dispatchStatus && (
         <div
-          className={`p-4 text-xs flex items-center justify-between transition-opacity duration-150 ${
+          className={`p-4 rounded-xl border text-xs flex items-center justify-between shadow-sm transition-all ${
             dispatchStatus.type === 'SUCCESS'
-              ? 'bg-emerald-500/10 text-emerald-400'
-              : 'bg-rose-500/10 text-rose-400'
+              ? 'bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border-emerald-500/20'
+              : 'bg-rose-500/10 text-rose-500 dark:text-rose-400 border-rose-500/20'
           }`}
         >
-          <div className="flex items-center space-x-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="flex items-center space-x-2.5">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span className="font-medium">{dispatchStatus.message}</span>
           </div>
           <button
             onClick={() => setDispatchStatus(null)}
-            className="text-sm font-bold opacity-70 hover:opacity-100 ml-4 cursor-pointer"
+            className="opacity-70 hover:opacity-100 p-1 cursor-pointer"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* ── 4 Executive KPI Cards (Borderless Modern Look) ──── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1: Active Incidents */}
-        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
-          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Active Flood Incidents</span>
+      {/* ── 2. Compact & Elegant Telemetry Cards ───────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="p-4 sm:p-5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs">
+            <span className="text-[11px] font-medium tracking-wide uppercase font-mono">Active Incidents</span>
             <AlertTriangle className="w-4 h-4 text-rose-500" />
           </div>
           <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-mono font-bold text-[var(--text-primary)]">{metrics.total}</span>
-            <span className="text-[11px] font-mono text-rose-400 font-semibold">
-              ({metrics.critical} Critical)
+            <span className="text-2xl sm:text-3xl font-mono font-bold text-[var(--text-primary)]">{metrics.total}</span>
+            <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 dark:text-rose-400">
+              {metrics.critical} Critical
             </span>
           </div>
-          <div className="mt-2 text-[10px] text-[var(--text-muted)]">
-            Verified ground reports logged
-          </div>
         </div>
 
-        {/* KPI 2: Max Water Depth */}
-        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
-          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Peak Inundation Depth</span>
+        <div className="p-4 sm:p-5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs">
+            <span className="text-[11px] font-medium tracking-wide uppercase font-mono">Peak Inundation</span>
             <Droplets className="w-4 h-4 text-sky-400" />
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-mono font-bold text-sky-400">{metrics.maxDepth}</span>
-            <span className="text-xs font-mono text-[var(--text-muted)]">cm recorded</span>
-          </div>
-          <div className="mt-2 text-[10px] text-[var(--text-muted)]">
-            Underpass & transit rail bottlenecks
+          <div className="flex items-baseline space-x-1.5">
+            <span className="text-2xl sm:text-3xl font-mono font-bold text-sky-500 dark:text-sky-400">{metrics.maxDepth}</span>
+            <span className="text-xs font-mono text-[var(--text-muted)]">cm depth</span>
           </div>
         </div>
 
-        {/* KPI 3: Available QRTs */}
-        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
-          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Available Emergency QRTs</span>
+        <div className="p-4 sm:p-5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs">
+            <span className="text-[11px] font-medium tracking-wide uppercase font-mono">Available QRTs</span>
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-mono font-bold text-emerald-400">{metrics.availableTeams}</span>
-            <span className="text-xs font-mono text-[var(--text-muted)]">Ready for deployment</span>
-          </div>
-          <div className="mt-2 text-[10px] text-[var(--text-muted)]">
-            Equipped with mobile extraction units
+          <div className="flex items-baseline space-x-1.5">
+            <span className="text-2xl sm:text-3xl font-mono font-bold text-emerald-500 dark:text-emerald-400">{metrics.availableTeams}</span>
+            <span className="text-xs font-mono text-[var(--text-muted)]">Ready to deploy</span>
           </div>
         </div>
 
-        {/* KPI 4: Mobilized Teams */}
-        <div className="p-4 bg-[var(--surface-elevated)] flex flex-col justify-between shadow-sm">
-          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs mb-2">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Mobilized On-Scene Crews</span>
+        <div className="p-4 sm:p-5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-[var(--text-muted)] text-xs">
+            <span className="text-[11px] font-medium tracking-wide uppercase font-mono">Active Crews</span>
             <Truck className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-mono font-bold text-amber-400">{metrics.deployedTeams}</span>
-            <span className="text-xs font-mono text-[var(--text-muted)]">Active assignments</span>
-          </div>
-          <div className="mt-2 text-[10px] text-[var(--text-muted)]">
-            Dewatering & silt dredging underway
+          <div className="flex items-baseline space-x-1.5">
+            <span className="text-2xl sm:text-3xl font-mono font-bold text-amber-500 dark:text-amber-400">{metrics.deployedTeams}</span>
+            <span className="text-xs font-mono text-[var(--text-muted)]">Mobilized</span>
           </div>
         </div>
       </div>
 
-      {/* ── Citywide Tactical Roadmap ("What Should the City Do Now?") ── */}
+      {/* ── 3. AI Tactical Action Roadmap (Collapsible & Clean) ──── */}
       {roadmapItems.length > 0 && (
-        <div className="bg-[var(--surface-elevated)] p-5 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-4 gap-2">
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-[var(--brand)] animate-ping" />
-                <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
-                  Citywide Tactical Roadmap ("What Should The City Do Now?")
-                </h2>
+        <div className="rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm overflow-hidden">
+          <div className="p-4 sm:p-5 flex items-center justify-between gap-4">
+            <div className="flex items-center space-x-2.5">
+              <span className="p-1.5 rounded-lg bg-[var(--brand)]/10 text-[var(--brand)]">
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-sm font-bold text-[var(--text-primary)]">
+                    AI Tactical Roadmap
+                  </h2>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] font-semibold">
+                    {roadmapItems.length} Ranked Interventions
+                  </span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)] hidden sm:block">
+                  Priority operational actions sorted by estimated flood risk reduction (ΔRisk) and staging feasibility.
+                </p>
               </div>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                Dynamic risk intelligence ranking based on expected risk reduction (ΔRisk) and operational feasibility. Click any card to relocate directly to ground deployment.
-              </p>
             </div>
-            <span className="self-start sm:self-auto text-[10px] font-mono font-bold px-2 py-0.5 bg-[var(--surface)] text-[var(--brand)]">
-              {roadmapItems.length} RANKED ACTIONS
-            </span>
+
+            <button
+              onClick={() => setShowRoadmap(!showRoadmap)}
+              className="text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center space-x-1 px-2.5 py-1.5 rounded-lg hover:bg-[var(--surface-soft)] cursor-pointer"
+            >
+              <span>{showRoadmap ? 'Collapse' : 'Expand'}</span>
+              {showRoadmap ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {roadmapItems.slice(0, 3).map((item, idx) => (
-              <div
-                key={idx}
-                onClick={() => handleStageCrew(item)}
-                className="p-4 bg-[var(--surface-soft)] hover:bg-[var(--surface-soft)]/90 transition-colors duration-150 flex flex-col justify-between cursor-pointer"
-                title="Click to relocate to Ground Incident Registry & stage deployment"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-mono font-bold text-[var(--brand)] flex items-center space-x-1">
-                      <MapPin className="w-3 h-3" />
-                      <span>{item.wardName ? `${item.wardName} (${item.wardCode || item.wardId})` : `Ward ${item.wardCode || item.wardId}`}</span>
-                    </span>
-                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-rose-500/15 text-rose-400">
-                      RANK #{idx + 1}
-                    </span>
-                  </div>
-                  <h3 className="text-xs font-bold text-[var(--text-primary)] mb-1">
-                    {item.title || item.action}
-                  </h3>
-                  <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed mb-3">
-                    {item.description || item.reason || 'Execute rapid dewatering and traffic diversion immediately.'}
-                  </p>
-                </div>
+          {showRoadmap && (
+            <div className="px-4 pb-5 sm:px-5 sm:pb-5 pt-0 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-[var(--border)]">
+              {roadmapItems.slice(0, 3).map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => handleStageCrew(item)}
+                  className="mt-4 p-4 rounded-xl bg-[var(--surface)] hover:bg-[var(--surface-soft)] border border-[var(--border)] hover:border-[var(--brand)]/40 transition-all cursor-pointer flex flex-col justify-between group shadow-sm"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-mono font-semibold text-[var(--brand)] flex items-center space-x-1">
+                        <MapPin className="w-3 h-3" />
+                        <span>{item.wardName || `Ward ${item.wardCode || item.wardId}`}</span>
+                      </span>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-500/15 text-rose-500 dark:text-rose-400">
+                        Priority #{idx + 1}
+                      </span>
+                    </div>
 
-                <div className="pt-2.5 mt-2 space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)]">
-                    <span>
-                      ΔRisk: <b className="text-emerald-400">+{item.expectedEffect?.projectedRiskScoreReduction || item.estReduction || 15} pts</b>
-                    </span>
-                    <span>
-                      Est. Cost: <b className="text-[var(--text-primary)]">₹{item.feasibility?.estimatedCostRupees || '25,000'}</b>
-                    </span>
+                    <h3 className="text-xs font-bold text-[var(--text-primary)] line-clamp-1 group-hover:text-[var(--brand)] transition-colors">
+                      {item.title || item.action}
+                    </h3>
+
+                    <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                      {item.description || item.reason || 'Immediate mobile dewatering and perimeter stabilization.'}
+                    </p>
                   </div>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStageCrew(item);
-                    }}
-                    className="w-full py-2 px-2 bg-[var(--surface)] hover:bg-[var(--brand)] hover:text-white text-[10px] font-mono uppercase tracking-wider text-[var(--text-primary)] transition-colors duration-150 flex items-center justify-center space-x-1 cursor-pointer"
-                  >
-                    <span>Stage Crew for this Ward</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </button>
+                  <div className="pt-3 mt-3 border-t border-[var(--border)] flex items-center justify-between">
+                    <span className="text-[11px] font-mono font-semibold text-emerald-500 dark:text-emerald-400">
+                      +{item.expectedEffect?.projectedRiskScoreReduction || item.estReduction || 15} pts ΔRisk
+                    </span>
+                    <span className="inline-flex items-center space-x-1 text-xs font-medium text-[var(--brand)] group-hover:translate-x-0.5 transition-transform">
+                      <span>Stage Unit</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* ── Search & Filter Controls (Borderless) ─────────── */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[var(--surface-elevated)] p-3 shadow-sm">
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-[var(--text-muted)]" />
-          <input
-            type="text"
-            placeholder="Search by ward name, code (e.g. W056), or incident notes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-[var(--surface-soft)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)]"
-          />
-        </div>
+      {/* ── 4. Main Two-Column Incident Command Workspace ──────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        {/* Left Column: Ground Incident Queue (7 cols) */}
+        <div ref={registryRef} className="lg:col-span-7 space-y-4">
+          {/* Filter Bar & Search */}
+          <div className="p-3.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm space-y-3">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-[var(--text-muted)]" />
+              <input
+                type="text"
+                placeholder="Filter by ward name, ward code (e.g. W056), or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--surface-soft)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] border border-[var(--border)] focus:outline-none focus:border-[var(--brand)] transition-colors"
+              />
+            </div>
 
-        {/* Severity Filter Tabs */}
-        <div className="flex items-center space-x-1 overflow-x-auto pb-1 sm:pb-0">
-          {[
-            { id: 'ALL', label: 'All Incidents' },
-            { id: 'CRITICAL', label: 'Critical' },
-            { id: 'HIGH', label: 'High' },
-            { id: 'ACTIVE', label: 'Active' },
-            { id: 'DISPATCHED', label: 'Dispatched' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setFilterSeverity(tab.id)}
-              className={`px-3 py-1.5 text-[11px] font-mono tracking-wider uppercase transition-colors duration-150 whitespace-nowrap cursor-pointer ${
-                filterSeverity === tab.id
-                  ? 'bg-[var(--brand)] text-white font-bold'
-                  : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+            <div className="flex items-center justify-between gap-2 overflow-x-auto pb-0.5">
+              <div className="flex items-center space-x-1">
+                {[
+                  { id: 'ALL', label: 'All' },
+                  { id: 'CRITICAL', label: 'Critical' },
+                  { id: 'HIGH', label: 'High' },
+                  { id: 'ACTIVE', label: 'Active' },
+                  { id: 'DISPATCHED', label: 'Dispatched' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setFilterSeverity(tab.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+                      filterSeverity === tab.id
+                        ? 'bg-[var(--brand)] text-white shadow-sm'
+                        : 'bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)]'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
 
-      {/* ── Operational Dispatch Grid (Incidents + Action Console) ── */}
-      <div ref={registryRef} className="grid grid-cols-1 lg:grid-cols-12 gap-6 scroll-mt-6">
-        {/* Left Column: Active Incidents List (7 cols) — COMPLETELY BORDERLESS */}
-        <div className="lg:col-span-7 space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold flex items-center space-x-1.5">
-              <Radio className="w-3.5 h-3.5 text-rose-500" />
-              <span>Ground Incident Registry ({filteredIncidents.length})</span>
-            </h2>
-            <span className="text-[10px] font-mono text-[var(--text-muted)]">
-              Click an incident to select & dispatch
-            </span>
+              <span className="text-[11px] font-mono text-[var(--text-muted)] shrink-0 pr-1">
+                {filteredIncidents.length} {filteredIncidents.length === 1 ? 'incident' : 'incidents'}
+              </span>
+            </div>
           </div>
 
+          {/* Incident List */}
           {filteredIncidents.length === 0 ? (
-            <div className="bg-[var(--surface-elevated)] p-12 text-center text-xs text-[var(--text-muted)] shadow-sm">
-              No matching flood incidents found for current query.
+            <div className="p-12 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] text-center text-xs text-[var(--text-muted)] shadow-sm">
+              No matching flood incidents found for current filter.
             </div>
           ) : (
             <div className="space-y-3">
@@ -546,78 +562,71 @@ export default function IncidentCommand() {
                         setSelectedTeamId(avail ? avail.id : teams[0].id);
                       }
                     }}
-                    className={`p-4 transition-colors duration-150 cursor-pointer relative shadow-sm ${
+                    className={`p-4 sm:p-5 rounded-xl border transition-all cursor-pointer relative shadow-sm ${
                       isSelected
-                        ? 'bg-[var(--surface-elevated)] ring-1 ring-[var(--brand)]'
-                        : 'bg-[var(--surface-soft)] hover:bg-[var(--surface-elevated)]'
+                        ? 'bg-[var(--surface-elevated)] border-[var(--brand)] ring-1 ring-[var(--brand)] shadow-md'
+                        : 'bg-[var(--surface-elevated)] border-[var(--border)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-soft)]'
                     }`}
                   >
-                    {/* Urgency Edge Stripe */}
+                    {/* Severity indicator line */}
                     <div
-                      className={`absolute left-0 top-0 bottom-0 w-1 ${
+                      className={`absolute left-0 top-3 bottom-3 w-1 rounded-r ${
                         isCrit ? 'bg-rose-500' : 'bg-amber-500'
                       }`}
                     />
 
-                    <div className="flex items-start justify-between gap-3 mb-2 pl-2">
-                      <div className="space-y-0.5">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs font-mono font-bold text-[var(--text-primary)] flex items-center space-x-1">
-                            <MapPin className="w-3 h-3 text-[var(--brand)]" />
-                            <span>{inc.wardName || `Ward ${inc.wardId || inc.wardCode || 'W001'}`}</span>
+                    <div className="pl-2 space-y-2.5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-semibold text-[var(--text-primary)]">
+                              {inc.wardName || `Ward ${inc.wardId || inc.wardCode}`}
+                            </span>
+                            <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface-soft)] text-[var(--text-muted)] border border-[var(--border)]">
+                              {inc.wardCode || inc.wardId}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-1.5 shrink-0">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                              isCrit
+                                ? 'bg-rose-500/15 text-rose-500 dark:text-rose-400'
+                                : 'bg-amber-500/15 text-amber-500 dark:text-amber-400'
+                            }`}
+                          >
+                            {inc.severity}
                           </span>
-                          <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                            ({inc.wardCode || inc.wardId || 'W000'})
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                              inc.status === 'DISPATCHED'
+                                ? 'bg-sky-500/15 text-sky-400'
+                                : 'bg-emerald-500/15 text-emerald-400'
+                            }`}
+                          >
+                            {inc.status || 'ACTIVE'}
                           </span>
                         </div>
-                        <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                          Incident ID: {inc.id}
-                        </span>
                       </div>
 
-                      <div className="flex items-center space-x-1.5">
-                        <span
-                          className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase ${
-                            isCrit
-                              ? 'bg-rose-500/20 text-rose-400'
-                              : 'bg-amber-500/20 text-amber-400'
-                          }`}
-                        >
-                          {inc.severity}
-                        </span>
+                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                        {inc.description}
+                      </p>
 
-                        <span
-                          className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase ${
-                            inc.status === 'DISPATCHED'
-                              ? 'bg-sky-500/20 text-sky-400'
-                              : 'bg-emerald-500/20 text-emerald-400'
-                          }`}
-                        >
-                          {inc.status || 'ACTIVE'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-[var(--text-secondary)] pl-2 mb-3 leading-relaxed">
-                      {inc.description}
-                    </p>
-
-                    {/* Depth & Logistics Footer */}
-                    <div className="pl-2 pt-1 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1.5">
+                      <div className="pt-1 flex items-center justify-between text-xs text-[var(--text-muted)] border-t border-[var(--border)]">
+                        <div className="flex items-center space-x-2 text-[11px]">
                           <Droplets className="w-3.5 h-3.5 text-sky-400" />
-                          <span className="text-[var(--text-muted)] text-[10px]">Water Depth:</span>
+                          <span>Depth:</span>
                           <span className="font-mono font-bold text-[var(--text-primary)]">
                             {inc.waterDepthCm || 35} cm
                           </span>
                         </div>
-                      </div>
 
-                      <div className="flex items-center space-x-2 text-[10px] font-mono text-[var(--text-muted)]">
-                        <Clock className="w-3 h-3" />
-                        <span>Logged recently</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-[var(--brand)]" />
+                        <div className="flex items-center space-x-1.5 text-[11px] font-medium text-[var(--brand)]">
+                          <span>{isSelected ? 'Selected for Dispatch' : 'Select'}</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -627,53 +636,57 @@ export default function IncidentCommand() {
           )}
         </div>
 
-        {/* Right Column: Emergency Dispatch Console (5 cols) — COMPLETELY BORDERLESS */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold flex items-center space-x-1.5">
-              <Truck className="w-3.5 h-3.5 text-[var(--brand)]" />
-              <span>Tactical Dispatch Console</span>
-            </h2>
-            <span className="text-[10px] font-mono text-[var(--text-muted)]">
-              Authorized MCD Logistics
-            </span>
-          </div>
+        {/* Right Column: Tactical Dispatch Console (5 cols) */}
+        <div ref={consoleRef} className="lg:col-span-5 space-y-4 lg:sticky lg:top-24">
+          <div className="p-5 sm:p-6 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-sm space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
+              <div className="flex items-center space-x-2">
+                <Truck className="w-4 h-4 text-[var(--brand)]" />
+                <h2 className="text-sm font-bold text-[var(--text-primary)]">
+                  Tactical Dispatch Console
+                </h2>
+              </div>
+              <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">
+                Authorized MCD Logistics
+              </span>
+            </div>
 
-          <div className="bg-[var(--surface-elevated)] p-5 shadow-sm space-y-5">
             {selectedIncident ? (
-              <form onSubmit={handleDispatch} className="space-y-4">
-                {/* Briefing Summary */}
-                <div className="p-3.5 bg-[var(--surface-soft)] text-xs space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wider">
-                    <span>Target Incident Site</span>
-                    <span className="text-rose-400 font-bold">{selectedIncident.severity}</span>
+              <form onSubmit={handleDispatch} className="space-y-5">
+                {/* Selected Incident Briefing */}
+                <div className="p-3.5 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {selectedIncident.wardName ? `${selectedIncident.wardName} (${selectedIncident.wardId || selectedIncident.wardCode})` : `Ward ${selectedIncident.wardId || selectedIncident.wardCode}`}
+                    </span>
+                    <span className="font-mono text-rose-500 dark:text-rose-400 font-bold text-[10px]">
+                      {selectedIncident.severity}
+                    </span>
                   </div>
-                  <div className="font-bold text-sm text-[var(--text-primary)]">
-                    {selectedIncident.wardName ? `${selectedIncident.wardName} (${selectedIncident.wardId || selectedIncident.wardCode})` : `Ward ${selectedIncident.wardId || selectedIncident.wardCode}`}
-                  </div>
-                  <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2">
+                  <p className="text-xs text-[var(--text-secondary)] line-clamp-2">
                     {selectedIncident.description}
                   </p>
-                  <div className="text-[10px] font-mono text-sky-400 pt-1">
-                    Recorded Depth: {selectedIncident.waterDepthCm || 35} cm · Status: {selectedIncident.status || 'ACTIVE'}
+                  <div className="text-[11px] font-mono text-sky-500 dark:text-sky-400 pt-1 flex items-center space-x-3">
+                    <span>Water Depth: <b>{selectedIncident.waterDepthCm || 35} cm</b></span>
+                    <span>Status: <b>{selectedIncident.status || 'ACTIVE'}</b></span>
                   </div>
                 </div>
 
-                {/* Response Team Selection with guaranteed high-contrast dropdown */}
-                <div>
-                  <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
-                    1. Select Available Field QRT Unit
+                {/* 1. Response Team Selector */}
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider font-mono">
+                    1. Assigned Response Unit
                   </label>
                   <select
                     value={selectedTeamId}
                     onChange={(e) => setSelectedTeamId(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-[var(--surface-soft)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] font-mono"
+                    className="w-full px-3 py-2.5 rounded-lg bg-[var(--surface)] text-xs text-[var(--text-primary)] border border-[var(--border)] focus:outline-none focus:border-[var(--brand)]"
                   >
                     {teams.map((t) => (
                       <option
                         key={t.id}
                         value={t.id}
-                        className="bg-[var(--surface-elevated)] text-[var(--text-primary)] py-1.5"
+                        className="bg-[var(--surface-elevated)] text-[var(--text-primary)]"
                       >
                         {t.name} [{t.zone || 'Delhi Metro'}] — Crew: {t.crewSize || 6} ({t.status || 'AVAILABLE'})
                       </option>
@@ -681,60 +694,74 @@ export default function IncidentCommand() {
                   </select>
                 </div>
 
-                {/* Specialized Equipment Selector */}
-                <div>
-                  <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
-                    2. Allocate Specialized Equipment Rig
+                {/* 2. Specialized Equipment (2x2 Grid) */}
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider font-mono">
+                    2. Allocate Equipment Rig
                   </label>
-                  <div className="space-y-1.5">
+                  <div className="grid grid-cols-2 gap-2.5">
                     {EQUIPMENT_OPTIONS.map((equip) => {
                       const isEquipSelected = selectedEquipment === equip.id;
+                      const IconComponent = equip.icon;
                       return (
                         <div
                           key={equip.id}
                           onClick={() => setSelectedEquipment(equip.id)}
-                          className={`p-2.5 text-xs cursor-pointer transition-colors duration-150 ${
+                          className={`p-3 rounded-lg border text-left cursor-pointer transition-all ${
                             isEquipSelected
-                              ? 'bg-[var(--surface-soft)] ring-1 ring-[var(--brand)]'
-                              : 'bg-[var(--surface)] hover:bg-[var(--surface-soft)]'
+                              ? 'bg-[var(--brand)]/10 border-[var(--brand)] ring-1 ring-[var(--brand)]'
+                              : 'bg-[var(--surface)] border-[var(--border)] hover:bg-[var(--surface-soft)]'
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-[var(--text-primary)] text-[11px]">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <IconComponent className={`w-3.5 h-3.5 ${isEquipSelected ? 'text-[var(--brand)]' : 'text-[var(--text-muted)]'}`} />
+                            <span className="text-xs font-semibold text-[var(--text-primary)] truncate">
                               {equip.name}
                             </span>
-                            <span className="text-[9px] font-mono px-1.5 py-0.2 bg-[var(--surface-soft)] text-[var(--text-muted)]">
-                              {equip.category}
-                            </span>
                           </div>
-                          <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
-                            {equip.suitedFor}
-                          </div>
+                          <span className="text-[10px] text-[var(--text-muted)] block truncate">
+                            {equip.category}
+                          </span>
                         </div>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Dispatch Tactical Directives */}
-                <div>
-                  <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
-                    3. Dispatch Directives & Operational Orders
+                {/* 3. Dispatch Directives & Quick Tags */}
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider font-mono">
+                    3. Operational Orders & Directives
                   </label>
+                  
+                  {/* Quick Preset Directive Chips */}
+                  <div className="flex flex-wrap gap-1.5 mb-1.5">
+                    {QUICK_DIRECTIVES.map((tag, idx) => (
+                      <button
+                        type="button"
+                        key={idx}
+                        onClick={() => setDispatchNotes((prev) => (prev ? `${prev} · ${tag}` : tag))}
+                        className="text-[10px] px-2 py-1 rounded bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] transition-colors cursor-pointer text-left"
+                      >
+                        + {tag.slice(0, 24)}...
+                      </button>
+                    ))}
+                  </div>
+
                   <textarea
                     rows={2}
-                    placeholder="Enter specific deployment staging directions, gate clearance instructions, or police barricade coordination notes..."
+                    placeholder="Enter staging directives or click preset tags above..."
                     value={dispatchNotes}
                     onChange={(e) => setDispatchNotes(e.target.value)}
-                    className="w-full px-3 py-2 bg-[var(--surface-soft)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)]"
+                    className="w-full px-3 py-2 rounded-lg bg-[var(--surface)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] border border-[var(--border)] focus:outline-none focus:border-[var(--brand)]"
                   />
                 </div>
 
-                {/* Mobilize Action Button — Always Active, Never Broken */}
+                {/* Submit Mobilization Button */}
                 <button
                   type="submit"
                   disabled={isDispatching}
-                  className="w-full py-3.5 px-4 font-mono font-bold text-xs uppercase tracking-wider text-white transition-opacity duration-150 flex items-center justify-center space-x-2 bg-[var(--brand)] hover:opacity-90 cursor-pointer shadow-sm"
+                  className="w-full py-3 px-4 rounded-xl font-medium text-xs uppercase tracking-wider text-white transition-all flex items-center justify-center space-x-2 bg-[var(--brand)] hover:opacity-95 active:scale-[0.99] cursor-pointer shadow-md disabled:opacity-50"
                 >
                   <Send className={`w-3.5 h-3.5 ${isDispatching ? 'animate-bounce' : ''}`} />
                   <span>
@@ -745,25 +772,11 @@ export default function IncidentCommand() {
                 </button>
               </form>
             ) : (
-              <div className="p-8 text-center bg-[var(--surface-soft)] text-xs text-[var(--text-muted)] space-y-2">
-                <AlertTriangle className="w-6 h-6 text-amber-500 mx-auto opacity-60" />
-                <p>Select any active flood incident from the registry to mobilize crew.</p>
+              <div className="p-8 text-center bg-[var(--surface)] rounded-lg text-xs text-[var(--text-muted)] space-y-2 border border-[var(--border)]">
+                <AlertTriangle className="w-5 h-5 text-amber-500 mx-auto opacity-70" />
+                <p>Select an incident from the queue to mobilize field response units.</p>
               </div>
             )}
-          </div>
-
-          {/* Emergency Hotline Reference Box */}
-          <div className="p-4 bg-[var(--surface-elevated)] text-xs space-y-2 font-mono shadow-sm">
-            <div className="flex items-center space-x-2 text-[var(--brand)] font-bold text-[10px] uppercase tracking-wider">
-              <PhoneCall className="w-3.5 h-3.5" />
-              <span>Inter-Agency Emergency Hotlines</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[10px] text-[var(--text-muted)]">
-              <div>Delhi Police Traffic: <b className="text-[var(--text-primary)]">1095</b></div>
-              <div>Irrigation & Flood (I&FC): <b className="text-[var(--text-primary)]">22444555</b></div>
-              <div>Delhi Jal Board (DJB): <b className="text-[var(--text-primary)]">1916</b></div>
-              <div>Disaster Management: <b className="text-[var(--text-primary)]">1077</b></div>
-            </div>
           </div>
         </div>
       </div>

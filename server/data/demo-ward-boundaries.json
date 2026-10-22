@@ -60,10 +60,18 @@
           "latitude": 28.840484,
           "longitude": 77.094594
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 25,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W001",
+        "name": "Narela",
+        "drainageCapacity": 25,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 80,
+        "current_risk_score": 80,
+        "rainfall": 42
       }
     },
     {
@@ -113,10 +121,18 @@
           "latitude": 28.849101,
           "longitude": 77.121545
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 25,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W002",
+        "name": "Bankner",
+        "drainageCapacity": 25,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 80,
+        "current_risk_score": 80,
+        "rainfall": 43
       }
     },
     {
@@ -166,10 +182,18 @@
           "latitude": 28.848581,
           "longitude": 77.086708
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W003",
+        "name": "Holambi Kalan",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -219,10 +243,18 @@
           "latitude": 28.870059,
           "longitude": 77.119149
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W004",
+        "name": "Alipur",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -272,10 +304,18 @@
           "latitude": 28.846005,
           "longitude": 77.088475
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W005",
+        "name": "Bakhtawarpur",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -325,10 +365,18 @@
           "latitude": 28.836445,
           "longitude": 77.12279
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 28,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W006",
+        "name": "Burari",
+        "drainageCapacity": 28,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 83,
+        "current_risk_score": 83,
+        "rainfall": 45
       }
     },
     {
@@ -378,10 +426,18 @@
           "latitude": 28.867035,
           "longitude": 77.09977
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W007",
+        "name": "Kadipur",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -431,10 +487,18 @@
           "latitude": 28.836421,
           "longitude": 77.104145
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W008",
+        "name": "Mukundpur",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -484,10 +548,18 @@
           "latitude": 28.825297,
           "longitude": 77.105784
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W009",
+        "name": "Sant Nagar",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -537,10 +609,18 @@
           "latitude": 28.860188,
           "longitude": 77.101929
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W010",
+        "name": "Jharoda",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -590,10 +670,18 @@
           "latitude": 28.698012,
           "longitude": 77.210911
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 32,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W011",
+        "name": "Timarpur",
+        "drainageCapacity": 32,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 87,
+        "current_risk_score": 87,
+        "rainfall": 48
       }
     },
     {
@@ -643,10 +731,18 @@
           "latitude": 28.68849,
           "longitude": 77.221382
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W012",
+        "name": "Malka Ganj",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 54,
+        "current_risk_score": 54,
+        "rainfall": 28
       }
     },
     {
@@ -696,10 +792,18 @@
           "latitude": 28.690266,
           "longitude": 77.229198
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W013",
+        "name": "Mukherjee Nagar",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 21
       }
     },
     {
@@ -749,10 +853,18 @@
           "latitude": 28.7123,
           "longitude": 77.1923
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W014",
+        "name": "Adarsh Nagar",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -802,10 +914,18 @@
           "latitude": 28.721904,
           "longitude": 77.239633
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W015",
+        "name": "Majlis Park",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -855,10 +975,18 @@
           "latitude": 28.70647,
           "longitude": 77.239393
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 91,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W016",
+        "name": "Azadpur",
+        "drainageCapacity": 91,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 22
       }
     },
     {
@@ -908,10 +1036,18 @@
           "latitude": 28.7029,
           "longitude": 77.1937
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W017",
+        "name": "Model Town",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -961,10 +1097,18 @@
           "latitude": 28.694059,
           "longitude": 77.241135
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W018",
+        "name": "GTB Nagar",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 23
       }
     },
     {
@@ -1014,10 +1158,18 @@
           "latitude": 28.6816,
           "longitude": 77.2227
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W019",
+        "name": "Kamla Nagar",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 38,
+        "current_risk_score": 38,
+        "rainfall": 24
       }
     },
     {
@@ -1067,10 +1219,18 @@
           "latitude": 28.679595,
           "longitude": 77.235039
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 20,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W020",
+        "name": "Shakti Nagar",
+        "drainageCapacity": 20,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 75,
+        "current_risk_score": 75,
+        "rainfall": 38
       }
     },
     {
@@ -1120,10 +1280,18 @@
           "latitude": 28.739517,
           "longitude": 77.132308
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W021",
+        "name": "Rohini-A",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 28
       }
     },
     {
@@ -1173,10 +1341,18 @@
           "latitude": 28.744508,
           "longitude": 77.091294
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W022",
+        "name": "Rohini-B",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -1226,10 +1402,18 @@
           "latitude": 28.732903,
           "longitude": 77.128918
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W023",
+        "name": "Rithala",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 29
       }
     },
     {
@@ -1279,10 +1463,18 @@
           "latitude": 28.707992,
           "longitude": 77.127985
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W024",
+        "name": "Vijay Vihar",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -1332,10 +1524,18 @@
           "latitude": 28.691988,
           "longitude": 77.140145
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W025",
+        "name": "Budh Vihar",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -1385,10 +1585,18 @@
           "latitude": 28.714497,
           "longitude": 77.134433
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W026",
+        "name": "Pooth Kalan",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -1438,10 +1646,18 @@
           "latitude": 28.72878,
           "longitude": 77.13111
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 59,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W027",
+        "name": "Begumpur",
+        "drainageCapacity": 59,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 48,
+        "current_risk_score": 48,
+        "rainfall": 24
       }
     },
     {
@@ -1491,10 +1707,18 @@
           "latitude": 28.72075,
           "longitude": 77.102667
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W028",
+        "name": "Prahaladpur",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -1544,10 +1768,18 @@
           "latitude": 28.739532,
           "longitude": 77.093759
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W029",
+        "name": "Shahbad Daulatpur",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -1597,10 +1829,18 @@
           "latitude": 28.802,
           "longitude": 77.0427
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W030",
+        "name": "Bawana",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -1650,10 +1890,18 @@
           "latitude": 28.735766,
           "longitude": 77.092553
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W031",
+        "name": "Kanjhawala",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 26
       }
     },
     {
@@ -1703,10 +1951,18 @@
           "latitude": 28.683094,
           "longitude": 77.092089
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W032",
+        "name": "Rani Khera",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -1756,10 +2012,18 @@
           "latitude": 28.6826,
           "longitude": 77.0628
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W033",
+        "name": "Nangloi North",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -1809,10 +2073,18 @@
           "latitude": 28.6817,
           "longitude": 77.027
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W034",
+        "name": "Mundka",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -1862,10 +2134,18 @@
           "latitude": 28.6723,
           "longitude": 77.1023
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W035",
+        "name": "Nilothi",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -1915,10 +2195,18 @@
           "latitude": 28.73146,
           "longitude": 77.082328
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W036",
+        "name": "Kirari Suleman Nagar",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -1968,10 +2256,18 @@
           "latitude": 28.719492,
           "longitude": 77.090903
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W037",
+        "name": "Prem Nagar",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 30,
+        "current_risk_score": 30,
+        "rainfall": 20
       }
     },
     {
@@ -2021,10 +2317,18 @@
           "latitude": 28.728507,
           "longitude": 77.093954
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W038",
+        "name": "Aman Vihar",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 31,
+        "current_risk_score": 31,
+        "rainfall": 21
       }
     },
     {
@@ -2074,10 +2378,18 @@
           "latitude": 28.693688,
           "longitude": 77.105832
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W039",
+        "name": "Mangol Puri-A",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 32,
+        "current_risk_score": 32,
+        "rainfall": 21
       }
     },
     {
@@ -2127,10 +2439,18 @@
           "latitude": 28.713589,
           "longitude": 77.145229
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 91,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W040",
+        "name": "Mangol Puri-B",
+        "drainageCapacity": 91,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 22
       }
     },
     {
@@ -2180,10 +2500,18 @@
           "latitude": 28.707382,
           "longitude": 77.093458
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W041",
+        "name": "Sultanpuri-A",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -2233,10 +2561,18 @@
           "latitude": 28.728054,
           "longitude": 77.077001
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W042",
+        "name": "Sultanpuri-B",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 23
       }
     },
     {
@@ -2286,10 +2622,18 @@
           "latitude": 28.679984,
           "longitude": 77.130698
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W043",
+        "name": "Jwalapuri",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 23
       }
     },
     {
@@ -2339,10 +2683,18 @@
           "latitude": 28.709583,
           "longitude": 77.118358
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W044",
+        "name": "Nangloi Jat",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 24
       }
     },
     {
@@ -2392,10 +2744,18 @@
           "latitude": 28.69865,
           "longitude": 77.114042
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 42,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W045",
+        "name": "Nihal Vihar",
+        "drainageCapacity": 42,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 60,
+        "current_risk_score": 60,
+        "rainfall": 28
       }
     },
     {
@@ -2445,10 +2805,18 @@
           "latitude": 28.701633,
           "longitude": 77.122987
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W046",
+        "name": "Guru Harkishan Nagar",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 28
       }
     },
     {
@@ -2498,10 +2866,18 @@
           "latitude": 28.679,
           "longitude": 77.092
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W047",
+        "name": "Peeragarhi",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -2551,10 +2927,18 @@
           "latitude": 28.705048,
           "longitude": 77.109415
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W048",
+        "name": "Mangolpur Kalan",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 29
       }
     },
     {
@@ -2604,10 +2988,18 @@
           "latitude": 28.699,
           "longitude": 77.1384
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W049",
+        "name": "Pitampura North",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -2657,10 +3049,18 @@
           "latitude": 28.711473,
           "longitude": 77.135864
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W050",
+        "name": "Pitampura South",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -2710,10 +3110,18 @@
           "latitude": 28.7167,
           "longitude": 77.1528
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W051",
+        "name": "Shalimar Bagh North",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -2763,10 +3171,18 @@
           "latitude": 28.72482,
           "longitude": 77.141569
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 59,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W052",
+        "name": "Shalimar Bagh South",
+        "drainageCapacity": 59,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 48,
+        "current_risk_score": 48,
+        "rainfall": 24
       }
     },
     {
@@ -2816,10 +3232,18 @@
           "latitude": 28.695361,
           "longitude": 77.137558
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W053",
+        "name": "Saraswati Vihar",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -2869,10 +3293,18 @@
           "latitude": 28.6675,
           "longitude": 77.0981
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W054",
+        "name": "Paschim Vihar",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -2922,10 +3354,18 @@
           "latitude": 28.673525,
           "longitude": 77.167337
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W055",
+        "name": "Rani Bagh",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -2975,10 +3415,18 @@
           "latitude": 28.688459,
           "longitude": 77.165635
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W056",
+        "name": "Kohat Enclave",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 26
       }
     },
     {
@@ -3028,10 +3476,18 @@
           "latitude": 28.684511,
           "longitude": 77.144627
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W057",
+        "name": "Tri Nagar",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -3081,10 +3537,18 @@
           "latitude": 28.67162,
           "longitude": 77.17238
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W058",
+        "name": "Rampura",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -3134,10 +3598,18 @@
           "latitude": 28.68208,
           "longitude": 77.144116
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W059",
+        "name": "Ashok Vihar",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -3187,10 +3659,18 @@
           "latitude": 28.701,
           "longitude": 77.16
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W060",
+        "name": "Wazirpur",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -3240,10 +3720,18 @@
           "latitude": 28.685472,
           "longitude": 77.137997
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W061",
+        "name": "Sangam Park",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -3293,10 +3781,18 @@
           "latitude": 28.679036,
           "longitude": 77.162276
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W062",
+        "name": "Nimri Colony",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 30,
+        "current_risk_score": 30,
+        "rainfall": 20
       }
     },
     {
@@ -3346,10 +3842,18 @@
           "latitude": 28.668259,
           "longitude": 77.18707
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W063",
+        "name": "Shastri Nagar",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 31,
+        "current_risk_score": 31,
+        "rainfall": 21
       }
     },
     {
@@ -3399,10 +3903,18 @@
           "latitude": 28.667455,
           "longitude": 77.136443
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W064",
+        "name": "Sarai Rohilla",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 32,
+        "current_risk_score": 32,
+        "rainfall": 21
       }
     },
     {
@@ -3452,10 +3964,18 @@
           "latitude": 28.672,
           "longitude": 77.17
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 91,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W065",
+        "name": "Inderlok",
+        "drainageCapacity": 91,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 22
       }
     },
     {
@@ -3505,10 +4025,18 @@
           "latitude": 28.654565,
           "longitude": 77.155867
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W066",
+        "name": "Anand Parbat",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -3558,10 +4086,18 @@
           "latitude": 28.654884,
           "longitude": 77.18238
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W067",
+        "name": "Baljit Nagar",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 23
       }
     },
     {
@@ -3611,10 +4147,18 @@
           "latitude": 28.6533,
           "longitude": 77.167
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W068",
+        "name": "West Patel Nagar",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 23
       }
     },
     {
@@ -3664,10 +4208,18 @@
           "latitude": 28.670522,
           "longitude": 77.224125
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W069",
+        "name": "East Patel Nagar",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 24
       }
     },
     {
@@ -3717,10 +4269,18 @@
           "latitude": 28.627967,
           "longitude": 77.200204
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 42,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W070",
+        "name": "Ranjeet Nagar",
+        "drainageCapacity": 42,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 60,
+        "current_risk_score": 60,
+        "rainfall": 28
       }
     },
     {
@@ -3770,10 +4330,18 @@
           "latitude": 28.651,
           "longitude": 77.15
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W071",
+        "name": "Karam Pura",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 28
       }
     },
     {
@@ -3823,10 +4391,18 @@
           "latitude": 28.6575,
           "longitude": 77.1431
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W072",
+        "name": "Moti Nagar",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -3876,10 +4452,18 @@
           "latitude": 28.6504,
           "longitude": 77.143
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W073",
+        "name": "Kirti Nagar",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 29
       }
     },
     {
@@ -3929,10 +4513,18 @@
           "latitude": 28.642616,
           "longitude": 77.203167
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W074",
+        "name": "Mansarovar Garden",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -3982,10 +4574,18 @@
           "latitude": 28.643799,
           "longitude": 77.166161
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W075",
+        "name": "Rajinder Nagar",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -4035,10 +4635,18 @@
           "latitude": 28.632385,
           "longitude": 77.170171
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 80,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W076",
+        "name": "Pusa",
+        "drainageCapacity": 80,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 20,
+        "current_risk_score": 20,
+        "rainfall": 15
       }
     },
     {
@@ -4088,10 +4696,18 @@
           "latitude": 28.623676,
           "longitude": 77.166134
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 59,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W077",
+        "name": "Inderpuri",
+        "drainageCapacity": 59,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 48,
+        "current_risk_score": 48,
+        "rainfall": 24
       }
     },
     {
@@ -4141,10 +4757,18 @@
           "latitude": 28.6337,
           "longitude": 77.1389
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W078",
+        "name": "Naraina",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 48,
+        "current_risk_score": 48,
+        "rainfall": 25
       }
     },
     {
@@ -4194,10 +4818,18 @@
           "latitude": 28.652,
           "longitude": 77.191
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W079",
+        "name": "Karol Bagh",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -4247,10 +4879,18 @@
           "latitude": 28.651692,
           "longitude": 77.219541
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W080",
+        "name": "Dev Nagar",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -4300,10 +4940,18 @@
           "latitude": 28.642,
           "longitude": 77.21
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W081",
+        "name": "Pahar Ganj",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 26
       }
     },
     {
@@ -4353,10 +5001,18 @@
           "latitude": 28.656,
           "longitude": 77.215
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W082",
+        "name": "Sadar Bazar",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -4406,10 +5062,18 @@
           "latitude": 28.657602,
           "longitude": 77.198369
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W083",
+        "name": "Qasabpura",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -4459,10 +5123,18 @@
           "latitude": 28.6816,
           "longitude": 77.2227
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W084",
+        "name": "Civil Lines",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 26
       }
     },
     {
@@ -4512,10 +5184,18 @@
           "latitude": 28.6562,
           "longitude": 77.23
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W085",
+        "name": "Chandni Chowk",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -4565,10 +5245,18 @@
           "latitude": 28.651,
           "longitude": 77.234
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W086",
+        "name": "Jama Masjid",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -4618,10 +5306,18 @@
           "latitude": 28.64,
           "longitude": 77.24
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W087",
+        "name": "Delhi Gate",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 54,
+        "current_risk_score": 54,
+        "rainfall": 27
       }
     },
     {
@@ -4671,10 +5367,18 @@
           "latitude": 28.653,
           "longitude": 77.225
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W088",
+        "name": "Ballimaran",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 21
       }
     },
     {
@@ -4724,10 +5428,18 @@
           "latitude": 28.646329,
           "longitude": 77.222531
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W089",
+        "name": "Ram Nagar",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -4777,10 +5489,18 @@
           "latitude": 28.6672,
           "longitude": 77.2307
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W090",
+        "name": "Kashmere Gate",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -4830,10 +5550,18 @@
           "latitude": 28.647695,
           "longitude": 77.223
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W091",
+        "name": "Ajmeri Gate",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -4883,10 +5611,18 @@
           "latitude": 28.641,
           "longitude": 77.235
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 91,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W092",
+        "name": "Turkman Gate",
+        "drainageCapacity": 91,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -4936,10 +5672,18 @@
           "latitude": 28.6433,
           "longitude": 77.2427
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W093",
+        "name": "Darya Ganj",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 23
       }
     },
     {
@@ -4989,10 +5733,18 @@
           "latitude": 28.66208,
           "longitude": 77.2
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W094",
+        "name": "Pratap Nagar",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 24
       }
     },
     {
@@ -5042,10 +5794,18 @@
           "latitude": 28.646008,
           "longitude": 77.105305
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W095",
+        "name": "Vishnu Garden",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 38,
+        "current_risk_score": 38,
+        "rainfall": 24
       }
     },
     {
@@ -5095,10 +5855,18 @@
           "latitude": 28.6493,
           "longitude": 77.1207
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W096",
+        "name": "Rajouri Garden",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 28
       }
     },
     {
@@ -5148,10 +5916,18 @@
           "latitude": 28.640448,
           "longitude": 77.1125
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W097",
+        "name": "Tagore Garden",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -5201,10 +5977,18 @@
           "latitude": 28.639312,
           "longitude": 77.106821
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W098",
+        "name": "Subhash Nagar",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 29
       }
     },
     {
@@ -5254,10 +6038,18 @@
           "latitude": 28.629344,
           "longitude": 77.115941
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W099",
+        "name": "Hari Nagar-A",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -5307,10 +6099,18 @@
           "latitude": 28.628568,
           "longitude": 77.120594
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W100",
+        "name": "Hari Nagar-B",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -5360,10 +6160,18 @@
           "latitude": 28.63,
           "longitude": 77.1
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W101",
+        "name": "Fateh Nagar",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -5413,10 +6221,18 @@
           "latitude": 28.6366,
           "longitude": 77.0965
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 46,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W102",
+        "name": "Tilak Nagar",
+        "drainageCapacity": 46,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 64,
+        "current_risk_score": 64,
+        "rainfall": 31
       }
     },
     {
@@ -5466,10 +6282,18 @@
           "latitude": 28.64955,
           "longitude": 77.089756
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W103",
+        "name": "Khyala",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 48,
+        "current_risk_score": 48,
+        "rainfall": 25
       }
     },
     {
@@ -5519,10 +6343,18 @@
           "latitude": 28.618,
           "longitude": 77.09
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W104",
+        "name": "Janakpuri South",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -5572,10 +6404,18 @@
           "latitude": 28.625,
           "longitude": 77.08
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W105",
+        "name": "Janakpuri West",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -5625,10 +6465,18 @@
           "latitude": 28.63737,
           "longitude": 77.085
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W106",
+        "name": "Mahavir Nagar",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 26
       }
     },
     {
@@ -5678,10 +6526,18 @@
           "latitude": 28.639987,
           "longitude": 77.067388
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W107",
+        "name": "Vikas Puri",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -5731,10 +6587,18 @@
           "latitude": 28.643852,
           "longitude": 77.051158
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W108",
+        "name": "Hastsal",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -5784,10 +6648,18 @@
           "latitude": 28.6225,
           "longitude": 77.056
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W109",
+        "name": "Uttam Nagar",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 26
       }
     },
     {
@@ -5837,10 +6709,18 @@
           "latitude": 28.61,
           "longitude": 77.06
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W110",
+        "name": "Bindapur",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -5890,10 +6770,18 @@
           "latitude": 28.605,
           "longitude": 77.08
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W111",
+        "name": "Dabri",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -5943,10 +6831,18 @@
           "latitude": 28.595,
           "longitude": 77.09
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W112",
+        "name": "Sagarpur",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -5996,10 +6892,18 @@
           "latitude": 28.608,
           "longitude": 77.05
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W113",
+        "name": "Madhu Vihar",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 21
       }
     },
     {
@@ -6049,10 +6953,18 @@
           "latitude": 28.548,
           "longitude": 77.12
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W114",
+        "name": "Mahipalpur",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -6102,10 +7014,18 @@
           "latitude": 28.613244,
           "longitude": 77.033609
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W115",
+        "name": "Matiala",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -6155,10 +7075,18 @@
           "latitude": 28.617809,
           "longitude": 77.023984
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W116",
+        "name": "Kakrola",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 22
       }
     },
     {
@@ -6208,10 +7136,18 @@
           "latitude": 28.608979,
           "longitude": 77.040603
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W117",
+        "name": "Dwarka-A",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 23
       }
     },
     {
@@ -6261,10 +7197,18 @@
           "latitude": 28.5921,
           "longitude": 77.046
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W118",
+        "name": "Dwarka-B",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 23
       }
     },
     {
@@ -6314,10 +7258,18 @@
           "latitude": 28.571308,
           "longitude": 77.059152
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W119",
+        "name": "Dwarka-C",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -6367,10 +7319,18 @@
           "latitude": 28.5893,
           "longitude": 77.085
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 95,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W120",
+        "name": "Palam",
+        "drainageCapacity": 95,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 24
       }
     },
     {
@@ -6420,10 +7380,18 @@
           "latitude": 28.593295,
           "longitude": 77.071092
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 42,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W121",
+        "name": "Sadh Nagar",
+        "drainageCapacity": 42,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 60,
+        "current_risk_score": 60,
+        "rainfall": 28
       }
     },
     {
@@ -6473,10 +7441,18 @@
           "latitude": 28.587598,
           "longitude": 77.085336
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W122",
+        "name": "Manglapuri",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -6526,10 +7502,18 @@
           "latitude": 28.592901,
           "longitude": 77.06376
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W123",
+        "name": "Nasirpur",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 29
       }
     },
     {
@@ -6579,10 +7563,18 @@
           "latitude": 28.556289,
           "longitude": 77.052975
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W124",
+        "name": "Bijwasan",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -6632,10 +7624,18 @@
           "latitude": 28.528,
           "longitude": 77.08
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W125",
+        "name": "Kapashera",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -6685,10 +7685,18 @@
           "latitude": 28.537,
           "longitude": 77.09
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W126",
+        "name": "Samalkha",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -6738,10 +7746,18 @@
           "latitude": 28.609,
           "longitude": 76.9872
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 46,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W127",
+        "name": "Najafgarh",
+        "drainageCapacity": 46,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 64,
+        "current_risk_score": 64,
+        "rainfall": 31
       }
     },
     {
@@ -6791,10 +7807,18 @@
           "latitude": 28.627303,
           "longitude": 76.974932
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W128",
+        "name": "Dichon Kalan",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 48,
+        "current_risk_score": 48,
+        "rainfall": 25
       }
     },
     {
@@ -6844,10 +7868,18 @@
           "latitude": 28.63,
           "longitude": 77
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W129",
+        "name": "Baprola",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -6897,10 +7929,18 @@
           "latitude": 28.593682,
           "longitude": 77.117866
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W130",
+        "name": "Nangal Raya",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -6950,10 +7990,18 @@
           "latitude": 28.5961,
           "longitude": 77.136
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 84,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W131",
+        "name": "Delhi Cantt",
+        "drainageCapacity": 84,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 25,
+        "current_risk_score": 25,
+        "rainfall": 17
       }
     },
     {
@@ -7003,10 +8051,18 @@
           "latitude": 28.585094,
           "longitude": 76.988618
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W132",
+        "name": "Chhawla",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -7056,10 +8112,18 @@
           "latitude": 28.611899,
           "longitude": 76.964588
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W133",
+        "name": "Roshanpura",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -7109,10 +8173,18 @@
           "latitude": 28.64,
           "longitude": 76.95
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W134",
+        "name": "Jharoda Kalan",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 26
       }
     },
     {
@@ -7162,10 +8234,18 @@
           "latitude": 28.605663,
           "longitude": 76.936037
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W135",
+        "name": "Mundela",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -7215,10 +8295,18 @@
           "latitude": 28.574905,
           "longitude": 76.90343
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W136",
+        "name": "Ghuman Hera",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -7268,10 +8356,18 @@
           "latitude": 28.599537,
           "longitude": 76.884635
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W137",
+        "name": "Isapur",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -7321,10 +8417,18 @@
           "latitude": 28.567575,
           "longitude": 76.852009
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W138",
+        "name": "Dhansa",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 21
       }
     },
     {
@@ -7374,10 +8478,18 @@
           "latitude": 28.552221,
           "longitude": 76.831599
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W139",
+        "name": "Raota",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -7427,10 +8539,18 @@
           "latitude": 28.54,
           "longitude": 76.95
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W140",
+        "name": "Daulatpur",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -7480,10 +8600,18 @@
           "latitude": 28.535,
           "longitude": 77.21
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W141",
+        "name": "Malviya Nagar",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 22
       }
     },
     {
@@ -7533,10 +8661,18 @@
           "latitude": 28.5494,
           "longitude": 77.2001
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W142",
+        "name": "Hauz Khas",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -7586,10 +8722,18 @@
           "latitude": 28.5603,
           "longitude": 77.1627
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W143",
+        "name": "Vasant Vihar",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 23
       }
     },
     {
@@ -7639,10 +8783,18 @@
           "latitude": 28.555931,
           "longitude": 77.170228
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W144",
+        "name": "Munirka",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -7692,10 +8844,18 @@
           "latitude": 28.567238,
           "longitude": 77.187186
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 95,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W145",
+        "name": "RK Puram",
+        "drainageCapacity": 95,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 24
       }
     },
     {
@@ -7745,10 +8905,18 @@
           "latitude": 28.5293,
           "longitude": 77.1519
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 76,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W146",
+        "name": "Vasant Kunj",
+        "drainageCapacity": 76,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 16,
+        "current_risk_score": 16,
+        "rainfall": 12
       }
     },
     {
@@ -7798,10 +8966,18 @@
           "latitude": 28.5186,
           "longitude": 77.1843
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W147",
+        "name": "Mehrauli",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -7851,10 +9027,18 @@
           "latitude": 28.52988,
           "longitude": 77.193582
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W148",
+        "name": "Lado Sarai",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -7904,10 +9088,18 @@
           "latitude": 28.5023,
           "longitude": 77.1818
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W149",
+        "name": "Chhatarpur",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -7957,10 +9149,18 @@
           "latitude": 28.515,
           "longitude": 77.205
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W150",
+        "name": "Saidulajab",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -8010,10 +9210,18 @@
           "latitude": 28.45,
           "longitude": 77.22
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W151",
+        "name": "Bhatthi Mines",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -8063,10 +9271,18 @@
           "latitude": 28.47,
           "longitude": 77.13
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 46,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W152",
+        "name": "Aya Nagar",
+        "drainageCapacity": 46,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 64,
+        "current_risk_score": 64,
+        "rainfall": 31
       }
     },
     {
@@ -8116,10 +9332,18 @@
           "latitude": 28.505,
           "longitude": 77.235
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 26,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W153",
+        "name": "Sangam Vihar-A",
+        "drainageCapacity": 26,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 81,
+        "current_risk_score": 81,
+        "rainfall": 43
       }
     },
     {
@@ -8169,10 +9393,18 @@
           "latitude": 28.5,
           "longitude": 77.24
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 26,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W154",
+        "name": "Sangam Vihar-B",
+        "drainageCapacity": 26,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 81,
+        "current_risk_score": 81,
+        "rainfall": 44
       }
     },
     {
@@ -8222,10 +9454,18 @@
           "latitude": 28.495,
           "longitude": 77.245
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 27,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W155",
+        "name": "Sangam Vihar-C",
+        "drainageCapacity": 27,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 82,
+        "current_risk_score": 82,
+        "rainfall": 44
       }
     },
     {
@@ -8275,10 +9515,18 @@
           "latitude": 28.505,
           "longitude": 77.225
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W156",
+        "name": "Deoli",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -8328,10 +9576,18 @@
           "latitude": 28.515,
           "longitude": 77.23
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 62,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W157",
+        "name": "Khanpur",
+        "drainageCapacity": 62,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -8381,10 +9637,18 @@
           "latitude": 28.525,
           "longitude": 77.235
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W158",
+        "name": "Dakshinpuri",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -8434,10 +9698,18 @@
           "latitude": 28.53,
           "longitude": 77.225
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W159",
+        "name": "Madangir",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 26
       }
     },
     {
@@ -8487,10 +9759,18 @@
           "latitude": 28.535,
           "longitude": 77.215
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W160",
+        "name": "Pushp Vihar",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -8540,10 +9820,18 @@
           "latitude": 28.5244,
           "longitude": 77.2139
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W161",
+        "name": "Saket",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -8593,10 +9881,18 @@
           "latitude": 28.51,
           "longitude": 77.21
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W162",
+        "name": "Sainik Farm",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 30,
+        "current_risk_score": 30,
+        "rainfall": 20
       }
     },
     {
@@ -8646,10 +9942,18 @@
           "latitude": 28.5418,
           "longitude": 77.2389
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W163",
+        "name": "Greater Kailash",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 31,
+        "current_risk_score": 31,
+        "rainfall": 21
       }
     },
     {
@@ -8699,10 +10003,18 @@
           "latitude": 28.54,
           "longitude": 77.225
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W164",
+        "name": "Chirag Delhi",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 32,
+        "current_risk_score": 32,
+        "rainfall": 21
       }
     },
     {
@@ -8752,10 +10064,18 @@
           "latitude": 28.535,
           "longitude": 77.25
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 91,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W165",
+        "name": "CR Park",
+        "drainageCapacity": 91,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 32,
+        "current_risk_score": 32,
+        "rainfall": 21
       }
     },
     {
@@ -8805,10 +10125,18 @@
           "latitude": 28.5373,
           "longitude": 77.2613
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W166",
+        "name": "Kalkaji",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 22
       }
     },
     {
@@ -8858,10 +10186,18 @@
           "latitude": 28.53,
           "longitude": 77.265
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W167",
+        "name": "Govindpuri",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -8911,10 +10247,18 @@
           "latitude": 28.563,
           "longitude": 77.279
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W168",
+        "name": "Okhla",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 23
       }
     },
     {
@@ -8964,10 +10308,18 @@
           "latitude": 28.545,
           "longitude": 77.275
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W169",
+        "name": "Harkesh Nagar",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -9017,10 +10369,18 @@
           "latitude": 28.52,
           "longitude": 77.28
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 95,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W170",
+        "name": "Tekhand",
+        "drainageCapacity": 95,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 24
       }
     },
     {
@@ -9070,10 +10430,18 @@
           "latitude": 28.5,
           "longitude": 77.3
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 21,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W171",
+        "name": "Badarpur",
+        "drainageCapacity": 21,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 76,
+        "current_risk_score": 76,
+        "rainfall": 38
       }
     },
     {
@@ -9123,10 +10491,18 @@
           "latitude": 28.51,
           "longitude": 77.31
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W172",
+        "name": "Molarband",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -9176,10 +10552,18 @@
           "latitude": 28.5273,
           "longitude": 77.3002
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W173",
+        "name": "Sarita Vihar",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 61,
+        "current_risk_score": 61,
+        "rainfall": 29
       }
     },
     {
@@ -9229,10 +10613,18 @@
           "latitude": 28.535,
           "longitude": 77.29
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W174",
+        "name": "Jasola",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 29
       }
     },
     {
@@ -9282,10 +10674,18 @@
           "latitude": 28.56,
           "longitude": 77.27
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W175",
+        "name": "New Friends Colony",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -9335,10 +10735,18 @@
           "latitude": 28.565,
           "longitude": 77.28
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W176",
+        "name": "Zakir Nagar",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 30
       }
     },
     {
@@ -9388,10 +10796,18 @@
           "latitude": 28.555,
           "longitude": 77.295
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W177",
+        "name": "Abul Fazal Enclave",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 31
       }
     },
     {
@@ -9441,10 +10857,18 @@
           "latitude": 28.565,
           "longitude": 77.255
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W178",
+        "name": "Srinivaspuri",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 48,
+        "current_risk_score": 48,
+        "rainfall": 24
       }
     },
     {
@@ -9494,10 +10918,18 @@
           "latitude": 28.5672,
           "longitude": 77.239
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 60,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W179",
+        "name": "Lajpat Nagar",
+        "drainageCapacity": 60,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -9547,10 +10979,18 @@
           "latitude": 28.57,
           "longitude": 77.225
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W180",
+        "name": "Andrews Ganj",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 49,
+        "current_risk_score": 49,
+        "rainfall": 25
       }
     },
     {
@@ -9600,10 +11040,18 @@
           "latitude": 28.575,
           "longitude": 77.22
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 61,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W181",
+        "name": "Kotla Mubarakpur",
+        "drainageCapacity": 61,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 50,
+        "current_risk_score": 50,
+        "rainfall": 25
       }
     },
     {
@@ -9653,10 +11101,18 @@
           "latitude": 28.5732,
           "longitude": 77.2325
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 84,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W182",
+        "name": "Defence Colony",
+        "drainageCapacity": 84,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 25,
+        "current_risk_score": 25,
+        "rainfall": 18
       }
     },
     {
@@ -9706,10 +11162,18 @@
           "latitude": 28.585,
           "longitude": 77.225
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W183",
+        "name": "Lodhi Colony",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 51,
+        "current_risk_score": 51,
+        "rainfall": 26
       }
     },
     {
@@ -9759,10 +11223,18 @@
           "latitude": 28.588,
           "longitude": 77.247
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 63,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W184",
+        "name": "Nizamuddin",
+        "drainageCapacity": 63,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 26
       }
     },
     {
@@ -9812,10 +11284,18 @@
           "latitude": 28.5833,
           "longitude": 77.2439
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W185",
+        "name": "Jangpura",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 52,
+        "current_risk_score": 52,
+        "rainfall": 27
       }
     },
     {
@@ -9865,10 +11345,18 @@
           "latitude": 28.58,
           "longitude": 77.25
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 64,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W186",
+        "name": "Bhogal",
+        "drainageCapacity": 64,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -9918,10 +11406,18 @@
           "latitude": 28.575,
           "longitude": 77.24
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W187",
+        "name": "Kasturba Nagar",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -9971,10 +11467,18 @@
           "latitude": 28.57,
           "longitude": 77.23
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W188",
+        "name": "Seva Nagar",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 21
       }
     },
     {
@@ -10024,10 +11528,18 @@
           "latitude": 28.6125,
           "longitude": 77.2915
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W189",
+        "name": "Mayur Vihar I",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 21
       }
     },
     {
@@ -10077,10 +11589,18 @@
           "latitude": 28.625,
           "longitude": 77.305
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W190",
+        "name": "Mayur Vihar II",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -10130,10 +11650,18 @@
           "latitude": 28.595,
           "longitude": 77.3
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W191",
+        "name": "New Ashok Nagar",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -10183,10 +11711,18 @@
           "latitude": 28.605,
           "longitude": 77.305
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 36,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W192",
+        "name": "Trilokpuri East",
+        "drainageCapacity": 36,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 91,
+        "current_risk_score": 91,
+        "rainfall": 52
       }
     },
     {
@@ -10236,10 +11772,18 @@
           "latitude": 28.605,
           "longitude": 77.295
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 36,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W193",
+        "name": "Trilokpuri West",
+        "drainageCapacity": 36,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 91,
+        "current_risk_score": 91,
+        "rainfall": 53
       }
     },
     {
@@ -10289,10 +11833,18 @@
           "latitude": 28.615,
           "longitude": 77.31
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W194",
+        "name": "Kalyanpuri",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 23
       }
     },
     {
@@ -10342,10 +11894,18 @@
           "latitude": 28.61,
           "longitude": 77.32
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W195",
+        "name": "Kondli",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 38,
+        "current_risk_score": 38,
+        "rainfall": 24
       }
     },
     {
@@ -10395,10 +11955,18 @@
           "latitude": 28.615,
           "longitude": 77.33
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 40,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W196",
+        "name": "Gharoli",
+        "drainageCapacity": 40,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 62,
+        "current_risk_score": 62,
+        "rainfall": 30
       }
     },
     {
@@ -10448,10 +12016,18 @@
           "latitude": 28.605,
           "longitude": 77.325
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 41,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W197",
+        "name": "Dallupura",
+        "drainageCapacity": 41,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 31
       }
     },
     {
@@ -10501,10 +12077,18 @@
           "latitude": 28.625,
           "longitude": 77.285
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 41,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W198",
+        "name": "Patparganj",
+        "drainageCapacity": 41,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 63,
+        "current_risk_score": 63,
+        "rainfall": 31
       }
     },
     {
@@ -10554,10 +12138,18 @@
           "latitude": 28.635,
           "longitude": 77.29
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 42,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W199",
+        "name": "Mandawali",
+        "drainageCapacity": 42,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 64,
+        "current_risk_score": 64,
+        "rainfall": 31
       }
     },
     {
@@ -10607,10 +12199,18 @@
           "latitude": 28.63,
           "longitude": 77.295
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W200",
+        "name": "Vinod Nagar",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 64,
+        "current_risk_score": 64,
+        "rainfall": 32
       }
     },
     {
@@ -10660,10 +12260,18 @@
           "latitude": 28.64,
           "longitude": 77.3
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 43,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W201",
+        "name": "IP Extension",
+        "drainageCapacity": 43,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 65,
+        "current_risk_score": 65,
+        "rainfall": 32
       }
     },
     {
@@ -10713,10 +12321,18 @@
           "latitude": 28.6417,
           "longitude": 77.2952
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W202",
+        "name": "Preet Vihar",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 65,
+        "current_risk_score": 65,
+        "rainfall": 33
       }
     },
     {
@@ -10766,10 +12382,18 @@
           "latitude": 28.6332,
           "longitude": 77.2796
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 44,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W203",
+        "name": "Laxmi Nagar",
+        "drainageCapacity": 44,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 66,
+        "current_risk_score": 66,
+        "rainfall": 33
       }
     },
     {
@@ -10819,10 +12443,18 @@
           "latitude": 28.625,
           "longitude": 77.28
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W204",
+        "name": "Shakarpur",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 66,
+        "current_risk_score": 66,
+        "rainfall": 33
       }
     },
     {
@@ -10872,10 +12504,18 @@
           "latitude": 28.615,
           "longitude": 77.285
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W205",
+        "name": "Pandav Nagar",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 67,
+        "current_risk_score": 67,
+        "rainfall": 34
       }
     },
     {
@@ -10925,10 +12565,18 @@
           "latitude": 28.655,
           "longitude": 77.265
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 46,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W206",
+        "name": "Geeta Colony",
+        "drainageCapacity": 46,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 67,
+        "current_risk_score": 67,
+        "rainfall": 34
       }
     },
     {
@@ -10978,10 +12626,18 @@
           "latitude": 28.66,
           "longitude": 77.275
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 47,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W207",
+        "name": "Krishna Nagar",
+        "drainageCapacity": 47,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 68,
+        "current_risk_score": 68,
+        "rainfall": 35
       }
     },
     {
@@ -11031,10 +12687,18 @@
           "latitude": 28.655,
           "longitude": 77.28
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 47,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W208",
+        "name": "Anarkali",
+        "drainageCapacity": 47,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 68,
+        "current_risk_score": 68,
+        "rainfall": 35
       }
     },
     {
@@ -11084,10 +12748,18 @@
           "latitude": 28.665,
           "longitude": 77.29
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 48,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W209",
+        "name": "Vishwas Nagar",
+        "drainageCapacity": 48,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 69,
+        "current_risk_score": 69,
+        "rainfall": 35
       }
     },
     {
@@ -11137,10 +12809,18 @@
           "latitude": 28.675,
           "longitude": 77.285
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 48,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W210",
+        "name": "Shahdara",
+        "drainageCapacity": 48,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 69,
+        "current_risk_score": 69,
+        "rainfall": 36
       }
     },
     {
@@ -11190,10 +12870,18 @@
           "latitude": 28.675,
           "longitude": 77.305
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 49,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W211",
+        "name": "Jhilmil",
+        "drainageCapacity": 49,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 69,
+        "current_risk_score": 69,
+        "rainfall": 36
       }
     },
     {
@@ -11243,10 +12931,18 @@
           "latitude": 28.6693,
           "longitude": 77.316
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W212",
+        "name": "Vivek Vihar",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -11296,10 +12992,18 @@
           "latitude": 28.65,
           "longitude": 77.31
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 87,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W213",
+        "name": "Anand Vihar",
+        "drainageCapacity": 87,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 21
       }
     },
     {
@@ -11349,10 +13053,18 @@
           "latitude": 28.66,
           "longitude": 77.305
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W214",
+        "name": "Surajmal Vihar",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 21
       }
     },
     {
@@ -11402,10 +13114,18 @@
           "latitude": 28.685,
           "longitude": 77.32
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W215",
+        "name": "Seemapuri",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -11455,10 +13175,18 @@
           "latitude": 28.6853,
           "longitude": 77.3228
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W216",
+        "name": "Dilshad Garden",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -11508,10 +13236,18 @@
           "latitude": 28.69,
           "longitude": 77.315
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 91,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W217",
+        "name": "Dilshad Colony",
+        "drainageCapacity": 91,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -11561,10 +13297,18 @@
           "latitude": 28.695,
           "longitude": 77.31
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W218",
+        "name": "Nand Nagri",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -11614,10 +13358,18 @@
           "latitude": 28.7,
           "longitude": 77.315
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W219",
+        "name": "Sunder Nagri",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 23
       }
     },
     {
@@ -11667,10 +13419,18 @@
           "latitude": 28.705,
           "longitude": 77.305
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W220",
+        "name": "Ashok Nagar",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 38,
+        "current_risk_score": 38,
+        "rainfall": 24
       }
     },
     {
@@ -11720,10 +13480,18 @@
           "latitude": 28.71,
           "longitude": 77.315
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 20,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W221",
+        "name": "Mandoli",
+        "drainageCapacity": 20,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 75,
+        "current_risk_score": 75,
+        "rainfall": 38
       }
     },
     {
@@ -11773,10 +13541,18 @@
           "latitude": 28.715,
           "longitude": 77.31
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 21,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W222",
+        "name": "Saboli",
+        "drainageCapacity": 21,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 76,
+        "current_risk_score": 76,
+        "rainfall": 39
       }
     },
     {
@@ -11826,10 +13602,18 @@
           "latitude": 28.72,
           "longitude": 77.305
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 22,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W223",
+        "name": "Harsh Vihar",
+        "drainageCapacity": 22,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 77,
+        "current_risk_score": 77,
+        "rainfall": 40
       }
     },
     {
@@ -11879,10 +13663,18 @@
           "latitude": 28.73,
           "longitude": 77.285
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 23,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W224",
+        "name": "Sabhapur",
+        "drainageCapacity": 23,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 78,
+        "current_risk_score": 78,
+        "rainfall": 40
       }
     },
     {
@@ -11932,10 +13724,18 @@
           "latitude": 28.725,
           "longitude": 77.275
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 23,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W225",
+        "name": "Karawal Nagar",
+        "drainageCapacity": 23,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 78,
+        "current_risk_score": 78,
+        "rainfall": 41
       }
     },
     {
@@ -11985,10 +13785,18 @@
           "latitude": 28.72,
           "longitude": 77.265
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 24,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W226",
+        "name": "Dayalpur",
+        "drainageCapacity": 24,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 79,
+        "current_risk_score": 79,
+        "rainfall": 42
       }
     },
     {
@@ -12038,10 +13846,18 @@
           "latitude": 28.715,
           "longitude": 77.27
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 25,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W227",
+        "name": "Mustafabad",
+        "drainageCapacity": 25,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 80,
+        "current_risk_score": 80,
+        "rainfall": 42
       }
     },
     {
@@ -12091,10 +13907,18 @@
           "latitude": 28.71,
           "longitude": 77.26
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 25,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W228",
+        "name": "Khajoori Khas",
+        "drainageCapacity": 25,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 80,
+        "current_risk_score": 80,
+        "rainfall": 43
       }
     },
     {
@@ -12144,10 +13968,18 @@
           "latitude": 28.725,
           "longitude": 77.255
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W229",
+        "name": "Sonia Vihar",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 66,
+        "current_risk_score": 66,
+        "rainfall": 33
       }
     },
     {
@@ -12197,10 +14029,18 @@
           "latitude": 28.705,
           "longitude": 77.26
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 45,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W230",
+        "name": "Bhajanpura",
+        "drainageCapacity": 45,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 67,
+        "current_risk_score": 67,
+        "rainfall": 34
       }
     },
     {
@@ -12250,10 +14090,18 @@
           "latitude": 28.695,
           "longitude": 77.27
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 46,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W231",
+        "name": "Yamuna Vihar",
+        "drainageCapacity": 46,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 67,
+        "current_risk_score": 67,
+        "rainfall": 34
       }
     },
     {
@@ -12303,10 +14151,18 @@
           "latitude": 28.69,
           "longitude": 77.265
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 46,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W232",
+        "name": "Ghonda",
+        "drainageCapacity": 46,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 68,
+        "current_risk_score": 68,
+        "rainfall": 35
       }
     },
     {
@@ -12356,10 +14212,18 @@
           "latitude": 28.685,
           "longitude": 77.27
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 47,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W233",
+        "name": "Maujpur",
+        "drainageCapacity": 47,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 68,
+        "current_risk_score": 68,
+        "rainfall": 35
       }
     },
     {
@@ -12409,10 +14273,18 @@
           "latitude": 28.68,
           "longitude": 77.265
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 48,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W234",
+        "name": "Zafrabad",
+        "drainageCapacity": 48,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 68,
+        "current_risk_score": 68,
+        "rainfall": 35
       }
     },
     {
@@ -12462,10 +14334,18 @@
           "latitude": 28.675,
           "longitude": 77.27
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 48,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W235",
+        "name": "Welcome",
+        "drainageCapacity": 48,
+        "riskLevel": "HIGH",
+        "current_risk_level": "HIGH",
+        "riskScore": 69,
+        "current_risk_score": 69,
+        "rainfall": 36
       }
     },
     {
@@ -12515,10 +14395,18 @@
           "latitude": 28.6699,
           "longitude": 77.272
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 31,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W236",
+        "name": "Seelampur",
+        "drainageCapacity": 31,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 86,
+        "current_risk_score": 86,
+        "rainfall": 48
       }
     },
     {
@@ -12568,10 +14456,18 @@
           "latitude": 28.67,
           "longitude": 77.26
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 65,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W237",
+        "name": "Gautam Puri",
+        "drainageCapacity": 65,
+        "riskLevel": "MODERATE",
+        "current_risk_level": "MODERATE",
+        "riskScore": 53,
+        "current_risk_score": 53,
+        "rainfall": 27
       }
     },
     {
@@ -12621,10 +14517,18 @@
           "latitude": 28.675,
           "longitude": 77.255
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 87,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W238",
+        "name": "Brahmpuri",
+        "drainageCapacity": 87,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 33,
+        "current_risk_score": 33,
+        "rainfall": 21
       }
     },
     {
@@ -12674,10 +14578,18 @@
           "latitude": 28.665,
           "longitude": 77.25
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 88,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W239",
+        "name": "Shastri Park",
+        "drainageCapacity": 88,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 21
       }
     },
     {
@@ -12727,10 +14639,18 @@
           "latitude": 28.66,
           "longitude": 77.26
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 89,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W240",
+        "name": "Chauhan Banger",
+        "drainageCapacity": 89,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 34,
+        "current_risk_score": 34,
+        "rainfall": 22
       }
     },
     {
@@ -12780,10 +14700,18 @@
           "latitude": 28.67,
           "longitude": 77.265
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 90,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W241",
+        "name": "New Usmanpur",
+        "drainageCapacity": 90,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 35,
+        "current_risk_score": 35,
+        "rainfall": 22
       }
     },
     {
@@ -12833,10 +14761,18 @@
           "latitude": 28.68,
           "longitude": 77.28
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 91,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W242",
+        "name": "Kardar Puri",
+        "drainageCapacity": 91,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -12886,10 +14822,18 @@
           "latitude": 28.685,
           "longitude": 77.285
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 92,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W243",
+        "name": "Babarpur",
+        "drainageCapacity": 92,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 36,
+        "current_risk_score": 36,
+        "rainfall": 23
       }
     },
     {
@@ -12939,10 +14883,18 @@
           "latitude": 28.702,
           "longitude": 77.287
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 93,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W244",
+        "name": "Gokalpuri",
+        "drainageCapacity": 93,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 37,
+        "current_risk_score": 37,
+        "rainfall": 23
       }
     },
     {
@@ -12992,10 +14944,18 @@
           "latitude": 28.71,
           "longitude": 77.29
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 94,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W245",
+        "name": "Johripur",
+        "drainageCapacity": 94,
+        "riskLevel": "LOW",
+        "current_risk_level": "LOW",
+        "riskScore": 38,
+        "current_risk_score": 38,
+        "rainfall": 24
       }
     },
     {
@@ -13045,10 +15005,18 @@
           "latitude": 28.715,
           "longitude": 77.295
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 20,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W246",
+        "name": "Shiv Vihar",
+        "drainageCapacity": 20,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 75,
+        "current_risk_score": 75,
+        "rainfall": 38
       }
     },
     {
@@ -13098,10 +15066,18 @@
           "latitude": 28.725,
           "longitude": 77.285
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 21,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W247",
+        "name": "Karawal Nagar East",
+        "drainageCapacity": 21,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 76,
+        "current_risk_score": 76,
+        "rainfall": 39
       }
     },
     {
@@ -13151,10 +15127,18 @@
           "latitude": 28.725,
           "longitude": 77.265
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 22,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W248",
+        "name": "Karawal Nagar West",
+        "drainageCapacity": 22,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 77,
+        "current_risk_score": 77,
+        "rainfall": 40
       }
     },
     {
@@ -13204,10 +15188,18 @@
           "latitude": 28.735,
           "longitude": 77.25
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 23,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W249",
+        "name": "Sonia Vihar West",
+        "drainageCapacity": 23,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 78,
+        "current_risk_score": 78,
+        "rainfall": 40
       }
     },
     {
@@ -13257,10 +15249,18 @@
           "latitude": 28.735,
           "longitude": 77.26
         },
-        "drainage_capacity": 50,
+        "drainage_capacity": 23,
         "is_synthetic": true,
         "source": "derived-hexagon-demo-v2",
-        "provenance": "Generated from MCD centroid coordinates for local development"
+        "provenance": "Generated from MCD centroid coordinates for local development",
+        "id": "W250",
+        "name": "Sonia Vihar East",
+        "drainageCapacity": 23,
+        "riskLevel": "CRITICAL",
+        "current_risk_level": "CRITICAL",
+        "riskScore": 78,
+        "current_risk_score": 78,
+        "rainfall": 41
       }
     }
   ]

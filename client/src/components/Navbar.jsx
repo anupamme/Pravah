@@ -17,9 +17,8 @@ export default function Navbar() {
   const navItems = [
     { label: 'City Overview', path: '/dashboard' },
     { label: 'Incidents', path: '/incidents' },
-    { label: 'Simulation', path: '/simulator' },
     { label: 'Analytics', path: '/analytics' },
-    { label: 'Admin', path: '/admin' },
+    { label: 'Admin Portal', path: '/admin' },
   ];
 
   return (
