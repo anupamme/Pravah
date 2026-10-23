@@ -250,70 +250,93 @@ export default function AdminPortal() {
   // ── Unauthenticated Sign-in View ──────────────────────────────────────────
   if (!token) {
     return (
-      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 page-enter">
-        <div className="w-full max-w-sm surface-card p-6 sm:p-8 border border-[var(--border)] space-y-6">
-          <div className="text-center space-y-1.5">
-            <div className="w-10 h-10 bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/20 flex items-center justify-center mx-auto mb-3">
-              <Shield className="w-5 h-5" />
+      <div className="relative min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 overflow-hidden select-none">
+        
+        {/* Minimal Celestial / Radar Background Accents */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden" aria-hidden="true">
+          {/* Subtle Ambient Radial Glow */}
+          <div className="w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-sky-400/10 via-cyan-400/10 to-transparent blur-3xl pointer-events-none" />
+          
+          {/* Concentric Minimal Orbit Rings */}
+          <div className="absolute w-[360px] h-[360px] rounded-full border border-sky-500/10 dark:border-cyan-500/10 pointer-events-none" />
+          <div className="absolute w-[540px] h-[540px] rounded-full border border-sky-500/5 dark:border-cyan-500/5 pointer-events-none" />
+          <div className="absolute w-[720px] h-[720px] rounded-full border border-sky-500/[0.03] dark:border-cyan-500/[0.03] pointer-events-none" />
+
+          {/* Minimal Coordinate Grid Watermarks */}
+          <span className="absolute top-8 left-8 font-mono text-[10px] text-[var(--text-muted)] tracking-wider opacity-60 hidden sm:inline">
+            SEC-SYS // 28.6139° N · 77.2090° E
+          </span>
+          <span className="absolute bottom-8 right-8 font-mono text-[10px] text-[var(--text-muted)] tracking-wider opacity-60 hidden sm:inline">
+            POSTGIS SRID 4326 // NCT DELHI
+          </span>
+        </div>
+
+        {/* Elevated Glassmorphism Sign-in Card */}
+        <div className="relative z-10 w-full max-w-sm rounded-2xl surface-card p-7 sm:p-8 border border-[var(--border)] shadow-xl backdrop-blur-xl bg-[var(--surface-elevated)]/95 space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-sky-500/10 text-[var(--brand)] border border-sky-500/20 flex items-center justify-center mx-auto shadow-xs">
+              <Shield className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Admin Portal</h2>
-            <p className="text-xs text-[var(--text-muted)]">
-              Sign in to manage simulations, drainage, and city operations.
+            <h2 className="text-2xl font-serif text-[var(--text-primary)] tracking-tight">Admin Portal</h2>
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+              Municipal command login for hydraulic simulations, drainage overrides, and operational audit dispatch.
             </p>
           </div>
 
           {loginError && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center space-x-2">
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center space-x-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{loginError}</span>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                Username or Email
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-[var(--text-secondary)]">
+                Username or Official Email
               </label>
               <input
                 type="text"
                 value={username}
+                placeholder="admin@mcd.delhi.gov.in"
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono transition-colors"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                Password
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-[var(--text-secondary)]">
+                Security Password
               </label>
               <input
                 type="password"
                 value={password}
+                placeholder="••••••••••••"
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono transition-colors"
               />
             </div>
 
             <button
               type="submit"
               disabled={loginLoading}
-              className="w-full py-2 bg-[var(--brand)] hover:opacity-90 text-white font-semibold text-xs transition-opacity cursor-pointer flex items-center justify-center space-x-1.5"
+              className="w-full py-2.5 rounded-xl bg-[var(--brand)] hover:opacity-90 text-white font-semibold text-xs transition-opacity cursor-pointer flex items-center justify-center space-x-2 shadow-sm"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>{loginLoading ? 'Signing in…' : 'Sign In'}</span>
+              <span>{loginLoading ? 'Authenticating…' : 'Authenticate & Sign In'}</span>
             </button>
           </form>
 
-          <div className="pt-4 border-t border-[var(--border)] text-center">
-            <button
-              type="button"
-              onClick={handleLogin}
-              className="text-xs text-[var(--brand)] hover:underline font-medium cursor-pointer"
-            >
-              Click here for 1-Click Demo Login
-            </button>
+          {/* Secure Telemetry Footer Strip (Replaces Demo Login) */}
+          <div className="pt-4 border-t border-[var(--border)] flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)]">
+            <span className="flex items-center gap-1.5 text-emerald-500 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>TLS 256-BIT ENCRYPTED</span>
+            </span>
+            <span className="opacity-80">MCD / DDMA NCT</span>
           </div>
         </div>
+
       </div>
     );
   }
@@ -324,7 +347,7 @@ export default function AdminPortal() {
       {/* ── Clean Top Header ─────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
             Admin Portal
           </h1>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
@@ -445,7 +468,7 @@ export default function AdminPortal() {
                 <div className="w-8 h-8 bg-sky-500/10 text-sky-400 flex items-center justify-center">
                   <Sliders className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
+                <h3 className="text-base font-serif font-bold text-[var(--text-primary)] tracking-tight">
                   Flood Scenario Simulator
                 </h3>
                 <p className="text-xs text-[var(--text-muted)] leading-relaxed">
@@ -467,7 +490,7 @@ export default function AdminPortal() {
                 <div className="w-8 h-8 bg-blue-500/10 text-blue-400 flex items-center justify-center">
                   <Droplets className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
+                <h3 className="text-base font-serif font-bold text-[var(--text-primary)] tracking-tight">
                   Drainage Capacity Overrides
                 </h3>
                 <p className="text-xs text-[var(--text-muted)] leading-relaxed">
@@ -489,7 +512,7 @@ export default function AdminPortal() {
                 <div className="w-8 h-8 bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
                   <Users className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
+                <h3 className="text-base font-serif font-bold text-[var(--text-primary)] tracking-tight">
                   Incident Command
                 </h3>
                 <p className="text-xs text-[var(--text-muted)] leading-relaxed">
@@ -510,7 +533,7 @@ export default function AdminPortal() {
           <div className="surface-card p-5 border border-[var(--border)]">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)] tracking-tight">
+                <h3 className="text-base sm:text-lg font-serif font-bold text-[var(--text-primary)] tracking-tight">
                   Wards Needing Attention
                 </h3>
                 <p className="text-xs text-[var(--text-muted)] mt-0.5">
@@ -720,7 +743,7 @@ export default function AdminPortal() {
                 {/* Search & Filter Header */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+                    <h3 className="text-sm font-serif font-bold text-[var(--text-primary)] flex items-center gap-2">
                       <Layers className="w-4 h-4 text-[var(--brand)]" />
                       <span>Municipal Ward Directory</span>
                     </h3>
@@ -884,7 +907,7 @@ export default function AdminPortal() {
                       <Gauge className="w-3.5 h-3.5" />
                       <span>Calibrate Hydraulic Baseline</span>
                     </div>
-                    <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)] tracking-tight mt-0.5">
+                    <h2 className="text-lg sm:text-xl font-serif font-bold text-[var(--text-primary)] tracking-tight mt-0.5">
                       {selectedWard?.wardName || selectedWardId}
                     </h2>
                     <div className="text-xs text-[var(--text-muted)] font-mono">
@@ -1075,7 +1098,7 @@ export default function AdminPortal() {
               {/* Recent Drainage Overrides Audit Trail */}
               <div className="surface-card p-5 border border-[var(--border)] rounded-xl sm:rounded-2xl space-y-3 shadow-xs">
                 <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5">
-                  <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider font-mono flex items-center gap-2">
+                  <h3 className="text-xs font-serif font-bold text-[var(--text-primary)] uppercase tracking-wider font-mono flex items-center gap-2">
                     <Shield className="w-3.5 h-3.5 text-sky-500" />
                     <span>Hydraulic Audit Trail</span>
                   </h3>
@@ -1131,7 +1154,7 @@ export default function AdminPortal() {
         <div className="surface-card p-5 border border-[var(--border)] space-y-4">
           <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)] tracking-tight">
+              <h2 className="text-lg sm:text-xl font-serif font-bold text-[var(--text-primary)] tracking-tight">
                 Administrative Audit Logs
               </h2>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
