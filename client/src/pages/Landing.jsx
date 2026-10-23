@@ -15,7 +15,6 @@ import {
   Filter,
   Waves,
   Cpu,
-  ArrowUp,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -677,18 +676,6 @@ export default function Landing() {
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{item.desc}</p>
               </div>
             ))}
-          </div>
-
-          {/* Back to Top (Rightmost, Icon Only) */}
-          <div className="pt-4 flex justify-end">
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-elevated)] hover:border-[var(--brand)]/50 text-[var(--text-secondary)] hover:text-[var(--brand)] transition-all shadow-xs flex items-center justify-center cursor-pointer group"
-              aria-label="Back to top"
-              title="Back to top"
-            >
-              <ArrowUp size={16} strokeWidth={2.25} className="group-hover:-translate-y-0.5 transition-transform" />
-            </button>
           </div>
         </div>
       </section>
