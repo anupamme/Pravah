@@ -616,6 +616,24 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ─────────────────────────────────────────────────────────────
+          5. PRAVAH EDITORIAL CLOSING
+          ───────────────────────────────────────────────────────────── */}
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden border-t border-[var(--border)] bg-[var(--surface-soft)]/20">
+        <div className="max-w-3xl mx-auto space-y-3 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-mono font-semibold uppercase tracking-wider border border-sky-500/20">
+            <Waves className="w-3.5 h-3.5" />
+            <span>Responsive Hydrological Intelligence</span>
+          </div>
+
+          <h2 className="font-instrument text-3xl sm:text-5xl lg:text-6xl font-normal text-[var(--text-primary)] tracking-tight">
+            When the rain changes,
+            <br />
+            <span className="italic text-[var(--brand)]">PRAVAH changes with it.</span>
+          </h2>
+        </div>
+      </section>
+
       {/* Global Institutional Footer */}
       <Footer />
 
