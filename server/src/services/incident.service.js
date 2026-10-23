@@ -137,6 +137,7 @@ async function createComplaint({
   severity = 'MEDIUM',
   waterDepthCm = 0.0,
   userId = null,
+  imageUrl = null,
 }) {
   // 1. Resolve containing ward via GIS Point-in-Polygon
   const wardResolution = await resolveWardFromPoint(longitude, latitude);
@@ -214,6 +215,10 @@ async function createComplaint({
     MEMORY_COMPLAINTS.unshift(createdComplaint);
   }
 
+  if (imageUrl) {
+    createdComplaint.imageUrl = imageUrl;
+  }
+
   // Real-time broadcast
   try {
     const { broadcastNewComplaint } = require('../config/socket');
@@ -225,6 +230,7 @@ async function createComplaint({
       waterDepthCm: createdComplaint.waterDepthCm || 0,
       status: createdComplaint.status || 'SUBMITTED',
       timestamp: createdComplaint.createdAt,
+      imageUrl: createdComplaint.imageUrl || undefined,
     });
   } catch {
     // Socket broadcast non-fatal if offline

@@ -21,6 +21,7 @@ const complaintSubmissionSchema = z.object({
   description: z.string().min(5, 'Description must be at least 5 characters long'),
   severity: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional().default('MEDIUM'),
   waterDepthCm: z.number().min(0).max(300).optional().default(0.0),
+  imageUrl: z.string().optional(),
 });
 
 const statusUpdateSchema = z.object({

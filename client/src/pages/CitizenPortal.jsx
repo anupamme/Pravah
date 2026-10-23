@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Waves, AlertTriangle, Send, MapPin, CheckCircle2, Clock, Shield,
-  Crosshair, PhoneCall, Navigation
+  Crosshair, PhoneCall, Navigation, Camera, X, UploadCloud
 } from 'lucide-react';
 import { submitComplaint, listComplaints, getWardsGeoJSON } from '../services/api';
 import { subscribeToTelemetry } from '../services/socket';
@@ -39,6 +39,11 @@ export default function CitizenPortal() {
     latitude: 28.636,
     longitude: 77.225,
   });
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageError, setImageError] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Load initial wards and complaints
   useEffect(() => {
@@ -131,6 +136,39 @@ export default function CitizenPortal() {
     );
   }, [wards, formData.wardId]);
 
+  // Image selection and removal handlers
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    setImageError(null);
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setImageError('Please select a valid image file (PNG, JPG, WebP).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError('Image exceeds 5MB limit. Please select a smaller file.');
+      return;
+    }
+
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setImageError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -139,14 +177,19 @@ export default function CitizenPortal() {
     setErrorMsg(null);
 
     try {
-      const res = await submitComplaint({
+      const payload = {
         longitude: formData.longitude,
         latitude: formData.latitude,
         address: formData.address || undefined,
-        description: formData.description,
+        description: imageFile?.name
+          ? `${formData.description} [Photo: ${imageFile.name}]`
+          : formData.description,
         severity: formData.severity,
         waterDepthCm: parseFloat(formData.waterDepthCm),
-      });
+        imageUrl: imagePreview || undefined,
+      };
+
+      const res = await submitComplaint(payload);
 
       const assignedWardCode = res.complaint?.assignedWard?.wardCode || formData.wardId;
       setSuccessMsg(`Waterlogging report successfully lodged for Ward ${assignedWardCode}. Municipal dewatering crews alerted.`);
@@ -157,6 +200,7 @@ export default function CitizenPortal() {
         severity: 'MEDIUM',
         waterDepthCm: 30,
       }));
+      handleRemoveImage();
     } catch (err) {
       setErrorMsg(err.message || 'Failed to submit report. Please check your inputs and try again.');
     } finally {
@@ -180,7 +224,7 @@ export default function CitizenPortal() {
           <Shield className="w-4 h-4" />
           <span>MCD Citizen Incident Desk</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
+        <h1 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
           Report Waterlogging in Your Ward
         </h1>
         <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-2xl leading-relaxed">
@@ -194,7 +238,7 @@ export default function CitizenPortal() {
           <div className="flex items-center space-x-2.5 pb-4 border-b border-[var(--border)]">
             <Waves className="w-5 h-5 text-[var(--brand)]" />
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
+              <h2 className="text-base sm:text-lg font-serif font-bold text-[var(--text-primary)] tracking-tight">
                 Waterlogging Incident Form
               </h2>
               <p className="text-xs text-[var(--text-muted)]">
@@ -377,6 +421,92 @@ export default function CitizenPortal() {
               />
             </div>
 
+            {/* Field 6: Photo Evidence / Image Proof */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-[var(--text-primary)] flex items-center space-x-1.5">
+                  <Camera className="w-3.5 h-3.5 text-[var(--brand)]" />
+                  <span>Photo Evidence / Image Proof</span>
+                  <span className="text-[10px] text-[var(--text-muted)] font-normal">(Optional)</span>
+                </label>
+                {imagePreview && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="text-[11px] text-rose-400 hover:underline inline-flex items-center space-x-1 cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                    <span>Remove Photo</span>
+                  </button>
+                )}
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+                id="incident-photo-upload"
+              />
+
+              {!imagePreview ? (
+                <label
+                  htmlFor="incident-photo-upload"
+                  className="border-2 border-dashed border-[var(--border)] hover:border-[var(--brand)] bg-[var(--surface-soft)] p-4 text-center cursor-pointer transition-colors block group"
+                >
+                  <div className="flex flex-col items-center justify-center space-y-1.5">
+                    <div className="p-2 rounded-full bg-[var(--surface)] text-[var(--text-muted)] group-hover:text-[var(--brand)] transition-colors">
+                      <UploadCloud className="w-5 h-5" />
+                    </div>
+                    <div className="text-xs font-medium text-[var(--text-primary)]">
+                      Upload waterlogging photo or proof
+                    </div>
+                    <p className="text-[10px] text-[var(--text-muted)]">
+                      Supports JPG, PNG, WebP up to 5MB. Visual evidence speeds municipal crew dispatch.
+                    </p>
+                  </div>
+                </label>
+              ) : (
+                <div className="border border-[var(--border)] bg-[var(--surface-soft)] p-2.5 flex items-center space-x-3">
+                  <div className="w-16 h-16 shrink-0 bg-black/40 rounded overflow-hidden border border-[var(--border)]">
+                    <img
+                      src={imagePreview}
+                      alt="Incident Proof"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 text-xs">
+                    <div className="font-medium text-[var(--text-primary)] truncate">
+                      {imageFile?.name || 'Waterlogging_Proof.jpg'}
+                    </div>
+                    <div className="text-[10px] text-[var(--text-muted)] font-mono mt-0.5">
+                      {imageFile ? `${(imageFile.size / 1024).toFixed(1)} KB` : 'Image attached'} · Photo verified
+                    </div>
+                    <div className="text-[10px] text-emerald-400 font-medium flex items-center space-x-1 mt-1">
+                      <CheckCircle2 className="w-3 h-3 shrink-0" />
+                      <span>Ready to transmit with incident report</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="p-1.5 text-[var(--text-muted)] hover:text-rose-400 hover:bg-rose-500/10 rounded cursor-pointer transition-colors"
+                    title="Remove image"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {imageError && (
+                <p className="text-[11px] text-rose-400 flex items-center space-x-1">
+                  <AlertTriangle className="w-3 h-3 shrink-0" />
+                  <span>{imageError}</span>
+                </p>
+              )}
+            </div>
+
             {/* Submit Button */}
             <button
               type="submit"
@@ -396,7 +526,7 @@ export default function CitizenPortal() {
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
               <div className="flex items-center space-x-2">
                 <Clock className="w-4 h-4 text-[var(--brand)]" />
-                <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
+                <h3 className="text-xs sm:text-sm font-serif font-bold text-[var(--text-primary)] tracking-tight">
                   Recent Citizen Reports
                 </h3>
               </div>
@@ -439,6 +569,19 @@ export default function CitizenPortal() {
                       <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
                         {item.description || item.address || 'Waterlogging report.'}
                       </p>
+                      {item.imageUrl && (
+                        <div className="pt-1 flex items-center space-x-2">
+                          <img
+                            src={item.imageUrl}
+                            alt="Incident proof"
+                            className="w-10 h-10 object-cover rounded border border-[var(--border)] shrink-0"
+                          />
+                          <span className="text-[10px] text-emerald-400 font-semibold flex items-center space-x-1">
+                            <Camera className="w-3 h-3" />
+                            <span>Photo proof verified</span>
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] pt-1 border-t border-[var(--border)]">
                         <span>Depth: <b className="text-[var(--text-primary)] font-mono">{item.waterDepthCm || 0} cm</b></span>
                         <span className="font-mono">
@@ -456,7 +599,7 @@ export default function CitizenPortal() {
           <div className="surface-card p-5 border border-[var(--border)] space-y-3">
             <div className="flex items-center space-x-2 pb-2 border-b border-[var(--border)]">
               <PhoneCall className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
+              <h3 className="text-xs font-serif font-bold text-[var(--text-primary)] uppercase tracking-wider">
                 Emergency Municipal Contacts
               </h3>
             </div>
