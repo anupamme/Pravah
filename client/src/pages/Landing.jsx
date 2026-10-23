@@ -579,9 +579,6 @@ export default function Landing() {
               <br />
               <span className="italic text-[var(--brand)]">PRAVAH changes with it.</span>
             </h2>
-            <p className="max-w-xl mx-auto text-xs sm:text-sm text-[var(--text-secondary)] font-normal">
-              Unified command for municipal engineers, disaster response officers, and citizens across the National Capital Territory.
-            </p>
           </div>
         </div>
       </section>
