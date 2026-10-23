@@ -10,8 +10,7 @@ import {
   Cpu,
   Layers,
   Radio,
-  CheckCircle2,
-  LifeBuoy
+  CheckCircle2
 } from 'lucide-react';
 
 export default function Footer() {
@@ -59,60 +58,62 @@ export default function Footer() {
       {/* ─────────────────────────────────────────────────────────────
           2. MAIN INSTITUTIONAL FOOTER GRID
           ───────────────────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 lg:py-11">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
-          {/* Column 1: Municipal Checkpoints & Emergency Control Room Hotlines (Spans 5 cols on lg) */}
-          <div className="lg:col-span-5 space-y-4">
+          {/* Column 1: Municipal Checkpoints & Compact 2x2 Hotlines Matrix (Spans 5 cols on lg) */}
+          <div className="lg:col-span-5 space-y-3">
             {/* 3 Checkpoint Markers */}
-            <div className="space-y-2 text-xs text-[var(--text-secondary)] font-mono">
+            <div className="space-y-1.5 text-xs text-[var(--text-secondary)] font-mono">
               <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
                 <span>Delhi Disaster Management Authority (DDMA)</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
                 <span>Municipal Corporation of Delhi (MCD) Grid</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
                 <span>Public Works Department (PWD) Underpass Telemetry</span>
               </div>
             </div>
 
-            {/* Direct Aligned Hotlines Box */}
-            <div className="p-3.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2.5 text-xs max-w-sm">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold pb-1 border-b border-[var(--border)]">
-                24/7 Municipal Control Room Hotlines
+            {/* Compact Space-Saving 2x2 Hotlines Matrix */}
+            <div className="pt-1 max-w-sm">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold pb-1.5">
+                24/7 Control Room Hotlines
               </div>
-              <a
-                href="tel:1916"
-                className="flex items-center justify-between text-[var(--text-secondary)] hover:text-[var(--text-primary)] no-underline group"
-              >
-                <span className="text-[11px]">MCD Flood Control Room</span>
-                <span className="font-mono text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:underline">1916</span>
-              </a>
-              <a
-                href="tel:1077"
-                className="flex items-center justify-between text-[var(--text-secondary)] hover:text-[var(--text-primary)] no-underline group"
-              >
-                <span className="text-[11px]">DDMA Disaster Relief</span>
-                <span className="font-mono text-xs font-bold text-rose-600 dark:text-rose-400 group-hover:underline">1077</span>
-              </a>
-              <a
-                href="tel:112"
-                className="flex items-center justify-between text-[var(--text-secondary)] hover:text-[var(--text-primary)] no-underline group"
-              >
-                <span className="text-[11px]">National Emergency</span>
-                <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400 group-hover:underline">112</span>
-              </a>
-              <a
-                href="tel:01122479526"
-                className="flex items-center justify-between text-[var(--text-secondary)] hover:text-[var(--text-primary)] no-underline group"
-              >
-                <span className="text-[11px]">East/Yamuna Control</span>
-                <span className="font-mono text-[11px] text-[var(--text-muted)] group-hover:underline">011-22479526</span>
-              </a>
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                <a
+                  href="tel:1916"
+                  className="px-2.5 py-1.5 rounded-lg bg-[var(--surface)] hover:bg-[var(--surface-soft)] border border-[var(--border)] flex items-center justify-between no-underline transition-colors group shadow-2xs"
+                >
+                  <span className="text-[11px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)]">MCD</span>
+                  <span className="font-bold text-amber-600 dark:text-amber-400 group-hover:underline">1916</span>
+                </a>
+                <a
+                  href="tel:1077"
+                  className="px-2.5 py-1.5 rounded-lg bg-[var(--surface)] hover:bg-[var(--surface-soft)] border border-[var(--border)] flex items-center justify-between no-underline transition-colors group shadow-2xs"
+                >
+                  <span className="text-[11px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)]">DDMA</span>
+                  <span className="font-bold text-rose-600 dark:text-rose-400 group-hover:underline">1077</span>
+                </a>
+                <a
+                  href="tel:112"
+                  className="px-2.5 py-1.5 rounded-lg bg-[var(--surface)] hover:bg-[var(--surface-soft)] border border-[var(--border)] flex items-center justify-between no-underline transition-colors group shadow-2xs"
+                >
+                  <span className="text-[11px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)]">Emergency</span>
+                  <span className="font-bold text-sky-600 dark:text-sky-400 group-hover:underline">112</span>
+                </a>
+                <a
+                  href="tel:01122479526"
+                  className="px-2.5 py-1.5 rounded-lg bg-[var(--surface)] hover:bg-[var(--surface-soft)] border border-[var(--border)] flex items-center justify-between no-underline transition-colors group shadow-2xs"
+                >
+                  <span className="text-[11px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)]">Yamuna</span>
+                  <span className="text-[11px] font-semibold text-[var(--text-secondary)] group-hover:underline">22479526</span>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -122,7 +123,7 @@ export default function Footer() {
               <Layers size={13} className="text-[var(--brand)]" />
               <span>Operations</span>
             </h3>
-            <ul className="space-y-2.5 text-xs list-none p-0 m-0">
+            <ul className="space-y-2 text-xs list-none p-0 m-0">
               <li>
                 <Link to="/dashboard" className="text-[var(--text-secondary)] hover:text-[var(--brand)] transition-colors no-underline block">
                   City Risk Overview
@@ -160,18 +161,6 @@ export default function Footer() {
             
             <ul className="space-y-2 text-xs list-none p-0 m-0">
               <li>
-                <Link
-                  to="/report"
-                  className="w-full py-2 px-3 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs font-medium text-[var(--text-primary)] hover:border-[var(--brand)] flex items-center justify-between transition-colors no-underline mb-2.5"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <LifeBuoy size={13} className="text-cyan-500" />
-                    <span>Report Waterlogging</span>
-                  </span>
-                  <span className="text-[10px] font-mono text-[var(--brand)] font-semibold">GPS GeoTag</span>
-                </Link>
-              </li>
-              <li>
                 <Link to="/admin" className="text-[var(--text-secondary)] hover:text-[var(--brand)] transition-colors no-underline block">
                   Administrative Governance Portal
                 </Link>
@@ -200,7 +189,7 @@ export default function Footer() {
         {/* ─────────────────────────────────────────────────────────────
             3. BOTTOM GEO & COPYRIGHT STRIP
             ───────────────────────────────────────────────────────────── */}
-        <div className="mt-10 pt-5 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[var(--text-muted)]">
+        <div className="mt-8 pt-4 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[var(--text-muted)]">
           <div className="text-center sm:text-left">
             © 2026 Suhani Yadav · Delhi Flood Intelligence Platform (MCD & DDMA)
           </div>
