@@ -192,7 +192,7 @@ export default function Landing() {
             </div>
 
             {/* Authoritative Headline */}
-            <h1 className="font-instrument text-slate-900 dark:text-white text-4xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight transition-colors duration-300">
+            <h1 className="font-heading font-black text-slate-900 dark:text-white text-4xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight transition-colors duration-300">
               Know the risk.
               <br />
               <span className="italic font-light text-sky-600 dark:text-cyan-200">
@@ -322,7 +322,7 @@ export default function Landing() {
               <span className="inline-block px-3 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-bold uppercase tracking-wider mb-2">
                 01 · Geospatial Intelligence
               </span>
-              <h2 className="font-instrument text-3xl sm:text-4xl lg:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--text-primary)] tracking-tight">
                 Delhi, mapped in real time.
               </h2>
             </div>
@@ -384,7 +384,7 @@ export default function Landing() {
             <div className="lg:col-span-4 surface-card p-5 rounded-2xl border border-[var(--border)] space-y-4">
               <div className="flex items-start justify-between pb-3 border-b border-[var(--border)]">
                 <div>
-                  <h3 className="text-lg font-bold font-serif text-[var(--text-primary)] tracking-tight">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
                     {selectedWard?.name || selectedWard?.ward_name || 'Connaught Place'}
                   </h3>
                   <div className="text-xs text-[var(--text-muted)] font-mono mt-0.5">
@@ -528,7 +528,7 @@ export default function Landing() {
                 02 · Deterministic Mass-Balance Engine
               </span>
 
-              <h2 className="font-instrument text-3xl sm:text-4xl lg:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--text-primary)] tracking-tight">
                 When the rain changes,
                 <br />
                 <span className="italic text-yellow-500 dark:text-yellow-300">PRAVAH changes with it.</span>
@@ -569,7 +569,7 @@ export default function Landing() {
                 <span className="text-2xl font-black font-mono text-[var(--brand)]">40%</span>
                 <Layers className="w-5 h-5 text-[var(--brand)]" />
               </div>
-              <h3 className="text-base font-bold font-serif text-[var(--text-primary)] tracking-tight">
+              <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
                 Drainage Deficit
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -582,7 +582,7 @@ export default function Landing() {
                 <span className="text-2xl font-black font-mono text-cyan-700 dark:text-cyan-400">35%</span>
                 <CloudRain className="w-5 h-5 text-cyan-600" />
               </div>
-              <h3 className="text-base font-bold font-serif text-[var(--text-primary)] tracking-tight">
+              <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
                 Rainfall Forecast
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -595,7 +595,7 @@ export default function Landing() {
                 <span className="text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400">25%</span>
                 <Radio className="w-5 h-5 text-emerald-600" />
               </div>
-              <h3 className="text-base font-bold font-serif text-[var(--text-primary)] tracking-tight">
+              <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
                 Civic Complaints
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -616,7 +616,7 @@ export default function Landing() {
             <span className="text-xs font-mono uppercase tracking-wider text-[var(--brand)] font-semibold">
               Operational Continuum
             </span>
-            <h2 className="font-instrument text-3xl sm:text-4xl font-normal text-[var(--text-primary)] tracking-tight">
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-[var(--text-primary)] tracking-tight">
               How Pravah Protects Delhi
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
@@ -652,7 +652,7 @@ export default function Landing() {
                 className="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-2 relative shadow-xs"
               >
                 <span className="text-xs font-mono font-bold text-[var(--brand)]">{item.step}</span>
-                <h3 className="text-sm font-bold text-[var(--text-primary)] font-serif">{item.title}</h3>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">{item.title}</h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{item.desc}</p>
               </div>
             ))}

@@ -302,7 +302,7 @@ export default function Dashboard() {
             </span>
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-serif text-[var(--text-primary)] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
             Delhi Flood Operations Command
           </h1>
         </div>
