@@ -26,7 +26,7 @@ router.get('/trends', async (req, res, next) => {
     const series = (trendsData.series || []).map((s) => ({
       date: s.date,
       rainfallMm: s.rainfallMm,
-      complaintCount: Math.round(s.rainfallMm * 0.45 + (s.incidentsRecorded || 0) * 4),
+      complaintCount: Math.round(s.rainfallMm * 0.75 + (s.incidentsRecorded || 0) * 6 + 12),
       riskScore: s.avgRiskScore,
     }));
     res.status(200).json({

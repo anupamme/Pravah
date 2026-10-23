@@ -53,17 +53,121 @@ const QUICK_DIRECTIVES = [
   'Coordinate with Delhi Traffic Police (1095) for perimeter hold',
 ];
 
+/** Fast-boot seed incidents for instantaneous UI rendering */
+const SEED_INCIDENTS = [
+  {
+    id: 'INC-2026-081',
+    wardId: 'W056',
+    wardCode: 'W056',
+    wardName: 'Connaught Place',
+    description: 'Severe waterlogging under Minto Bridge rail crossing. Depth reached 48cm with stalled vehicles.',
+    severity: 'CRITICAL',
+    waterDepthCm: 48,
+    status: 'ACTIVE',
+    createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'INC-2026-082',
+    wardId: 'W110',
+    wardCode: 'W110',
+    wardName: 'Pul Prahladpur',
+    description: 'Pul Prahladpur underpass completely inundated. Depth estimated at 56cm, roadway blocked.',
+    severity: 'CRITICAL',
+    waterDepthCm: 56,
+    status: 'ACTIVE',
+    createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'INC-2026-083',
+    wardId: 'W089',
+    wardCode: 'W089',
+    wardName: 'Lajpat Nagar',
+    description: 'Ring road junction drain overflow near Lajpat Nagar metro station. Arterial traffic bottleneck.',
+    severity: 'HIGH',
+    waterDepthCm: 32,
+    status: 'ACTIVE',
+    createdAt: new Date(Date.now() - 65 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'INC-2026-084',
+    wardId: 'W006',
+    wardCode: 'W006',
+    wardName: 'Burari',
+    description: 'Outfall silt blockage causing backflow into low-lying residential lanes.',
+    severity: 'HIGH',
+    waterDepthCm: 28,
+    status: 'ACTIVE',
+    createdAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'INC-2026-085',
+    wardId: 'W018',
+    wardCode: 'W018',
+    wardName: 'Model Town',
+    description: 'Underpass depression water accumulation following intense local precipitation spike.',
+    severity: 'HIGH',
+    waterDepthCm: 35,
+    status: 'ACTIVE',
+    createdAt: new Date(Date.now() - 110 * 60 * 1000).toISOString(),
+  },
+];
+
+const SEED_TEAMS = [
+  { id: 'T-001', name: 'Central QRT-01 (MCD Heavy Dewatering)', status: 'AVAILABLE', crewSize: 6, primaryEquipment: '5000 GPM Mobile Pump Trailer', zone: 'City SP Zone' },
+  { id: 'T-002', name: 'South QRT-02 (Flood Action Crew)', status: 'AVAILABLE', crewSize: 8, primaryEquipment: 'High-Capacity Sludge Dredger', zone: 'South Zone' },
+  { id: 'T-003', name: 'Civil Lines QRT-03 (Drainage Rapid Response)', status: 'AVAILABLE', crewSize: 5, primaryEquipment: 'Mobile Sump Pump Unit', zone: 'Civil Lines' },
+  { id: 'T-004', name: 'Shahdara North QRT-04 (Culvert Desilting Team)', status: 'BUSY', crewSize: 7, primaryEquipment: 'Hydraulic Suction Jetter', zone: 'Shahdara North' },
+  { id: 'T-005', name: 'Najafgarh QRT-05 (Emergency Sump Unit)', status: 'AVAILABLE', crewSize: 6, primaryEquipment: '5000 GPM Mobile Pump Trailer', zone: 'Najafgarh' },
+];
+
 export default function IncidentCommand() {
-  const [incidents, setIncidents] = useState([]);
-  const [teams, setTeams] = useState([]);
-  const [tacticalPlan, setTacticalPlan] = useState(null);
-  const [selectedIncident, setSelectedIncident] = useState(null);
-  const [selectedTeamId, setSelectedTeamId] = useState('');
+  const [incidents, setIncidents] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('pravah_incidents_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return SEED_INCIDENTS;
+  });
+
+  const [teams, setTeams] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('pravah_teams_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return SEED_TEAMS;
+  });
+
+  const [tacticalPlan, setTacticalPlan] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('pravah_tactical_cache');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return null;
+  });
+
+  const [selectedIncident, setSelectedIncident] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('pravah_incidents_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+      }
+    } catch {}
+    return SEED_INCIDENTS[0];
+  });
+
+  const [selectedTeamId, setSelectedTeamId] = useState(SEED_TEAMS[0].id);
   const [selectedEquipment, setSelectedEquipment] = useState('MOBILE_PUMP_5000');
   const [dispatchNotes, setDispatchNotes] = useState('');
   const [dispatchStatus, setDispatchStatus] = useState(null);
   const [isDispatching, setIsDispatching] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Search, Filter & UI State
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,6 +201,8 @@ export default function IncidentCommand() {
 
   const loadData = useCallback((isManual = false) => {
     if (isManual) setIsLoading(true);
+
+    // Fast non-blocking load: fetch incidents & teams immediately
     Promise.all([
       listIncidents().catch(() => ({ incidents: [] })),
       listResponseTeams().catch(() => ({ teams: [] })),
@@ -105,25 +211,34 @@ export default function IncidentCommand() {
       .then(([incData, teamData, plan]) => {
         const rawIncidents = Array.isArray(incData) ? incData : (incData.incidents || []);
         const rawTeams = Array.isArray(teamData) ? teamData : (teamData.teams || []);
-        setIncidents(rawIncidents);
-        setTeams(rawTeams);
-        setTacticalPlan(plan?.topActionPlan || plan?.cityTacticalRoadmap?.topInterventions || plan?.cityTacticalRoadmap || null);
 
-        // Pre-select first critical incident if none selected
-        if (!selectedIncident && rawIncidents.length > 0) {
-          setSelectedIncident(rawIncidents[0]);
+        if (rawIncidents.length > 0) {
+          setIncidents(rawIncidents);
+          try { sessionStorage.setItem('pravah_incidents_cache', JSON.stringify(rawIncidents)); } catch {}
+          setSelectedIncident((prev) => {
+            if (!prev) return rawIncidents[0];
+            const stillExists = rawIncidents.find((i) => i.id === prev.id);
+            return stillExists || rawIncidents[0];
+          });
         }
 
-        // Auto-select first available response team by default
         if (rawTeams.length > 0) {
+          setTeams(rawTeams);
+          try { sessionStorage.setItem('pravah_teams_cache', JSON.stringify(rawTeams)); } catch {}
           const available = rawTeams.find((t) => t.status === 'AVAILABLE' || !t.status);
           setSelectedTeamId((prev) => prev || (available ? available.id : rawTeams[0].id));
+        }
+
+        if (plan) {
+          const parsedPlan = plan?.topActionPlan || plan?.cityTacticalRoadmap?.topInterventions || plan?.cityTacticalRoadmap || null;
+          setTacticalPlan(parsedPlan);
+          try { sessionStorage.setItem('pravah_tactical_cache', JSON.stringify(parsedPlan)); } catch {}
         }
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [selectedIncident]);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -757,11 +872,11 @@ export default function IncidentCommand() {
                   />
                 </div>
 
-                {/* Submit Mobilization Button */}
+                {/* Submit Mobilization Button - Clean rectangular shape */}
                 <button
                   type="submit"
                   disabled={isDispatching}
-                  className="w-full py-3 px-4 rounded-xl font-medium text-xs uppercase tracking-wider text-white transition-all flex items-center justify-center space-x-2 bg-[var(--brand)] hover:opacity-95 active:scale-[0.99] cursor-pointer shadow-md disabled:opacity-50"
+                  className="w-full py-3.5 px-4 rounded-none font-semibold text-xs uppercase tracking-wider text-white transition-all flex items-center justify-center space-x-2 bg-[var(--brand)] hover:opacity-95 active:scale-[0.99] cursor-pointer shadow-md disabled:opacity-50"
                 >
                   <Send className={`w-3.5 h-3.5 ${isDispatching ? 'animate-bounce' : ''}`} />
                   <span>

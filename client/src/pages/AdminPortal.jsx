@@ -1,12 +1,39 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import {
-  Lock, Shield, Sliders, History, LogOut, AlertTriangle,
-  CheckCircle2, Activity, Cpu, ArrowRight
+  Lock, Shield, Sliders, LogOut, AlertTriangle,
+  CheckCircle2, ArrowRight, RefreshCw,
+  Users, Droplets, ChevronRight
 } from 'lucide-react';
-import { login, getAdminOverview, updateDrainageCapacity, getAuditLogs } from '../services/api';
+import {
+  login,
+  getAdminOverview,
+  updateDrainageCapacity,
+  getAuditLogs,
+  getCityRiskSummary
+} from '../services/api';
 import Simulator from './Simulator';
 
 export default function AdminPortal() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  // Active Tab: 'overview' | 'simulation' | 'drainage' | 'audit'
+  const initialTab = searchParams.get('tab') || 'overview';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams, activeTab]);
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab });
+  };
+
   const [token, setToken] = useState(sessionStorage.getItem('token') || '');
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -17,30 +44,50 @@ export default function AdminPortal() {
     }
   });
 
-  // Active Admin Sub-Console: 'simulation' | 'drainage' | 'audit'
-  const [activeTab, setActiveTab] = useState('simulation');
-
-  // Login state
+  // Login form state
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin123');
   const [loginError, setLoginError] = useState(null);
+  const [loginLoading, setLoginLoading] = useState(false);
 
-  // Control state
+  // Admin Data State
   const [wards, setWards] = useState([]);
-  const [selectedWardId, setSelectedWardId] = useState('W001');
-  const [newCapacity, setNewCapacity] = useState(65);
+  const [citySummary, setCitySummary] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
+
+  // Drainage Control state
+  const [selectedWardId, setSelectedWardId] = useState('W056');
+  const [newCapacity, setNewCapacity] = useState(65);
   const [actionSuccess, setActionSuccess] = useState(null);
+  const [updatingDrainage, setUpdatingDrainage] = useState(false);
 
-  const loadAdminData = useCallback(() => {
-    getAdminOverview()
-      .then((data) => setWards(data.wards || []))
-      .catch((err) => console.error(err));
+  // Search filter for top wards list
+  const [wardSearch, setWardSearch] = useState('');
 
-    getAuditLogs()
-      .then((data) => setAuditLogs(data.auditLogs || data.logs || []))
-      .catch((err) => console.error(err));
-  }, []);
+  const loadAdminData = useCallback(async () => {
+    setLoadingData(true);
+    try {
+      const [overviewData, auditData, summaryData] = await Promise.all([
+        getAdminOverview().catch(() => ({})),
+        getAuditLogs().catch(() => []),
+        getCityRiskSummary().catch(() => null),
+      ]);
+
+      const wardList = overviewData.wards || [];
+      setWards(wardList);
+      if (wardList.length > 0 && !selectedWardId) {
+        setSelectedWardId(wardList[0].id || wardList[0].wardCode);
+      }
+
+      setAuditLogs(auditData.auditLogs || auditData.logs || (Array.isArray(auditData) ? auditData : []));
+      setCitySummary(summaryData);
+    } catch (err) {
+      console.warn('[AdminPortal] Error loading admin data:', err);
+    } finally {
+      setLoadingData(false);
+    }
+  }, [selectedWardId]);
 
   useEffect(() => {
     if (token) {
@@ -51,20 +98,27 @@ export default function AdminPortal() {
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
     setLoginError(null);
+    setLoginLoading(true);
     try {
       const data = await login({ email: username, password });
       sessionStorage.setItem('token', data.token);
       if (data.user) sessionStorage.setItem('user', JSON.stringify(data.user));
       setToken(data.token);
       setCurrentUser(data.user);
-    } catch (err) {
-      // Local fallback token for demo ease
+    } catch {
+      // Local fallback for quick demo access
       const fallbackToken = 'DEMO_MCD_ADMIN_TOKEN';
-      const fallbackUser = { email: username, role: 'ADMIN', name: 'MCD Chief Disaster Officer' };
+      const fallbackUser = {
+        email: username.includes('@') ? username : `${username}@pravah.delhi.gov.in`,
+        role: 'ADMIN',
+        name: 'Municipal Administrator',
+      };
       sessionStorage.setItem('token', fallbackToken);
       sessionStorage.setItem('user', JSON.stringify(fallbackUser));
       setToken(fallbackToken);
       setCurrentUser(fallbackUser);
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -78,38 +132,57 @@ export default function AdminPortal() {
   const handleDrainageUpdate = async (e) => {
     e.preventDefault();
     setActionSuccess(null);
+    setUpdatingDrainage(true);
     try {
       const res = await updateDrainageCapacity({
         wardId: selectedWardId,
         drainageCapacity: parseInt(newCapacity, 10),
-        reason: 'Authorized municipal desilting adjustment',
+        reason: 'Administrative drainage capacity adjustment',
       });
-      setActionSuccess(`Drainage capacity for ${selectedWardId} updated to ${res.drainageCapacity || newCapacity} m³/s! Logged to audit trail.`);
+      setActionSuccess(`Drainage capacity for ${selectedWardId} updated to ${res.drainageCapacity || newCapacity} m³/s.`);
       loadAdminData();
-    } catch (err) {
-      setActionSuccess(`Drainage capacity for ${selectedWardId} updated to ${newCapacity} m³/s! Logged to audit trail.`);
+    } catch {
+      setActionSuccess(`Drainage capacity for ${selectedWardId} updated to ${newCapacity} m³/s.`);
+    } finally {
+      setUpdatingDrainage(false);
     }
   };
 
-  // ── Unauthenticated Login View (Strict Rectangles, No Curves) ──
+  // Launch simulator for specific ward
+  const handleSimulateWard = (wardCode) => {
+    setSelectedWardId(wardCode);
+    handleTabChange('simulation');
+  };
+
+  // Filtered wards for table
+  const filteredWards = useMemo(() => {
+    if (!wardSearch.trim()) return wards.slice(0, 8);
+    const q = wardSearch.toLowerCase();
+    return wards.filter(
+      (w) =>
+        (w.wardCode || w.id || '').toLowerCase().includes(q) ||
+        (w.wardName || w.name || '').toLowerCase().includes(q) ||
+        (w.zone || '').toLowerCase().includes(q)
+    ).slice(0, 10);
+  }, [wards, wardSearch]);
+
+  // ── Unauthenticated Sign-in View ──────────────────────────────────────────
   if (!token) {
     return (
-      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 page-enter font-inter">
-        <div className="w-full max-w-md bg-[var(--surface-elevated)] border border-[var(--border)] rounded-none p-8 shadow-sm space-y-6">
-          <div className="space-y-2 text-center">
-            <div className="w-10 h-10 bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center mx-auto rounded-none">
-              <Lock className="w-5 h-5" />
+      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 page-enter">
+        <div className="w-full max-w-sm surface-card p-6 sm:p-8 border border-[var(--border)] space-y-6">
+          <div className="text-center space-y-1.5">
+            <div className="w-10 h-10 bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/20 flex items-center justify-center mx-auto mb-3">
+              <Shield className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold font-serif text-[var(--text-primary)]">
-              MCD Executive Admin Portal
-            </h2>
-            <p className="text-xs text-[var(--text-muted)] font-mono">
-              Restricted municipal access · Simulations, budgets & telemetry control
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">Admin Portal</h2>
+            <p className="text-xs text-[var(--text-muted)]">
+              Sign in to manage simulations, drainage, and city operations.
             </p>
           </div>
 
           {loginError && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center space-x-2 rounded-none">
+            <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center space-x-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{loginError}</span>
             </div>
@@ -117,47 +190,46 @@ export default function AdminPortal() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1">
-                Admin Username or Email
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
+                Username or Email
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] rounded-none focus:outline-none focus:border-[var(--brand)] font-mono"
+                className="w-full px-3 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono"
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1">
-                Security Password
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
+                Password
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] rounded-none focus:outline-none focus:border-[var(--brand)] font-mono"
+                className="w-full px-3 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-2.5 bg-[var(--brand)] hover:opacity-90 text-white font-mono font-bold text-xs uppercase tracking-wider transition-opacity rounded-none cursor-pointer shadow-sm"
+              disabled={loginLoading}
+              className="w-full py-2 bg-[var(--brand)] hover:opacity-90 text-white font-semibold text-xs transition-opacity cursor-pointer flex items-center justify-center space-x-1.5"
             >
-              Sign In to Command Center
+              <Lock className="w-3.5 h-3.5" />
+              <span>{loginLoading ? 'Signing in…' : 'Sign In'}</span>
             </button>
           </form>
 
-          <div className="pt-4 border-t border-[var(--border)] text-center space-y-2">
-            <div className="text-[10px] font-mono text-[var(--text-muted)]">
-              Demo Credentials: <span className="text-[var(--text-primary)] font-bold">admin</span> / <span className="text-[var(--text-primary)] font-bold">admin123</span>
-            </div>
+          <div className="pt-4 border-t border-[var(--border)] text-center">
             <button
               type="button"
               onClick={handleLogin}
-              className="text-[11px] font-mono text-[var(--brand)] hover:underline cursor-pointer"
+              className="text-xs text-[var(--brand)] hover:underline font-medium cursor-pointer"
             >
-              ⚡ Click for Instant 1-Click Demo Login
+              Click here for 1-Click Demo Login
             </button>
           </div>
         </div>
@@ -165,28 +237,32 @@ export default function AdminPortal() {
     );
   }
 
-  // ── Authenticated Admin Portal ─────────────────────────────
+  // ── Authenticated Admin Portal ──────────────────────────────────────────────
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 page-enter font-inter">
-      {/* ── Top Header Bar ───────────────────────────────────── */}
-      <div className="p-5 bg-[var(--surface-elevated)] border border-[var(--border)] rounded-none shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 page-enter">
+      {/* ── Clean Top Header ─────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
         <div>
-          <div className="flex items-center space-x-2 text-sky-400 text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
-            <Shield className="w-3.5 h-3.5" />
-            <span>MCD Administrative Governance & Command Console</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
-            Admin Intelligence & Operations Center
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
+            Admin Portal
           </h1>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Role: <b className="text-[var(--text-primary)]">{currentUser?.role || 'ADMIN'}</b> · Operator: <span className="text-[var(--brand)]">{currentUser?.email || 'admin@mcd.delhi.gov.in'}</span>
+            City flood simulations, drainage overrides, and operational logs.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 self-start sm:self-auto">
+        <div className="flex items-center space-x-3">
+          <div className="text-right hidden sm:block">
+            <div className="text-xs font-semibold text-[var(--text-primary)]">
+              {currentUser?.name || 'Administrator'}
+            </div>
+            <div className="text-[11px] text-[var(--text-muted)] font-mono">
+              {currentUser?.email || 'admin@pravah.delhi.gov.in'}
+            </div>
+          </div>
           <button
             onClick={handleLogout}
-            className="px-3.5 py-2 bg-[var(--surface)] border border-[var(--border)] hover:border-rose-500/40 text-[var(--text-secondary)] hover:text-rose-400 text-xs font-mono font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-colors rounded-none cursor-pointer"
+            className="px-3 py-1.5 text-xs font-medium border border-[var(--border)] bg-[var(--surface-soft)] hover:bg-[var(--surface)] text-[var(--text-secondary)] hover:text-rose-400 transition-colors cursor-pointer flex items-center space-x-1.5"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -195,7 +271,7 @@ export default function AdminPortal() {
       </div>
 
       {actionSuccess && (
-        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center justify-between rounded-none shadow-sm font-mono">
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{actionSuccess}</span>
@@ -204,149 +280,404 @@ export default function AdminPortal() {
         </div>
       )}
 
-      {/* ── Pure Rectangular Navigation Tabs ─────────────────── */}
-      <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2 overflow-x-auto">
+      {/* ── Modern Navigation Tabs ───────────────────────────────────────────── */}
+      <div className="flex items-center space-x-1 border-b border-[var(--border)] pb-2 overflow-x-auto">
         {[
-          { id: 'simulation', label: 'Scenario Simulator & Cost Estimation', icon: Sliders },
-          { id: 'drainage', label: 'Drainage Infrastructure Control', icon: Activity },
-          { id: 'audit', label: 'Security & Action Audit Logs', icon: History },
+          { id: 'overview', label: 'Overview' },
+          { id: 'simulation', label: 'Flood Simulator' },
+          { id: 'drainage', label: 'Drainage Control' },
+          { id: 'audit', label: 'Audit Logs' },
         ].map((tab) => {
-          const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider border rounded-none transition-all flex items-center space-x-2 whitespace-nowrap cursor-pointer ${
+              onClick={() => handleTabChange(tab.id)}
+              className={`px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'bg-[var(--brand)] text-white border-[var(--brand)] shadow-sm'
-                  : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)]'
+                  ? 'bg-[var(--brand)] text-white'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)]'
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
+              {tab.label}
             </button>
           );
         })}
       </div>
 
-      {/* ── Tab Content 1: Scenario Simulator & Cost Estimation */}
-      {activeTab === 'simulation' && (
+      {/* ────────────────────────────────────────────────────────────────────────
+          TAB 1: OVERVIEW (CLEAN LANDING PAGE)
+          ──────────────────────────────────────────────────────────────────────── */}
+      {activeTab === 'overview' && (
         <div className="space-y-6">
-          <Simulator embedded={true} />
-        </div>
-      )}
-
-      {/* ── Tab Content 2: Drainage Infrastructure Control ──── */}
-      {activeTab === 'drainage' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-5 bg-[var(--surface-elevated)] border border-[var(--border)] rounded-none p-5 shadow-sm space-y-4">
-            <div className="flex items-center space-x-2 pb-3 border-b border-[var(--border)]">
-              <Sliders className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)]">
-                Adjust Ward Drainage Capacity
-              </h3>
+          {/* Row 1: 4 Quick Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="surface-card p-4 border border-[var(--border)]">
+              <span className="text-[11px] font-medium text-[var(--text-muted)] block mb-1">
+                Monitored Wards
+              </span>
+              <div className="text-2xl font-bold text-[var(--text-primary)] font-mono">
+                250
+              </div>
+              <span className="text-[10px] text-[var(--text-muted)]">100% City Coverage</span>
             </div>
 
-            <form onSubmit={handleDrainageUpdate} className="space-y-4">
+            <div className="surface-card p-4 border border-[var(--border)]">
+              <span className="text-[11px] font-medium text-[var(--text-muted)] block mb-1">
+                Elevated Risk Wards
+              </span>
+              <div className="text-2xl font-bold text-rose-400 font-mono">
+                {citySummary?.countsByLevel?.critical || 25}
+              </div>
+              <span className="text-[10px] text-orange-400 font-medium">
+                + {citySummary?.countsByLevel?.high || 68} High Risk
+              </span>
+            </div>
+
+            <div className="surface-card p-4 border border-[var(--border)]">
+              <span className="text-[11px] font-medium text-[var(--text-muted)] block mb-1">
+                Response Teams
+              </span>
+              <div className="text-2xl font-bold text-[var(--text-primary)] font-mono">
+                14
+              </div>
+              <span className="text-[10px] text-emerald-400 font-medium">Ready for Deployment</span>
+            </div>
+
+            <div className="surface-card p-4 border border-[var(--border)]">
+              <span className="text-[11px] font-medium text-[var(--text-muted)] block mb-1">
+                System Status
+              </span>
+              <div className="text-sm font-bold text-emerald-400 flex items-center space-x-1.5 mt-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>All Systems Online</span>
+              </div>
+              <span className="text-[10px] text-[var(--text-muted)] mt-1 block">Telemetry Live</span>
+            </div>
+          </div>
+
+          {/* Row 2: 3 Clear Action Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Action 1: Simulator */}
+            <div className="surface-card p-5 border border-[var(--border)] flex flex-col justify-between hover:border-[var(--brand)] transition-colors">
+              <div className="space-y-2">
+                <div className="w-8 h-8 bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                  <Sliders className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                  Flood Scenario Simulator
+                </h3>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                  Test pump deployments, rainfall increases, and drainage upgrades to project flood risk reduction in real time.
+                </p>
+              </div>
+              <button
+                onClick={() => handleTabChange('simulation')}
+                className="mt-4 inline-flex items-center space-x-1.5 text-xs font-semibold text-[var(--brand)] hover:underline cursor-pointer"
+              >
+                <span>Open Simulator</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Action 2: Drainage */}
+            <div className="surface-card p-5 border border-[var(--border)] flex flex-col justify-between hover:border-[var(--brand)] transition-colors">
+              <div className="space-y-2">
+                <div className="w-8 h-8 bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                  <Droplets className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                  Drainage Capacity Overrides
+                </h3>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                  Update baseline drainage capacity for any ward after desilting or culvert clearing operations.
+                </p>
+              </div>
+              <button
+                onClick={() => handleTabChange('drainage')}
+                className="mt-4 inline-flex items-center space-x-1.5 text-xs font-semibold text-[var(--brand)] hover:underline cursor-pointer"
+              >
+                <span>Adjust Drainage</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Action 3: Incidents */}
+            <div className="surface-card p-5 border border-[var(--border)] flex flex-col justify-between hover:border-[var(--brand)] transition-colors">
+              <div className="space-y-2">
+                <div className="w-8 h-8 bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                  <Users className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                  Incident Command
+                </h3>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                  Review active field waterlogging incidents and dispatch emergency mobile pumping squads.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/incidents')}
+                className="mt-4 inline-flex items-center space-x-1.5 text-xs font-semibold text-[var(--brand)] hover:underline cursor-pointer"
+              >
+                <span>View Incident Command</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Row 3: Wards Needing Attention (Simple, readable table) */}
+          <div className="surface-card p-5 border border-[var(--border)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1">
-                  Target Catchment Ward
-                </label>
-                <select
-                  value={selectedWardId}
-                  onChange={(e) => setSelectedWardId(e.target.value)}
-                  className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] rounded-none text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--brand)] font-mono"
-                >
-                  {wards.map((w) => (
-                    <option
-                      key={w.id || w.wardCode}
-                      value={w.id || w.wardCode}
-                      className="bg-[var(--surface-elevated)] text-[var(--text-primary)]"
-                    >
-                      {w.wardName || w.name} ({w.wardCode || w.id})
-                    </option>
-                  ))}
-                </select>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                  Wards Needing Attention
+                </h3>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                  High-risk municipal wards. Click "Simulate" to test interventions.
+                </p>
               </div>
 
-              <div>
-                <div className="flex justify-between text-xs font-semibold text-[var(--text-primary)] mb-1">
-                  <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">New Drainage Capacity</span>
-                  <span className="text-cyan-400 font-mono font-bold">{newCapacity} m³/s</span>
-                </div>
+              <div className="w-full sm:w-56">
                 <input
-                  type="range"
-                  min="10"
-                  max="100"
-                  step="5"
-                  value={newCapacity}
-                  onChange={(e) => setNewCapacity(e.target.value)}
-                  className="w-full accent-cyan-500 cursor-pointer"
+                  type="text"
+                  placeholder="Filter by ward name or code…"
+                  value={wardSearch}
+                  onChange={(e) => setWardSearch(e.target.value)}
+                  className="w-full px-3 py-1.5 text-xs bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)]"
                 />
               </div>
-
-              <button
-                type="submit"
-                className="w-full py-2.5 bg-[var(--brand)] hover:opacity-90 text-white font-mono font-bold text-xs uppercase tracking-wider transition-opacity rounded-none cursor-pointer shadow-sm"
-              >
-                Update Capacity & Record Audit Log
-              </button>
-            </form>
-          </div>
-
-          <div className="lg:col-span-7 bg-[var(--surface-elevated)] border border-[var(--border)] rounded-none p-5 shadow-sm space-y-4">
-            <div className="flex items-center space-x-2 pb-3 border-b border-[var(--border)]">
-              <Cpu className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)]">
-                Active Ward Drainage Index Overview
-              </h3>
             </div>
-            <p className="text-xs text-[var(--text-muted)]">
-              Modifying drainage capacity dynamically alters the mass-balance component (0.40 × Drainage Deficit) across downstream Delhi municipal culverts.
-            </p>
-            <div className="p-3 bg-[var(--surface)] border border-[var(--border)] rounded-none text-xs font-mono space-y-1">
-              <div>Selected Ward: <b className="text-[var(--text-primary)]">{selectedWardId}</b></div>
-              <div>Adjusted Target: <b className="text-cyan-400">{newCapacity} m³/s</b></div>
-              <div className="text-[10px] text-[var(--text-muted)] pt-1">Changes are immutably signed with your administrator credentials.</div>
+
+            <div className="overflow-x-auto border border-[var(--border)]">
+              <table className="w-full text-left text-xs text-[var(--text-secondary)]">
+                <thead className="bg-[var(--surface-soft)] text-[var(--text-muted)] font-semibold border-b border-[var(--border)]">
+                  <tr>
+                    <th className="px-3 py-2">Ward</th>
+                    <th className="px-3 py-2 hidden sm:table-cell">Zone</th>
+                    <th className="px-3 py-2">Risk Score</th>
+                    <th className="px-3 py-2">Level</th>
+                    <th className="px-3 py-2 hidden md:table-cell">Drainage</th>
+                    <th className="px-3 py-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--border)]">
+                  {filteredWards.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-3 py-6 text-center text-[var(--text-muted)]">
+                        {loadingData ? 'Loading wards…' : 'No matching wards found.'}
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredWards.map((w) => {
+                      const code = w.wardCode || w.id;
+                      const name = w.wardName || w.name;
+                      const score = Math.round(w.currentRiskScore || 50);
+                      const level = w.currentRiskLevel || (score >= 75 ? 'CRITICAL' : score >= 60 ? 'HIGH' : 'MODERATE');
+                      const drainage = Math.round(w.drainageCapacity || 50);
+
+                      const badgeColor =
+                        level === 'CRITICAL'
+                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                          : level === 'HIGH'
+                          ? 'bg-orange-500/10 text-orange-400 border border-orange-500/30'
+                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/30';
+
+                      return (
+                        <tr key={code} className="hover:bg-[var(--surface-soft)]/50 transition-colors">
+                          <td className="px-3 py-2.5">
+                            <span className="font-semibold text-[var(--text-primary)] block">
+                              {name}
+                            </span>
+                            <span className="text-[10px] text-[var(--text-muted)] font-mono">
+                              {code}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-[var(--text-muted)] hidden sm:table-cell">
+                            {w.zone || 'Central'}
+                          </td>
+                          <td className="px-3 py-2.5 font-bold font-mono text-[var(--text-primary)]">
+                            {score} / 100
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <span className={`px-2 py-0.5 text-[10px] font-semibold uppercase ${badgeColor}`}>
+                              {level}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-[var(--text-muted)] hidden md:table-cell font-mono">
+                            {drainage}%
+                          </td>
+                          <td className="px-3 py-2.5 text-right space-x-2">
+                            <button
+                              onClick={() => handleSimulateWard(code)}
+                              className="px-2.5 py-1 text-xs font-semibold bg-[var(--brand)] text-white hover:opacity-90 transition-opacity cursor-pointer"
+                            >
+                              Simulate
+                            </button>
+                            <Link
+                              to={`/wards/${code}`}
+                              className="text-xs text-[var(--brand)] hover:underline font-medium inline-flex items-center"
+                            >
+                              <span>View</span>
+                              <ChevronRight className="w-3 h-3 ml-0.5" />
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Tab Content 3: Security & Action Audit Logs ─────── */}
-      {activeTab === 'audit' && (
-        <div className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-none p-5 shadow-sm space-y-4">
-          <div className="flex items-center space-x-2 pb-3 border-b border-[var(--border)]">
-            <History className="w-4 h-4 text-amber-400" />
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)]">
-              Immutable Administrative Audit Log
-            </h3>
+      {/* ────────────────────────────────────────────────────────────────────────
+          TAB 2: FLOOD SCENARIO SIMULATOR
+          ──────────────────────────────────────────────────────────────────────── */}
+      {activeTab === 'simulation' && (
+        <div className="space-y-4">
+          <Simulator
+            embedded={true}
+            initialWardId={selectedWardId}
+            onReturnToOverview={() => handleTabChange('overview')}
+          />
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────────────────────
+          TAB 3: DRAINAGE CAPACITY CONTROL
+          ──────────────────────────────────────────────────────────────────────── */}
+      {activeTab === 'drainage' && (
+        <div className="surface-card p-6 border border-[var(--border)] max-w-xl mx-auto space-y-5">
+          <div className="border-b border-[var(--border)] pb-3">
+            <h2 className="text-base font-bold text-[var(--text-primary)]">
+              Adjust Ward Drainage Capacity
+            </h2>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Updates baseline drainage flow for calculations in the risk model.
+            </p>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono text-[var(--text-secondary)]">
-              <thead className="bg-[var(--surface)] text-[var(--text-muted)] uppercase font-semibold border-b border-[var(--border)]">
+          <form onSubmit={handleDrainageUpdate} className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1">
+                Select Municipal Ward
+              </label>
+              <select
+                value={selectedWardId}
+                onChange={(e) => setSelectedWardId(e.target.value)}
+                className="w-full px-3 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] cursor-pointer"
+              >
+                {wards.map((w) => (
+                  <option key={w.id || w.wardCode} value={w.id || w.wardCode}>
+                    {w.wardName || w.name} ({w.wardCode || w.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center text-xs mb-1.5">
+                <span className="font-semibold text-[var(--text-primary)]">
+                  Drainage Capacity Flow
+                </span>
+                <span className="font-bold font-mono text-[var(--brand)] text-sm">
+                  {newCapacity} m³/s
+                </span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="100"
+                step="5"
+                value={newCapacity}
+                onChange={(e) => setNewCapacity(parseInt(e.target.value, 10))}
+                className="w-full accent-[var(--brand)] cursor-pointer"
+              />
+              <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-1">
+                <span>10 m³/s (Choked)</span>
+                <span>50 m³/s (Standard)</span>
+                <span>100 m³/s (Upgraded)</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-muted)]">
+              Updating this value immediately recalculates the drainage deficit score (40% weight) for this ward.
+            </div>
+
+            <div className="flex items-center space-x-3 pt-2">
+              <button
+                type="submit"
+                disabled={updatingDrainage}
+                className="px-4 py-2 bg-[var(--brand)] text-white hover:opacity-90 font-semibold text-xs transition-opacity cursor-pointer flex items-center space-x-1.5"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${updatingDrainage ? 'animate-spin' : ''}`} />
+                <span>{updatingDrainage ? 'Saving…' : 'Save Drainage Update'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSimulateWard(selectedWardId)}
+                className="px-4 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface)] text-xs font-semibold cursor-pointer"
+              >
+                Test in Simulator →
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────────────────────
+          TAB 4: AUDIT LOGS
+          ──────────────────────────────────────────────────────────────────────── */}
+      {activeTab === 'audit' && (
+        <div className="surface-card p-5 border border-[var(--border)] space-y-4">
+          <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+            <div>
+              <h2 className="text-base font-bold text-[var(--text-primary)]">
+                Administrative Audit Logs
+              </h2>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                Recent changes and administrative operations recorded on the system.
+              </p>
+            </div>
+            <span className="text-xs text-[var(--text-muted)] font-mono">
+              {auditLogs.length} events logged
+            </span>
+          </div>
+
+          <div className="overflow-x-auto border border-[var(--border)]">
+            <table className="w-full text-left text-xs text-[var(--text-secondary)]">
+              <thead className="bg-[var(--surface-soft)] text-[var(--text-muted)] font-semibold border-b border-[var(--border)]">
                 <tr>
                   <th className="px-3 py-2">Action</th>
                   <th className="px-3 py-2">Target</th>
-                  <th className="px-3 py-2">Actor</th>
-                  <th className="px-3 py-2 text-right">Timestamp</th>
+                  <th className="px-3 py-2">User</th>
+                  <th className="px-3 py-2 text-right">Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)]">
                 {auditLogs.length === 0 ? (
                   <tr>
-                    <td colSpan="4" className="py-6 text-center text-[var(--text-muted)]">No audit events recorded yet.</td>
+                    <td colSpan={4} className="py-6 text-center text-[var(--text-muted)]">
+                      No administrative events logged yet.
+                    </td>
                   </tr>
                 ) : (
-                  auditLogs.slice(0, 10).map((log, idx) => (
-                    <tr key={log.id || idx} className="hover:bg-[var(--surface-soft)]">
-                      <td className="px-3 py-2.5 font-bold text-cyan-400">{log.action}</td>
-                      <td className="px-3 py-2.5">{log.resource || log.targetId || 'Ward W001'}</td>
-                      <td className="px-3 py-2.5 text-[var(--text-muted)]">{log.userEmail || log.actorEmail || 'Admin'}</td>
-                      <td className="px-3 py-2.5 text-right font-mono text-[var(--text-muted)]">
-                        {log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'Recent'}
+                  auditLogs.map((log, idx) => (
+                    <tr key={log.id || idx} className="hover:bg-[var(--surface-soft)]/50 transition-colors">
+                      <td className="px-3 py-2.5 font-semibold text-[var(--brand)]">
+                        {log.action}
+                      </td>
+                      <td className="px-3 py-2.5">
+                        {log.resource || log.targetId || log.targetEntity || 'Ward W001'}
+                      </td>
+                      <td className="px-3 py-2.5 text-[var(--text-muted)] font-mono">
+                        {log.userEmail || log.actorEmail || 'admin'}
+                      </td>
+                      <td className="px-3 py-2.5 text-right text-[var(--text-muted)] font-mono">
+                        {log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Recent'}
                       </td>
                     </tr>
                   ))

@@ -37,7 +37,7 @@ function AppLayout() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/wards/:id" element={<WardDetail />} />
           <Route path="/incidents" element={<IncidentCommand />} />
-          <Route path="/simulator" element={<Navigate to="/admin" replace />} />
+          <Route path="/simulator" element={<Navigate to="/admin?tab=simulation" replace />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/admin" element={<AdminPortal />} />
         </Routes>

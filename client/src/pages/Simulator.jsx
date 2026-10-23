@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Sliders, Sparkles, RefreshCw, ArrowRight, ShieldCheck,
-  Droplets, Truck, Layers, Activity, ChevronDown, ChevronUp,
+  Sliders, Sparkles, RefreshCw, ArrowRight, ArrowLeft, ShieldCheck,
+  Droplets, Layers, Activity, ChevronDown, ChevronUp,
   CheckCircle2, DollarSign, Calculator
 } from 'lucide-react';
 import {
@@ -43,13 +43,19 @@ function CustomTooltip({ active, payload, label }) {
   return null;
 }
 
-export default function Simulator({ embedded = false }) {
+export default function Simulator({ embedded = false, initialWardId = null, onReturnToOverview = null }) {
   const navigate = useNavigate();
 
   const [wards, setWards] = useState([]);
   const [presets, setPresets] = useState([]);
-  const [selectedWardId, setSelectedWardId] = useState('W056');
+  const [selectedWardId, setSelectedWardId] = useState(initialWardId || 'W056');
   const [selectedPresetId, setSelectedPresetId] = useState('MAX_EMERGENCY_DEWATERING');
+
+  useEffect(() => {
+    if (initialWardId) {
+      setSelectedWardId(initialWardId);
+    }
+  }, [initialWardId]);
 
   // Simulator intervention parameters
   const [additionalPumps, setAdditionalPumps] = useState(2);
@@ -214,6 +220,16 @@ export default function Simulator({ embedded = false }) {
         </div>
 
         <div className="flex items-center space-x-2 shrink-0">
+          {onReturnToOverview && (
+            <button
+              type="button"
+              onClick={onReturnToOverview}
+              className="px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)] transition-colors rounded-none cursor-pointer flex items-center space-x-1.5"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-[var(--brand)]" />
+              <span>Admin Hub</span>
+            </button>
+          )}
           <button
             onClick={() => handleRun()}
             disabled={loading}
