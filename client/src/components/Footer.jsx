@@ -1,12 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUp, PhoneCall, Shield } from 'lucide-react';
+import { PhoneCall, Shield } from 'lucide-react';
 
 export default function Footer() {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <footer className="w-full border-t border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
@@ -17,7 +13,7 @@ export default function Footer() {
             © 2026 Suhani Yadav · Delhi Flood Intelligence Platform (MCD & DDMA)
           </div>
 
-          {/* Right Side: Admin Portal + 24/7 Hotlines + Rightmost Back to Top Button */}
+          {/* Right Side: Admin Portal + 24/7 Hotlines */}
           <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 font-mono text-xs">
             {/* Admin beside hotlines */}
             <Link
@@ -54,16 +50,6 @@ export default function Footer() {
                 <strong className="text-sky-600 dark:text-sky-400 font-bold">112</strong>
               </a>
             </div>
-
-            {/* Back to Top (Rightmost, Icon Only, Zero Wasted Space) */}
-            <button
-              onClick={scrollToTop}
-              className="w-7 h-7 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-soft)] hover:border-[var(--brand)]/50 text-[var(--text-secondary)] hover:text-[var(--brand)] transition-all flex items-center justify-center cursor-pointer group ml-1 shrink-0"
-              aria-label="Back to top"
-              title="Back to top"
-            >
-              <ArrowUp size={13} strokeWidth={2.25} className="group-hover:-translate-y-0.5 transition-transform" />
-            </button>
           </div>
 
         </div>
