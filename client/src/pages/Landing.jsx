@@ -54,11 +54,6 @@ export default function Landing() {
     });
   }, []);
 
-  const counts = riskSummary?.countsByLevel || { critical: 25, high: 68, moderate: 75, low: 82 };
-  const totalWardsCount = wardsGeoJSON?.features?.length || 250;
-  const currentRainfall = weather?.rainfallMm?.toFixed(1) ?? '42.0';
-  const avgRiskScore = riskSummary?.avgRiskScore?.toFixed(1) ?? '58.4';
-
   const availableZones = useMemo(() => {
     if (!wardsGeoJSON?.features) return ['ALL'];
     const set = new Set();
@@ -68,6 +63,62 @@ export default function Landing() {
     });
     return ['ALL', ...Array.from(set).sort()];
   }, [wardsGeoJSON]);
+
+  const displayedWards = useMemo(() => {
+    if (!wardsGeoJSON?.features) return wardsGeoJSON;
+    if (!selectedZone || selectedZone === 'ALL') return wardsGeoJSON;
+    return {
+      ...wardsGeoJSON,
+      features: wardsGeoJSON.features.filter(
+        (f) => (f.properties?.zone || '').toUpperCase() === selectedZone
+      ),
+    };
+  }, [wardsGeoJSON, selectedZone]);
+
+  const handleSelectZone = (zone) => {
+    setSelectedZone(zone);
+    if (!wardsGeoJSON?.features) return;
+    if (zone === 'ALL') {
+      const crit = wardsGeoJSON.features.find((f) => {
+        const lvl = (f.properties?.riskLevel || f.properties?.risk_level || '').toUpperCase();
+        return lvl.includes('CRIT');
+      }) || wardsGeoJSON.features[0];
+      if (crit) setSelectedWard(crit.properties);
+    } else {
+      const zoneWards = wardsGeoJSON.features.filter(
+        (f) => (f.properties?.zone || '').toUpperCase() === zone
+      );
+      if (zoneWards.length > 0) {
+        // Select the ward with highest risk in this zone
+        const sorted = [...zoneWards].sort((a, b) => {
+          const scoreA = a.properties?.riskScore ?? a.properties?.risk_score ?? 0;
+          const scoreB = b.properties?.riskScore ?? b.properties?.risk_score ?? 0;
+          return scoreB - scoreA;
+        });
+        setSelectedWard(sorted[0].properties);
+      }
+    }
+  };
+
+  const counts = useMemo(() => {
+    const sourceWards = displayedWards?.features;
+    if (!sourceWards || selectedZone === 'ALL') {
+      return riskSummary?.countsByLevel || { critical: 12, high: 38, moderate: 110, low: 90 };
+    }
+    const c = { critical: 0, high: 0, moderate: 0, low: 0 };
+    sourceWards.forEach((f) => {
+      const lvl = (f.properties?.riskLevel || f.properties?.risk_level || 'moderate').toLowerCase();
+      if (lvl.includes('crit')) c.critical++;
+      else if (lvl.includes('high')) c.high++;
+      else if (lvl.includes('mod')) c.moderate++;
+      else c.low++;
+    });
+    return c;
+  }, [displayedWards, selectedZone, riskSummary]);
+
+  const totalWardsCount = wardsGeoJSON?.features?.length || 250;
+  const currentRainfall = weather?.rainfallMm?.toFixed(1) ?? '42.0';
+  const avgRiskScore = riskSummary?.avgRiskScore?.toFixed(1) ?? '58.4';
 
   // Real-time live search matching
   useEffect(() => {
@@ -112,17 +163,23 @@ export default function Landing() {
 
         {/* 3D Motion Earth Video Background */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Subtle Ambient Planetary Halo in Light Mode */}
+          <div className="absolute right-0 lg:right-16 top-1/2 -translate-y-1/2 w-[340px] sm:w-[460px] h-[340px] sm:h-[460px] rounded-full bg-sky-300/20 dark:bg-cyan-500/10 blur-3xl pointer-events-none" />
+
           <video
             autoPlay
             muted
             loop
             playsInline
-            className="w-full h-full object-cover object-center scale-[1.02]"
+            className="w-full h-full object-cover object-center scale-[1.02] hero-earth-video"
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
           />
-          {/* Gentle Directional Shadows: Keep the rotating 3D Earth 100% luminous & crystal clear on the right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-50/90 via-slate-50/45 to-transparent dark:from-black/85 dark:via-black/35 dark:to-transparent pointer-events-none transition-colors duration-300" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent pointer-events-none transition-colors duration-300" />
+
+          {/* Dark Mode Cosmic Gradient: Preserves sharp text contrast against deep space */}
+          <div className="absolute inset-0 hidden dark:block bg-gradient-to-r from-black/90 via-black/40 to-transparent pointer-events-none transition-opacity duration-300" />
+          
+          {/* Subtle Bottom Transition to Metric Ribbon */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/50 to-transparent pointer-events-none transition-colors duration-300" />
         </div>
 
         {/* Hero Editorial Content */}
@@ -284,17 +341,17 @@ export default function Landing() {
                 />
               </div>
 
-              <div className="flex items-center gap-1 text-xs font-mono bg-[var(--surface)] border border-[var(--border)] rounded-full p-1">
-                <Filter className="w-3.5 h-3.5 text-[var(--text-muted)] ml-2 mr-1" />
-                {availableZones.slice(0, 5).map((zone) => (
+              <div className="flex items-center gap-1 text-xs font-mono bg-[var(--surface)] border border-[var(--border)] rounded-full p-1 overflow-x-auto max-w-[280px] sm:max-w-md scrollbar-none">
+                <Filter className="w-3.5 h-3.5 text-[var(--text-muted)] ml-2 mr-1 shrink-0" />
+                {availableZones.slice(0, 7).map((zone) => (
                   <button
                     key={zone}
                     type="button"
-                    onClick={() => setSelectedZone(zone)}
-                    className={`px-2 py-0.5 rounded-full text-[11px] cursor-pointer transition-colors ${
+                    onClick={() => handleSelectZone(zone)}
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap cursor-pointer transition-colors ${
                       selectedZone === zone
-                        ? 'bg-[var(--brand)] text-white font-bold'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        ? 'bg-[var(--brand)] text-white font-bold shadow-xs'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-soft)]'
                     }`}
                   >
                     {zone}
@@ -336,7 +393,7 @@ export default function Landing() {
                 </div>
               ) : (
                 <WardMap
-                  wardsData={wardsGeoJSON}
+                  wardsData={displayedWards}
                   selectedWardId={selectedWard?.ward_code || selectedWard?.id}
                   onSelectWard={handleSelectWard}
                   height="500px"

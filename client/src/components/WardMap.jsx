@@ -231,6 +231,33 @@ export default function WardMap({
     });
   }, [wardCentroids, selectedWardId, showCircles, onSelectWard]);
 
+  // ── 2b. Auto-fit bounds when zone or ward dataset changes ──
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || wardCentroids.length === 0) return;
+
+    if (wardCentroids.length < 240) {
+      // Specific zone filtered: Zoom and center directly on this zone
+      const bounds = L.latLngBounds(wardCentroids.map((w) => [w.lat, w.lng]));
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14, animate: true, duration: 0.8 });
+      }
+    } else {
+      // Full Delhi overview
+      map.flyTo([28.625, 77.200], 11, { duration: 0.8 });
+    }
+  }, [wardCentroids]);
+
+  // ── 2c. Smoothly fly to selected ward when changed externally (hotspots/search/zone) ──
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !selectedWardId) return;
+    const target = wardCentroids.find((w) => String(w.code) === String(selectedWardId));
+    if (target) {
+      map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 12.5), { duration: 0.7 });
+    }
+  }, [selectedWardId, wardCentroids]);
+
   // ── 3. Render Circular Chronic Flood Hotspots (Beacons) ──
   useEffect(() => {
     const map = mapInstanceRef.current;
