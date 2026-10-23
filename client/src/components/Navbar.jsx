@@ -36,9 +36,6 @@ export default function Navbar() {
             <span className="font-limelight text-xl sm:text-2xl tracking-wider text-[var(--text-primary)] group-hover:text-[var(--brand)] transition-colors uppercase">
               PRAVAH
             </span>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20">
-              V2
-            </span>
           </Link>
 
           {/* Center: Balanced, Clean Navigation Titles */}

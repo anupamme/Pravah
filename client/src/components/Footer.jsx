@@ -61,8 +61,19 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 lg:py-11">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
-          {/* Column 1: Municipal Checkpoints & Compact 2x2 Hotlines Matrix (Spans 5 cols on lg) */}
-          <div className="lg:col-span-5 space-y-3">
+          {/* Column 1: Municipal Institutional Identity & Hotlines (Spans 5 cols on lg) */}
+          <div className="lg:col-span-5 space-y-3.5">
+            <div>
+              <Link to="/" className="inline-block text-decoration-none group select-none" aria-label="Pravah Home">
+                <span className="font-limelight text-2xl tracking-wider text-[var(--text-primary)] uppercase group-hover:text-[var(--brand)] transition-colors">
+                  PRAVAH
+                </span>
+              </Link>
+              <div className="text-xs text-[var(--text-muted)] font-mono mt-0.5">
+                Delhi Flood Intelligence & Decision Support Platform
+              </div>
+            </div>
+
             {/* 3 Checkpoint Markers */}
             <div className="space-y-1.5 text-xs text-[var(--text-secondary)] font-mono">
               <div className="flex items-center gap-2">
@@ -82,7 +93,7 @@ export default function Footer() {
             {/* Compact Space-Saving 2x2 Hotlines Matrix */}
             <div className="pt-1 max-w-sm">
               <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold pb-1.5">
-                24/7 Control Room Hotlines
+                24/7 Civic Control Room Hotlines
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                 <a

@@ -616,25 +616,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          7. CLOSING STATEMENT CALL TO ACTION (STREAMLINED & ELEVATED)
-          ───────────────────────────────────────────────────────────── */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-soft)]/50 text-center relative overflow-hidden transition-colors duration-300">
-        <div className="max-w-3xl mx-auto space-y-4 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[var(--brand-strong)] to-[var(--brand-deep)] flex items-center justify-center text-white mx-auto shadow-xl shadow-[var(--brand)]/20">
-            <Waves className="w-7 h-7" />
-          </div>
-
-          <div className="space-y-2">
-            <h2 className="font-instrument text-3xl sm:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
-              When the rain changes,
-              <br />
-              <span className="italic text-[var(--brand)]">PRAVAH changes with it.</span>
-            </h2>
-          </div>
-        </div>
-      </section>
-
       {/* Global Institutional Footer */}
       <Footer />
 
