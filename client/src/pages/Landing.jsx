@@ -15,6 +15,7 @@ import {
   Filter,
   Waves,
   Cpu,
+  ArrowUp,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -617,10 +618,10 @@ export default function Landing() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          5. PRAVAH EDITORIAL CLOSING
+          5. PRAVAH EDITORIAL CLOSING & BACK TO TOP
           ───────────────────────────────────────────────────────────── */}
       <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden border-t border-[var(--border)] bg-[var(--surface-soft)]/20">
-        <div className="max-w-3xl mx-auto space-y-3 relative z-10">
+        <div className="max-w-3xl mx-auto space-y-5 relative z-10 flex flex-col items-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-mono font-semibold uppercase tracking-wider border border-sky-500/20">
             <Waves className="w-3.5 h-3.5" />
             <span>Responsive Hydrological Intelligence</span>
@@ -631,6 +632,17 @@ export default function Landing() {
             <br />
             <span className="italic text-[var(--brand)]">PRAVAH changes with it.</span>
           </h2>
+
+          <div className="pt-2">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-elevated)] hover:border-[var(--brand)]/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-medium transition-all shadow-xs cursor-pointer group"
+              aria-label="Scroll back to top"
+            >
+              <span>Back to Top</span>
+              <ArrowUp size={13} strokeWidth={2} className="group-hover:-translate-y-0.5 transition-transform text-[var(--brand)]" />
+            </button>
+          </div>
         </div>
       </section>
 
