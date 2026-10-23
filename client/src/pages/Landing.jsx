@@ -165,8 +165,14 @@ export default function Landing() {
           <div className="lg:col-span-4 hidden lg:block pointer-events-none" />
         </div>
 
-        {/* Lower Hero Bar: Geolocation Aligned Pixel-Perfect Above City Risk Index */}
-        <div className="relative z-10 max-w-6xl mx-auto w-full flex items-center justify-end pt-3 border-t border-slate-200 dark:border-white/15 text-xs text-slate-600 dark:text-white/70 font-mono transition-colors duration-300">
+        {/* Lower Hero Bar: Radar Heartbeat Left & Coordinates Right Above City Risk Index */}
+        <div className="relative z-10 max-w-6xl mx-auto w-full flex items-center justify-between pt-3 border-t border-slate-200 dark:border-white/15 text-xs text-slate-600 dark:text-white/70 font-mono transition-colors duration-300">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="tracking-wider uppercase text-[10px] text-slate-600 dark:text-white/70 font-semibold">
+              LIVE RADAR SYNC · UPDATED 2 MINS AGO
+            </span>
+          </div>
           <span className="text-[11px] text-slate-700 dark:text-white/80 tracking-wider font-semibold">
             28.6139° N · 77.2090° E · DELHI NCT
           </span>
@@ -400,6 +406,52 @@ export default function Landing() {
                 <span>Deep Ward Inspection</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
+            </div>
+          </div>
+
+          {/* Live Yamuna River Basin Gauge Bar */}
+          <div className="p-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
+              <div className="flex items-center gap-2">
+                <Waves className="w-4 h-4 text-cyan-500 shrink-0" />
+                <span className="font-bold text-[var(--text-primary)] tracking-wide">
+                  YAMUNA RIVER BASIN · OLD RAILWAY BRIDGE (ORB)
+                </span>
+                <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 uppercase">
+                  Safe Flow
+                </span>
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-3">
+                <span>Hathnikund Barrage: <strong className="text-[var(--text-secondary)]">28,400 cusecs</strong></span>
+                <span className="hidden md:inline">·</span>
+                <span className="hidden md:inline">Flow Velocity: <strong className="text-[var(--text-secondary)]">1.8 m/s</strong></span>
+              </div>
+            </div>
+
+            {/* River Level Hydrograph Bar */}
+            <div className="space-y-1">
+              <div className="relative w-full h-2.5 rounded-full bg-[var(--surface-soft)] border border-[var(--border)] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-sky-500 transition-all duration-700"
+                  style={{ width: '42%' }}
+                />
+              </div>
+
+              {/* Threshold Labels */}
+              <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] pt-0.5">
+                <div>
+                  <span className="text-[var(--text-primary)] font-bold text-xs">204.85 m</span>
+                  <span className="ml-1 text-[var(--text-secondary)]">(Current Level)</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-amber-600 dark:text-amber-400 font-semibold">205.33 m</span>
+                  <span className="ml-1">(Warning Mark)</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-rose-600 dark:text-rose-400 font-semibold">205.53 m</span>
+                  <span className="ml-1">(Danger Mark)</span>
+                </div>
+              </div>
             </div>
           </div>
 
