@@ -545,20 +545,14 @@ export default function Landing() {
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 border-b border-[var(--border)]">
             <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-block px-3 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-bold uppercase tracking-wider">
-                  02 · Deterministic Mass-Balance Engine
-                </span>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-mono font-semibold uppercase tracking-wider border border-sky-500/20">
-                  <Waves className="w-3.5 h-3.5" />
-                  <span>Responsive Hydrological Intelligence</span>
-                </div>
-              </div>
+              <span className="inline-block px-3 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-bold uppercase tracking-wider">
+                02 · Deterministic Mass-Balance Engine
+              </span>
 
               <h2 className="font-instrument text-3xl sm:text-4xl lg:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
                 When the rain changes,
                 <br />
-                <span className="italic text-[var(--brand)]">PRAVAH changes with it.</span>
+                <span className="italic text-yellow-500 dark:text-yellow-300">PRAVAH changes with it.</span>
               </h2>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-normal">
                 Deterministic mass-balance physics: transparent math, not black-box guesses.
