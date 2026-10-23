@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   Activity,
   ArrowRight,
-  ShieldCheck,
   MapPin,
   AlertTriangle,
   CloudRain,
@@ -106,9 +105,9 @@ export default function Landing() {
       <Navbar />
 
       {/* ─────────────────────────────────────────────────────────────
-          1. HERO SECTION: 3D MOTION EARTH OBSERVATORY
+          1. HERO SECTION: DUAL-THEME RESPONSIVE OBSERVATORY
           ───────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[88vh] sm:min-h-[92vh] w-full flex flex-col justify-between pt-24 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden select-none bg-black">
+      <section className="relative min-h-[74vh] sm:min-h-[80vh] w-full flex flex-col justify-between pt-24 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden select-none bg-slate-50 dark:bg-black transition-colors duration-300">
 
         {/* 3D Motion Earth Video Background */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
@@ -117,65 +116,46 @@ export default function Landing() {
             muted
             loop
             playsInline
-            className="w-full h-full object-cover object-center scale-[1.02]"
+            className="w-full h-full object-cover object-center scale-[1.02] opacity-80 dark:opacity-100 transition-opacity duration-300"
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
           />
-          {/* Gentle Gradient Masks for Text Legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
+          {/* Dual-Theme Responsive Gradient Masks: Clean daylight in light mode, deep cosmos in dark mode */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-50/95 via-slate-50/80 to-slate-50/20 dark:from-black/90 dark:via-black/50 dark:to-transparent pointer-events-none transition-colors duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/80 to-transparent dark:from-black/80 dark:via-black/30 dark:to-transparent pointer-events-none transition-colors duration-300" />
         </div>
 
         {/* Hero Editorial Content */}
-        <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+        <div className="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
           {/* Left Column: Authoritative Editorial */}
-          <div className="lg:col-span-8 space-y-5 text-left max-w-xl">
+          <div className="lg:col-span-8 space-y-4 text-left max-w-xl">
             {/* Live Status Pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-mono text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
               <span>LIVE · 250 WARDS MONITORED</span>
             </div>
 
             {/* Authoritative Headline */}
-            <h1 className="font-instrument text-white text-4xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight text-glow">
+            <h1 className="font-instrument text-slate-900 dark:text-white text-4xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight transition-colors duration-300">
               Know the risk.
               <br />
-              <span className="italic font-light text-cyan-200">
+              <span className="italic font-light text-sky-600 dark:text-cyan-200">
                 Before the water rises.
               </span>
             </h1>
 
             {/* Mission Statement */}
-            <p className="text-sm sm:text-base text-white/85 leading-relaxed font-normal max-w-lg">
+            <p className="text-sm sm:text-base text-slate-700 dark:text-white/85 leading-relaxed font-normal max-w-lg transition-colors duration-300">
               Delhi's unified municipal flood monitoring, deterministic risk intelligence, and emergency dispatch system across all 250 municipal wards.
             </p>
 
-            {/* Refined Action CTAs */}
-            <div className="flex flex-wrap items-center gap-3.5 pt-1">
-              <Link
-                to="/dashboard"
-                className="btn-primary py-3 px-6 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 rounded-full shadow-lg shadow-[var(--brand)]/25 no-underline transition-all hover:-translate-y-0.5 cursor-pointer"
-              >
-                <Activity className="w-4 h-4" />
-                <span>Launch City Dashboard</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/report"
-                className="btn-secondary py-3 px-5 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md no-underline transition-all hover:-translate-y-0.5 cursor-pointer"
-              >
-                <ShieldCheck className="w-4 h-4 text-cyan-300" />
-                <span>Report Waterlogging</span>
-              </Link>
-            </div>
-
             {/* Architecture Badges */}
-            <div className="pt-1 flex flex-wrap items-center gap-4 text-xs text-white/70 font-mono">
+            <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-white/70 font-mono transition-colors duration-300">
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>PostGIS Spatial Containment</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Zero-Crash Offline Resilient</span>
               </span>
             </div>
@@ -185,10 +165,12 @@ export default function Landing() {
           <div className="lg:col-span-4 hidden lg:block pointer-events-none" />
         </div>
 
-        {/* Lower Hero Bar: Geolocation & Telemetry Status */}
-        <div className="relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between pt-3 border-t border-white/15 text-xs text-white/70 font-mono">
-          <span className="tracking-wider uppercase">28.6139° N · 77.2090° E · DELHI NCT</span>
-          <span className="text-[11px] text-white/60 tracking-wider hidden sm:inline">250 MUNICIPAL WARDS · REAL-TIME HYDRAULIC SENSING</span>
+        {/* Lower Hero Bar: Geolocation Aligned Pixel-Perfect In Place Of 250 Wards Above City Risk Index */}
+        <div className="relative z-10 max-w-6xl mx-auto w-full flex items-center justify-between pt-3 border-t border-slate-200 dark:border-white/15 text-xs text-slate-600 dark:text-white/70 font-mono transition-colors duration-300">
+          <span className="tracking-wider uppercase font-semibold">DELHI NCT HYDRAULIC OBSERVATORY</span>
+          <span className="text-[11px] text-slate-700 dark:text-white/80 tracking-wider font-semibold">
+            28.6139° N · 77.2090° E · DELHI NCT
+          </span>
         </div>
       </section>
 
@@ -196,7 +178,7 @@ export default function Landing() {
           2. STREAMLINED EXECUTIVE TELEMETRY RIBBON (COMPACT & SLEEK)
           ───────────────────────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-5 sm:-mt-6 relative z-20">
-        <div className="bg-[var(--surface-elevated)]/95 backdrop-blur-xl rounded-xl border border-[var(--border)] shadow-md grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[var(--border)]">
+        <div className="bg-[var(--surface-elevated)] backdrop-blur-xl rounded-xl border border-[var(--border)] shadow-md grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[var(--border)] transition-colors duration-300">
           
           {/* 1. Coverage */}
           <div className="p-3 sm:p-3.5 text-center flex flex-col justify-center">
@@ -251,7 +233,7 @@ export default function Landing() {
         </div>
 
         {/* Live Municipal Advisory Ticker Bar */}
-        <div className="mt-2.5 px-3 py-1.5 rounded-lg bg-[var(--surface-soft)]/60 border border-[var(--border)] text-[11px] font-mono text-[var(--text-secondary)] flex flex-wrap items-center justify-between gap-2">
+        <div className="mt-2.5 px-3 py-1.5 rounded-lg bg-[var(--surface-soft)]/70 border border-[var(--border)] text-[11px] font-mono text-[var(--text-secondary)] flex flex-wrap items-center justify-between gap-2 transition-colors duration-300">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <span className="text-[var(--text-primary)] font-semibold">YAMUNA RIVER LEVEL: 204.85 m</span>
@@ -446,9 +428,9 @@ export default function Landing() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          4. CRITICAL UNDERPASSES & VULNERABILITY NODES (NEW EXECUTIVE HUD)
+          4. CRITICAL UNDERPASSES & VULNERABILITY NODES
           ───────────────────────────────────────────────────────────── */}
-      <section className="py-14 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-soft)]/30">
+      <section className="py-14 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-soft)]/40 transition-colors duration-300">
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-3 border-b border-[var(--border)]">
             <div>
@@ -474,7 +456,7 @@ export default function Landing() {
             ].map((node, i) => (
               <div
                 key={i}
-                className="p-3.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2 hover:border-[var(--brand)] transition-colors"
+                className="p-3.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2 hover:border-[var(--brand)] transition-colors shadow-xs"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-[var(--text-primary)] font-serif">{node.name}</span>
@@ -497,7 +479,7 @@ export default function Landing() {
       {/* ─────────────────────────────────────────────────────────────
           5. DETERMINISTIC MASS-BALANCE ENGINE
           ───────────────────────────────────────────────────────────── */}
-      <section id="risk-engine" className="py-16 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-elevated)]">
+      <section id="risk-engine" className="py-16 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-elevated)] transition-colors duration-300">
         <div className="max-w-7xl mx-auto space-y-8">
 
           {/* Section Header */}
@@ -521,7 +503,7 @@ export default function Landing() {
           </div>
 
           {/* Mathematical Equation Ribbon */}
-          <div className="p-4 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] font-mono text-xs sm:text-sm flex flex-col md:flex-row items-center justify-between gap-3 text-[var(--text-primary)]">
+          <div className="p-4 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] font-mono text-xs sm:text-sm flex flex-col md:flex-row items-center justify-between gap-3 text-[var(--text-primary)] transition-colors duration-300">
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-[var(--brand)] shrink-0" />
               <span className="font-semibold text-xs tracking-wide">HYDROLOGICAL RISK EQUATION:</span>
@@ -621,7 +603,7 @@ export default function Landing() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-2 relative"
+                className="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-2 relative shadow-xs"
               >
                 <span className="text-xs font-mono font-bold text-[var(--brand)]">{item.step}</span>
                 <h3 className="text-sm font-bold text-[var(--text-primary)] font-serif">{item.title}</h3>
@@ -633,15 +615,15 @@ export default function Landing() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          7. CLOSING STATEMENT CALL TO ACTION
+          7. CLOSING STATEMENT CALL TO ACTION (STREAMLINED & ELEVATED)
           ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-gradient-to-b from-[var(--surface-elevated)] to-[var(--bg)] text-center relative overflow-hidden">
-        <div className="max-w-3xl mx-auto space-y-5 relative z-10">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-soft)]/50 text-center relative overflow-hidden transition-colors duration-300">
+        <div className="max-w-3xl mx-auto space-y-4 relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[var(--brand-strong)] to-[var(--brand-deep)] flex items-center justify-center text-white mx-auto shadow-xl shadow-[var(--brand)]/20">
             <Waves className="w-7 h-7" />
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             <h2 className="font-instrument text-3xl sm:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
               When the rain changes,
               <br />
@@ -650,28 +632,6 @@ export default function Landing() {
             <p className="max-w-xl mx-auto text-xs sm:text-sm text-[var(--text-secondary)] font-normal">
               Unified command for municipal engineers, disaster response officers, and citizens across the National Capital Territory.
             </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-3">
-            <Link
-              to="/dashboard"
-              className="btn-primary py-3 px-7 text-xs sm:text-sm font-semibold flex items-center gap-2 rounded-full shadow-lg shadow-[var(--brand)]/25 no-underline transition-all hover:-translate-y-0.5 cursor-pointer"
-            >
-              <span>Launch Operations Dashboard</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to="/incidents"
-              className="btn-secondary py-3 px-6 text-xs sm:text-sm font-medium rounded-full no-underline transition-all hover:-translate-y-0.5 cursor-pointer"
-            >
-              <span>Emergency Dispatch Center</span>
-            </Link>
-            <Link
-              to="/report"
-              className="py-3 px-5 text-xs sm:text-sm font-medium rounded-full bg-[var(--surface-soft)] hover:bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] no-underline transition-all hover:-translate-y-0.5 cursor-pointer"
-            >
-              <span>Report Waterlogging</span>
-            </Link>
           </div>
         </div>
       </section>
