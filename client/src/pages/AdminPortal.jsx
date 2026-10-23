@@ -252,31 +252,78 @@ export default function AdminPortal() {
     return (
       <div className="relative min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 overflow-hidden select-none">
         
-        {/* Minimal Celestial / Radar Background Accents */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden" aria-hidden="true">
-          {/* Subtle Ambient Radial Glow */}
-          <div className="w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-sky-400/10 via-cyan-400/10 to-transparent blur-3xl pointer-events-none" />
-          
-          {/* Concentric Minimal Orbit Rings */}
-          <div className="absolute w-[360px] h-[360px] rounded-full border border-sky-500/10 dark:border-cyan-500/10 pointer-events-none" />
-          <div className="absolute w-[540px] h-[540px] rounded-full border border-sky-500/5 dark:border-cyan-500/5 pointer-events-none" />
-          <div className="absolute w-[720px] h-[720px] rounded-full border border-sky-500/[0.03] dark:border-cyan-500/[0.03] pointer-events-none" />
+        {/* ── Dynamic Tactical Radar & Topographical Background ── */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Subtle Geospatial Dot Grid Pattern */}
+          <div 
+            className="absolute inset-0 opacity-[0.04] dark:opacity-[0.08]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1.5px 1.5px, currentColor 1.5px, transparent 0)',
+              backgroundSize: '28px 28px'
+            }}
+          />
 
-          {/* Minimal Coordinate Grid Watermarks */}
-          <span className="absolute top-8 left-8 font-mono text-[10px] text-[var(--text-muted)] tracking-wider opacity-60 hidden sm:inline">
-            SEC-SYS // 28.6139° N · 77.2090° E
-          </span>
-          <span className="absolute bottom-8 right-8 font-mono text-[10px] text-[var(--text-muted)] tracking-wider opacity-60 hidden sm:inline">
-            POSTGIS SRID 4326 // NCT DELHI
-          </span>
+          {/* Deep Ambient Glow Spheres */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[720px] rounded-full bg-gradient-to-tr from-sky-500/15 via-cyan-400/10 to-indigo-500/10 blur-3xl pointer-events-none" />
+          <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full bg-blue-500/10 dark:bg-cyan-500/10 blur-2xl pointer-events-none animate-pulse-slow" />
+          <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[440px] h-[440px] rounded-full bg-cyan-400/10 dark:bg-sky-400/10 blur-2xl pointer-events-none animate-pulse-slow" style={{ animationDelay: '1.8s' }} />
+
+          {/* Concentric Mission Ops Rings & Animated Radar Reticles */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full border border-sky-500/20 dark:border-cyan-400/25 pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[460px] h-[460px] rounded-full border border-dashed border-sky-500/20 dark:border-cyan-400/20 pointer-events-none animate-[spin_90s_linear_infinite]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[680px] h-[680px] rounded-full border border-sky-500/15 dark:border-cyan-400/15 pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[920px] h-[920px] rounded-full border border-sky-500/[0.06] dark:border-cyan-400/[0.07] pointer-events-none" />
+
+          {/* Crosshair Tactical Axis Lines */}
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 dark:via-cyan-400/25 to-transparent pointer-events-none" />
+          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-sky-500/20 dark:via-cyan-400/25 to-transparent pointer-events-none" />
+
+          {/* Subtle Topographical Elevation Contours SVG */}
+          <svg className="absolute inset-0 w-full h-full opacity-[0.04] dark:opacity-[0.09]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 1000 1000">
+            <path d="M0,280 C300,180 500,420 1000,320 L1000,1000 L0,1000 Z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="6 6" />
+            <path d="M0,430 C350,360 650,530 1000,400 L1000,1000 L0,1000 Z" fill="none" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M0,580 C250,500 750,680 1000,560 L1000,1000 L0,1000 Z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="4 4" />
+            <path d="M0,730 C400,660 600,830 1000,700 L1000,1000 L0,1000 Z" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          </svg>
+
+          {/* Tactical Corner HUD Telemetry Badges */}
+          <div className="absolute top-6 left-6 hidden lg:flex items-center gap-2 font-mono text-[11px] text-[var(--text-muted)] bg-[var(--surface-elevated)]/70 px-3.5 py-1.5 rounded-xl border border-[var(--border)] backdrop-blur-md shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>SYS_ID: DDMA-DELHI-MCD // NODE 01</span>
+          </div>
+
+          <div className="absolute top-6 right-6 hidden lg:flex items-center gap-2 font-mono text-[11px] text-[var(--text-muted)] bg-[var(--surface-elevated)]/70 px-3.5 py-1.5 rounded-xl border border-[var(--border)] backdrop-blur-md shadow-xs">
+            <Radio className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
+            <span>RADAR: SAFDARJUNG-DOPPLER [LIVE]</span>
+          </div>
+
+          <div className="absolute bottom-6 left-6 hidden lg:flex items-center gap-3 font-mono text-[11px] text-[var(--text-muted)] bg-[var(--surface-elevated)]/70 px-3.5 py-1.5 rounded-xl border border-[var(--border)] backdrop-blur-md shadow-xs">
+            <span className="text-[var(--brand)] font-semibold">28.6139° N · 77.2090° E</span>
+            <span className="opacity-40">|</span>
+            <span>YAMUNA SUB-BASIN (SRID 4326)</span>
+          </div>
+
+          <div className="absolute bottom-6 right-6 hidden lg:flex items-center gap-2 font-mono text-[11px] text-[var(--text-muted)] bg-[var(--surface-elevated)]/70 px-3.5 py-1.5 rounded-xl border border-[var(--border)] backdrop-blur-md shadow-xs">
+            <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+            <span>AUTHENTICATION PROTOCOL // V2.4</span>
+          </div>
         </div>
 
         {/* Elevated Glassmorphism Sign-in Card */}
-        <div className="relative z-10 w-full max-w-sm rounded-2xl surface-card p-7 sm:p-8 border border-[var(--border)] shadow-xl backdrop-blur-xl bg-[var(--surface-elevated)]/95 space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-2xl bg-sky-500/10 text-[var(--brand)] border border-sky-500/20 flex items-center justify-center mx-auto shadow-xs">
+        <div className="relative z-10 w-full max-w-sm rounded-2xl surface-card p-7 sm:p-8 border border-[var(--border)] shadow-[0_8px_40px_-12px_rgba(14,165,233,0.18)] dark:shadow-[0_8px_40px_-12px_rgba(56,189,248,0.22)] backdrop-blur-2xl bg-[var(--surface-elevated)]/95 space-y-6">
+          {/* Card Top Horizon Glow Line */}
+          <div className="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-sky-400/60 dark:via-cyan-400/60 to-transparent rounded-full pointer-events-none" />
+
+          <div className="text-center space-y-2.5">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-[10px] font-mono font-semibold uppercase tracking-wider mx-auto">
+              <Shield className="w-3 h-3 text-[var(--brand)]" />
+              <span>Restricted Municipal Access</span>
+            </div>
+
+            <div className="w-12 h-12 rounded-2xl bg-sky-500/10 text-[var(--brand)] border border-sky-500/20 flex items-center justify-center mx-auto shadow-xs mt-1">
               <Shield className="w-6 h-6" />
             </div>
+            
             <h2 className="text-2xl font-serif text-[var(--text-primary)] tracking-tight">Admin Portal</h2>
             <p className="text-xs text-[var(--text-muted)] leading-relaxed">
               Municipal command login for hydraulic simulations, drainage overrides, and operational audit dispatch.
@@ -327,7 +374,7 @@ export default function AdminPortal() {
             </button>
           </form>
 
-          {/* Secure Telemetry Footer Strip (Replaces Demo Login) */}
+          {/* Secure Telemetry Footer Strip */}
           <div className="pt-4 border-t border-[var(--border)] flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)]">
             <span className="flex items-center gap-1.5 text-emerald-500 font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
