@@ -295,12 +295,20 @@
     transition: background-color 0.4s ease, color 0.4s ease;
   }
 
-  .font-heading {
-    font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+  .font-instrument {
+    font-family: 'Instrument Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
+  }
+
+  .font-limelight {
+    font-family: 'Limelight', cursive, sans-serif;
+  }
+
+  .font-dancing {
+    font-family: 'Dancing Script', cursive, sans-serif;
   }
 
   .font-inter {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 
   ::selection {

@@ -9,8 +9,10 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+        display: ['"Instrument Serif"', 'Georgia', 'serif'],
+        limelight: ['"Limelight"', 'cursive', 'sans-serif'],
+        dancing: ['"Dancing Script"', 'cursive', 'sans-serif'],
       },
       colors: {
         pravah: {

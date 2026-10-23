@@ -407,7 +407,7 @@ export default function IncidentCommand() {
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
             Incident Command & Rapid Dispatch
           </h1>
           <p className="text-xs text-[var(--text-muted)]">
