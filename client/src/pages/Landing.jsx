@@ -7,21 +7,11 @@ import {
   MapPin,
   AlertTriangle,
   CloudRain,
-  Layers,
   ChevronDown,
-  CheckCircle2,
   Sliders,
-  Radio,
-  Zap,
-  Clock,
-  Waves,
-  Terminal,
-  Cpu,
+  Eye,
   Search,
   Filter,
-  Eye,
-  Camera,
-  Server,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -34,15 +24,8 @@ export default function Landing() {
   const [wardsGeoJSON, setWardsGeoJSON] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState('ALL');
-
-  // Real-time digital clock ticker (UTC & IST)
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Ingest initial city risk, weather, and ward boundaries
   useEffect(() => {
@@ -72,10 +55,7 @@ export default function Landing() {
   const currentRainfall = weather?.rainfallMm?.toFixed(1) ?? '42.0';
   const avgRiskScore = riskSummary?.avgRiskScore?.toFixed(1) ?? '58.4';
 
-  const utcTime = currentTime.toUTCString().slice(17, 25);
-  const istTime = currentTime.toLocaleTimeString('en-IN', { hour12: false, timeZone: 'Asia/Kolkata' });
-
-  // Filtered wards for the interactive directory search
+  // Filtered zones for quick filter
   const availableZones = useMemo(() => {
     if (!wardsGeoJSON?.features) return ['ALL'];
     const set = new Set();
@@ -97,40 +77,11 @@ export default function Landing() {
       <Navbar />
 
       {/* ─────────────────────────────────────────────────────────────
-          TOP TELEMETRY STATUS RIBBON
-          ───────────────────────────────────────────────────────────── */}
-      <div className="pt-16 border-b border-[var(--border)] bg-[var(--surface-soft)] text-xs font-mono select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-y-1 gap-x-4 text-[var(--text-secondary)]">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>SYS // ONLINE</span>
-            </span>
-            <span className="text-[var(--border-strong)]">|</span>
-            <span>DELHI NCT · 28.6139° N, 77.2090° E</span>
-            <span className="hidden sm:inline text-[var(--border-strong)]">|</span>
-            <span className="hidden sm:inline text-[var(--text-muted)]">EPSG:4326 PostGIS</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[var(--text-muted)]">
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[var(--brand)]" />
-              <span>UTC {utcTime} · IST {istTime}</span>
-            </div>
-            <span className="hidden md:inline text-[var(--border-strong)]">|</span>
-            <span className="hidden md:inline text-[var(--brand)] font-semibold">
-              MASS-BALANCE v2.4
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────────
           1. HERO SECTION: 3D MOTION EARTH OBSERVATORY
           ───────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[calc(100vh-6rem)] w-full flex flex-col justify-between pt-10 pb-10 px-4 sm:px-6 lg:px-8 overflow-hidden select-none bg-black">
+      <section className="relative min-h-[92vh] w-full flex flex-col justify-between pt-24 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden select-none bg-black">
 
-        {/* 3D Motion Earth Video Viewport — Crystal Clear & Unobstructed */}
+        {/* 3D Motion Earth Video Viewport — Pure, Bright & Unobstructed */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <video
             autoPlay
@@ -140,25 +91,24 @@ export default function Landing() {
             className="w-full h-full object-cover object-center scale-[1.02]"
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
           />
-          {/* Subtle Directional Shadow for Text Readability — Earth on the right stays 100% luminous & unobstructed */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
+          {/* Subtle Directional Shadow for Text Readability — Earth on the right shines bright */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        {/* Center Grid Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto py-8">
-
-          {/* Left Column: Authoritative Editorial & Industrial Controls */}
-          <div className="lg:col-span-8 space-y-6 text-left max-w-2xl">
-            {/* Status Eyebrow Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/60 border border-white/20 text-white font-mono text-[11px] tracking-wider uppercase backdrop-blur-md">
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+          {/* Left Column: Focused, Punchy & Breathable */}
+          <div className="lg:col-span-8 space-y-6 text-left max-w-xl">
+            {/* Live Status Tag */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/60 border border-white/20 text-white font-mono text-[11px] uppercase tracking-wider backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="font-bold text-cyan-300">LIVE TELEMETRY</span>
+              <span className="font-semibold text-cyan-300">LIVE TELEMETRY</span>
               <span className="text-white/40">·</span>
-              <span>250 MUNICIPAL WARDS</span>
+              <span>250 WARDS</span>
             </div>
 
-            {/* Main Headline */}
+            {/* Authoritative Headline */}
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif text-white tracking-tight leading-[0.98]">
               Know the risk.
               <br />
@@ -167,16 +117,16 @@ export default function Landing() {
               </span>
             </h1>
 
-            {/* Description */}
-            <p className="text-sm sm:text-base text-white/85 leading-relaxed font-normal">
-              Continuous deterministic mass-balance intelligence across all 250 municipal wards of Delhi. High-precision PostGIS polygon containment, localized rainfall projections, and real-time civic dispatch.
+            {/* One-Sentence Punchline */}
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed font-normal max-w-lg">
+              Continuous municipal flood monitoring, explainable risk intelligence, and emergency dispatch across Delhi.
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 to="/dashboard"
-                className="py-3 px-6 text-xs font-semibold bg-[var(--brand)] hover:opacity-95 text-white flex items-center justify-center gap-2 no-underline shadow-lg transition-opacity cursor-pointer"
+                className="py-3 px-6 text-xs font-semibold bg-[var(--brand)] hover:opacity-95 text-white flex items-center gap-2 no-underline shadow-lg transition-opacity cursor-pointer"
               >
                 <Activity className="w-4 h-4" />
                 <span>Explore Live Intelligence</span>
@@ -184,40 +134,24 @@ export default function Landing() {
               </Link>
               <Link
                 to="/report"
-                className="py-3 px-5 text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md flex items-center justify-center gap-2 no-underline transition-colors cursor-pointer"
+                className="py-3 px-5 text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md flex items-center gap-2 no-underline transition-colors cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4 text-cyan-300" />
                 <span>Report an Incident</span>
               </Link>
             </div>
-
-            {/* Core Verification Tags */}
-            <div className="pt-2 flex flex-wrap items-center gap-5 text-xs text-white/70 font-mono">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>PostGIS Polygon Containment</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Zero-Crash Offline Resilient</span>
-              </span>
-            </div>
           </div>
 
-          {/* Right Column: Left intentionally open so 3D Rotating Earth is 100% visible */}
+          {/* Right Column: Kept completely open so the 3D rotating Earth is 100% visible */}
           <div className="lg:col-span-4 hidden lg:block pointer-events-none" />
-
         </div>
 
-        {/* Lower Hero Bar: Geolocation & Scroll Cue */}
+        {/* Lower Hero Bar: Minimal Geolocation & Scroll Cue */}
         <div className="relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between pt-4 border-t border-white/15 text-xs text-white/70 font-mono">
-          <div className="tracking-widest uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-            <span>28.6139° N · 77.2090° E · 250 WARDS MONITORED</span>
-          </div>
+          <span className="tracking-wider uppercase">28.6139° N · 77.2090° E · DELHI NCT</span>
           <a
             href="#city-map"
-            className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors no-underline cursor-pointer font-sans text-xs font-medium"
+            className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors no-underline font-sans text-xs font-medium"
           >
             <span>EXPLORE PLATFORM</span>
             <ChevronDown className="w-4 h-4 animate-bounce" />
@@ -226,25 +160,23 @@ export default function Landing() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          1.5 DEDICATED LIVE TELEMETRY STRIP (CLEAN IN LIGHT & DARK)
+          2. STREAMLINED LIVE METRICS RIBBON (LIGHT & DARK PERFECT)
           ───────────────────────────────────────────────────────────── */}
       <section className="border-b border-[var(--border)] bg-[var(--surface-elevated)] py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Tile 1: Coverage */}
           <div className="p-4 bg-[var(--surface)] border border-[var(--border)] space-y-1">
-            <div className="flex items-center justify-between text-[11px] font-mono text-[var(--text-muted)] uppercase tracking-wider">
-              <span>Coverage</span>
+            <div className="flex items-center justify-between text-[11px] font-mono text-[var(--text-muted)] uppercase">
+              <span>Wards Monitored</span>
               <MapPin className="w-3.5 h-3.5 text-[var(--brand)]" />
             </div>
             <div className="text-2xl sm:text-3xl font-black font-mono text-[var(--text-primary)]">
               {totalWardsCount}
             </div>
-            <div className="text-xs text-[var(--text-muted)]">Municipal Wards Monitored</div>
+            <div className="text-xs text-[var(--text-muted)]">250 PostGIS Polygons</div>
           </div>
 
-          {/* Tile 2: High Risk */}
           <div className="p-4 bg-[var(--surface)] border border-rose-500/30 space-y-1">
-            <div className="flex items-center justify-between text-[11px] font-mono text-rose-600 dark:text-rose-400 uppercase tracking-wider">
+            <div className="flex items-center justify-between text-[11px] font-mono text-rose-600 dark:text-rose-400 uppercase">
               <span>Alert Wards</span>
               <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
             </div>
@@ -254,9 +186,8 @@ export default function Landing() {
             <div className="text-xs text-[var(--text-muted)]">Requiring Pump Staging</div>
           </div>
 
-          {/* Tile 3: Precipitation */}
           <div className="p-4 bg-[var(--surface)] border border-cyan-500/30 space-y-1">
-            <div className="flex items-center justify-between text-[11px] font-mono text-cyan-700 dark:text-cyan-400 uppercase tracking-wider">
+            <div className="flex items-center justify-between text-[11px] font-mono text-cyan-700 dark:text-cyan-400 uppercase">
               <span>Precipitation</span>
               <CloudRain className="w-3.5 h-3.5 text-cyan-500" />
             </div>
@@ -264,12 +195,11 @@ export default function Landing() {
               {currentRainfall}
               <span className="text-xs font-normal text-[var(--text-muted)]">mm/h</span>
             </div>
-            <div className="text-xs text-[var(--text-muted)]">Open-Meteo Doppler Feed</div>
+            <div className="text-xs text-[var(--text-muted)]">Live Radar Feeds</div>
           </div>
 
-          {/* Tile 4: Mean Risk Index */}
           <div className="p-4 bg-[var(--surface)] border border-emerald-500/30 space-y-1">
-            <div className="flex items-center justify-between text-[11px] font-mono text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+            <div className="flex items-center justify-between text-[11px] font-mono text-emerald-700 dark:text-emerald-400 uppercase">
               <span>City Risk Index</span>
               <Activity className="w-3.5 h-3.5 text-emerald-500" />
             </div>
@@ -277,33 +207,29 @@ export default function Landing() {
               {avgRiskScore}
               <span className="text-xs font-normal text-[var(--text-muted)]">/100</span>
             </div>
-            <div className="text-xs text-[var(--text-muted)]">Deterministic City Mean</div>
+            <div className="text-xs text-[var(--text-muted)]">Deterministic Average</div>
           </div>
         </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          2. SECTION: GEOSPATIAL BOUNDARY TERMINAL (#city-map)
+          3. INTERACTIVE GEOSPATIAL MAP (#city-map)
           ───────────────────────────────────────────────────────────── */}
-      <section id="city-map" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <section id="city-map" className="py-16 px-4 sm:px-6 lg:px-8 border-b border-[var(--border)] bg-[var(--bg)]">
+        <div className="max-w-7xl mx-auto space-y-6">
 
-          {/* Section Header */}
+          {/* Clean Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[var(--border)]">
-            <div className="max-w-2xl space-y-2">
-              <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-[var(--brand)] uppercase tracking-wider">
-                <Terminal className="w-3.5 h-3.5" />
-                <span>// SECTION 01 · SPATIAL BOUNDARY TERMINAL</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
+            <div>
+              <span className="text-xs font-mono font-semibold text-[var(--brand)] uppercase tracking-wider block mb-1">
+                Geospatial Intelligence
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
                 Delhi Municipal Ward Topography
               </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                All 250 municipal ward boundaries modeled as PostGIS polygon geometries. Select or search any ward to inspect its live drainage capacity, meteorological forecast, and verified civic reports.
-              </p>
             </div>
 
-            {/* Quick Interactive Search & Filter Controls */}
+            {/* Quick Filter & Search */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
                 <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-2.5 top-2.5" />
@@ -312,12 +238,12 @@ export default function Landing() {
                   placeholder="Filter ward by name or code…"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 pr-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono w-56 placeholder-[var(--text-muted)]"
+                  className="pl-8 pr-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] font-mono w-52 placeholder-[var(--text-muted)]"
                 />
               </div>
 
               <div className="flex items-center gap-1 text-xs font-mono bg-[var(--surface)] border border-[var(--border)] p-0.5">
-                <Filter className="w-3 h-3 text-[var(--text-muted)] ml-1.5" />
+                <Filter className="w-3 h-3 text-[var(--text-muted)] ml-1" />
                 {availableZones.slice(0, 5).map((zone) => (
                   <button
                     key={zone}
@@ -336,37 +262,34 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Interactive Map & Telemetry HUD Grid */}
+          {/* Interactive Map & Telemetry HUD */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Map Container */}
-            <div className="lg:col-span-8 border border-[var(--border)] relative bg-[var(--surface)] min-h-[560px]">
+            <div className="lg:col-span-8 border border-[var(--border)] relative bg-[var(--surface)] min-h-[520px]">
               {loading ? (
-                <div className="h-[560px] flex items-center justify-center font-mono text-xs text-[var(--text-muted)] space-x-2">
+                <div className="h-[520px] flex items-center justify-center font-mono text-xs text-[var(--text-muted)] space-x-2">
                   <span className="w-2 h-2 rounded-full bg-[var(--brand)] animate-ping" />
-                  <span>Loading Delhi Geospatial Boundaries…</span>
+                  <span>Loading Delhi Boundaries…</span>
                 </div>
               ) : (
                 <WardMap
                   wardsData={wardsGeoJSON}
                   selectedWardId={selectedWard?.ward_code || selectedWard?.id}
                   onSelectWard={handleSelectWard}
-                  height="560px"
+                  height="520px"
                 />
               )}
             </div>
 
-            {/* Selected Ward Telemetry Panel */}
-            <div className="lg:col-span-4 surface-card p-5 border border-[var(--border)] space-y-5">
+            {/* Selected Ward Inspection Card */}
+            <div className="lg:col-span-4 surface-card p-5 border border-[var(--border)] space-y-4">
               <div className="flex items-start justify-between pb-3 border-b border-[var(--border)]">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--brand)]">
-                    TELEMETRY INSPECTION
-                  </span>
-                  <h3 className="text-xl font-bold font-serif text-[var(--text-primary)] tracking-tight mt-0.5">
+                  <h3 className="text-xl font-bold font-serif text-[var(--text-primary)] tracking-tight">
                     {selectedWard?.name || selectedWard?.ward_name || 'Connaught Place'}
                   </h3>
                   <div className="text-xs text-[var(--text-muted)] font-mono mt-0.5">
-                    CODE: {selectedWard?.id || selectedWard?.ward_code || 'W056'} · ZONE: {selectedWard?.zone || 'CENTRAL'}
+                    Ward {selectedWard?.id || selectedWard?.ward_code || 'W056'} · {selectedWard?.zone || 'Central'} Zone
                   </div>
                 </div>
                 <span className={`badge-risk-${(selectedWard?.riskLevel || 'critical').toLowerCase()}`}>
@@ -390,73 +313,57 @@ export default function Landing() {
                 </div>
               </div>
 
-              {/* Physical Sub-Factor Breakdown */}
+              {/* Sub-Factor Metrics */}
               <div className="space-y-2 text-xs font-mono">
                 <div className="p-2.5 bg-[var(--surface-soft)] border border-[var(--border)] flex justify-between items-center">
-                  <span className="text-[var(--text-secondary)] font-sans">Drainage Capacity Deficit (40%)</span>
+                  <span className="text-[var(--text-secondary)] font-sans">Drainage Deficit (40%)</span>
                   <span className="font-bold text-[var(--text-primary)]">
                     {100 - (selectedWard?.drainageCapacity ?? 68)}%
                   </span>
                 </div>
                 <div className="p-2.5 bg-[var(--surface-soft)] border border-[var(--border)] flex justify-between items-center">
-                  <span className="text-[var(--text-secondary)] font-sans">Precipitation Forecast (35%)</span>
+                  <span className="text-[var(--text-secondary)] font-sans">Rainfall Forecast (35%)</span>
                   <span className="font-bold text-cyan-600 dark:text-cyan-400">
                     {currentRainfall} mm/h
                   </span>
                 </div>
                 <div className="p-2.5 bg-[var(--surface-soft)] border border-[var(--border)] flex justify-between items-center">
-                  <span className="text-[var(--text-secondary)] font-sans">Civic Incident Reports (25%)</span>
+                  <span className="text-[var(--text-secondary)] font-sans">Citizen Reports (25%)</span>
                   <span className="font-bold text-amber-600 dark:text-amber-400">
-                    {selectedWard?.activeComplaints ?? 7} Verified
+                    {selectedWard?.activeComplaints ?? 7} Active
                   </span>
                 </div>
               </div>
 
-              {/* Centroid Coordinates */}
-              <div className="p-2.5 bg-[var(--surface-soft)]/60 border border-[var(--border)] text-[11px] font-mono text-[var(--text-secondary)] space-y-1">
-                <div className="flex justify-between">
-                  <span>CENTROID LAT:</span>
-                  <span className="text-[var(--text-primary)] font-bold">
-                    {selectedWard?.centroid?.latitude?.toFixed(4) || '28.6360'}° N
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>CENTROID LON:</span>
-                  <span className="text-[var(--text-primary)] font-bold">
-                    {selectedWard?.centroid?.longitude?.toFixed(4) || '77.2250'}° E
-                  </span>
-                </div>
-              </div>
-
-              {/* Deep Analysis Action */}
+              {/* Action Button */}
               <Link
                 to={`/wards/${selectedWard?.id || selectedWard?.ward_code || 'W056'}`}
                 className="w-full py-2.5 bg-[var(--brand)] hover:opacity-90 text-white text-xs font-semibold flex items-center justify-center gap-1.5 no-underline transition-opacity cursor-pointer shadow-sm"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Open Comprehensive Ward Analysis</span>
+                <span>Deep Ward Inspection</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
-          {/* Citywide 4-Tier Risk Distribution Ribbon (WCAG AAA in Light & Dark) */}
+          {/* 4-Tier Risk Distribution Ribbon */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
             <div className="p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400">
               <span className="block text-2xl font-bold">{counts.critical || 12}</span>
-              <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-sans font-semibold">Critical Risk Wards</span>
+              <span className="text-xs uppercase text-[var(--text-secondary)] font-sans font-semibold">Critical Wards</span>
             </div>
             <div className="p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-500/30 text-orange-700 dark:text-orange-400">
               <span className="block text-2xl font-bold">{counts.high || 38}</span>
-              <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-sans font-semibold">High Risk Wards</span>
+              <span className="text-xs uppercase text-[var(--text-secondary)] font-sans font-semibold">High Wards</span>
             </div>
             <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-400">
               <span className="block text-2xl font-bold">{counts.moderate || 110}</span>
-              <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-sans font-semibold">Moderate Risk Wards</span>
+              <span className="text-xs uppercase text-[var(--text-secondary)] font-sans font-semibold">Moderate Wards</span>
             </div>
             <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400">
               <span className="block text-2xl font-bold">{counts.low || 90}</span>
-              <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-sans font-semibold">Low Risk Wards</span>
+              <span className="text-xs uppercase text-[var(--text-secondary)] font-sans font-semibold">Low Wards</span>
             </div>
           </div>
 
@@ -464,99 +371,70 @@ export default function Landing() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          3. SECTION: DETERMINISTIC MASS-BALANCE FORMULA ENGINE
+          4. DETERMINISTIC MASS-BALANCE ENGINE (VISUAL & CONCISE)
           ───────────────────────────────────────────────────────────── */}
-      <section id="risk-engine" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-[var(--border)] bg-[var(--surface-elevated)]">
-        <div className="max-w-7xl mx-auto space-y-10">
+      <section id="risk-engine" className="py-16 px-4 sm:px-6 lg:px-8 border-b border-[var(--border)] bg-[var(--surface-elevated)]">
+        <div className="max-w-7xl mx-auto space-y-8">
 
-          <div className="max-w-2xl space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-[var(--brand)] uppercase tracking-wider">
-              <Cpu className="w-3.5 h-3.5" />
-              <span>// SECTION 02 · HYDROLOGICAL MASS-BALANCE ENGINE</span>
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border)]">
+            <div>
+              <span className="text-xs font-mono font-semibold text-[var(--brand)] uppercase tracking-wider block mb-1">
+                Deterministic Model
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-serif text-[var(--text-primary)] tracking-tight">
+                Explainable Risk Engine
+              </h2>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
-              Transparent math, not black-box guesses
-            </h2>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-              Pravah evaluates municipal risk using a mass-balance physical equation. Every score is mathematically explainable with weighted sub-factors.
-            </p>
+            <Link
+              to="/simulator"
+              className="py-2 px-4 bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--text-primary)] text-xs font-semibold border border-[var(--border)] transition-colors no-underline flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
+            >
+              <Sliders className="w-3.5 h-3.5 text-amber-500" />
+              <span>Launch Simulator</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
-          {/* Mathematical Formula Card */}
-          <div className="surface-card p-6 sm:p-7 border border-[var(--border-strong)] bg-[var(--surface)]">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <span className="text-[11px] font-mono font-bold text-[var(--brand)] uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand)]" />
-                  <span>DETERMINISTIC MASS-BALANCE EQUATION</span>
-                </span>
-                <div className="text-base sm:text-2xl font-mono font-bold text-[var(--text-primary)] tracking-tight">
-                  RiskScore = (DrainageDeficit &times; 0.40) + (RainfallSurge &times; 0.35) + (CivicReports &times; 0.25)
-                </div>
-                <p className="text-xs text-[var(--text-muted)] max-w-2xl">
-                  Evaluated in real time per ward boundary against rainfall telemetry and hydraulic siltation indices.
-                </p>
-              </div>
-
-              <Link
-                to="/simulator"
-                className="py-2.5 px-5 bg-[var(--surface-soft)] hover:bg-[var(--surface)] text-[var(--text-primary)] text-xs font-mono font-semibold border border-[var(--border)] transition-colors no-underline flex items-center gap-2 shrink-0 cursor-pointer"
-              >
-                <Sliders className="w-3.5 h-3.5 text-amber-500" />
-                <span>Test in Simulator</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-
-          {/* 3 Physical Weights Sub-System Cards */}
+          {/* 3 Physical Weights Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="surface-card p-5 border border-[var(--border)] space-y-3 bg-[var(--surface)]">
+            <div className="surface-card p-5 border border-[var(--border)] space-y-2 bg-[var(--surface)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-[var(--brand)]">[MOD-01] DRAINAGE DEFICIT</span>
-                <span className="text-xl font-bold font-mono text-[var(--brand)]">40%</span>
+                <span className="text-xs font-mono font-bold text-[var(--brand)]">DRAINAGE DEFICIT</span>
+                <span className="text-2xl font-black font-mono text-[var(--brand)]">40%</span>
               </div>
               <h3 className="text-base font-bold font-serif text-[var(--text-primary)] tracking-tight">
                 Stormwater Capacity Deficit
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Evaluates municipal stormwater trunk lines, culvert cross-sectional flow volume, siltation index, and outfall backflow against 50-year return storm events.
+                Evaluates culvert carrying volume, siltation depth, and outfall backflow against 50-year return storms.
               </p>
-              <div className="pt-2 text-[11px] font-mono text-[var(--text-muted)] border-t border-[var(--border)]">
-                INPUT: MCD Municipal Audit Registry
-              </div>
             </div>
 
-            <div className="surface-card p-5 border border-[var(--border)] space-y-3 bg-[var(--surface)]">
+            <div className="surface-card p-5 border border-[var(--border)] space-y-2 bg-[var(--surface)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-cyan-700 dark:text-cyan-400">[MOD-02] RAINFALL SURGE</span>
-                <span className="text-xl font-bold font-mono text-cyan-700 dark:text-cyan-400">35%</span>
+                <span className="text-xs font-mono font-bold text-cyan-700 dark:text-cyan-400">RAINFALL SURGE</span>
+                <span className="text-2xl font-black font-mono text-cyan-700 dark:text-cyan-400">35%</span>
               </div>
               <h3 className="text-base font-bold font-serif text-[var(--text-primary)] tracking-tight">
                 Meteorological Precipitation
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                6h, 12h, and 24h multi-horizon convective precipitation projections fetched via Open-Meteo high-resolution radar feeds with automated fallback caching.
+                6h, 12h, and 24h convective precipitation projections pulled from high-resolution radar feeds.
               </p>
-              <div className="pt-2 text-[11px] font-mono text-[var(--text-muted)] border-t border-[var(--border)]">
-                INPUT: Open-Meteo High-Res Radar Feed
-              </div>
             </div>
 
-            <div className="surface-card p-5 border border-[var(--border)] space-y-3 bg-[var(--surface)]">
+            <div className="surface-card p-5 border border-[var(--border)] space-y-2 bg-[var(--surface)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">[MOD-03] CIVIC REPORTS</span>
-                <span className="text-xl font-bold font-mono text-emerald-700 dark:text-emerald-400">25%</span>
+                <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">CIVIC DISPATCH</span>
+                <span className="text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400">25%</span>
               </div>
               <h3 className="text-base font-bold font-serif text-[var(--text-primary)] tracking-tight">
                 Geotagged Incident Telemetry
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Real-time citizen waterlogging reports filtered for boundary containment, deduplicated, and chronologically decayed over a rolling operational window.
+                Verified citizen waterlogging reports filtered for boundary containment and decayed over time.
               </p>
-              <div className="pt-2 text-[11px] font-mono text-[var(--text-muted)] border-t border-[var(--border)]">
-                INPUT: Citizen Incident Desk & Telemetry
-              </div>
             </div>
           </div>
 
@@ -564,278 +442,35 @@ export default function Landing() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          4. SECTION: MUNICIPAL OPERATIONS & PIPELINE (#operations)
+          5. MINIMAL CLOSING CALL TO ACTION
           ───────────────────────────────────────────────────────────── */}
-      <section id="operations" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="max-w-7xl mx-auto space-y-10">
-
-          <div className="max-w-2xl space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-[var(--brand)] uppercase tracking-wider">
-              <Zap className="w-3.5 h-3.5" />
-              <span>// SECTION 03 · OPERATIONAL DISPATCH PIPELINE</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
-              From observation to municipal dispatch
-            </h2>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-              Pravah converts raw physical telemetry into prioritized emergency action roadmaps for MCD zonal disaster managers and pump crews.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              {
-                step: 'PHASE 01',
-                code: 'INGEST',
-                title: 'Detect Risk',
-                desc: 'Continuous spatial mass-balance computation identifies emerging waterlogging pockets across 250 wards before surface flooding occurs.',
-                icon: Activity,
-              },
-              {
-                step: 'PHASE 02',
-                code: 'RANK',
-                title: 'Rank Interventions',
-                desc: 'Decision support algorithms prioritize actionable interventions by severity, affected population density, and infrastructure exposure.',
-                icon: Clock,
-              },
-              {
-                step: 'PHASE 03',
-                code: 'SIMULATE',
-                title: 'Digital Twin Feasibility',
-                desc: 'What-If simulation engine calculates delta risk reduction and pump deployment feasibility prior to field mobilization.',
-                icon: Sliders,
-              },
-              {
-                step: 'PHASE 04',
-                code: 'DISPATCH',
-                title: 'Mobilize Teams',
-                desc: 'Dispatch heavy submersible dewatering pumps, notify zonal field engineers, and issue civic traffic advisories.',
-                icon: Zap,
-              },
-            ].map((card) => {
-              const Icon = card.icon;
-              return (
-                <div key={card.step} className="surface-card p-5 space-y-3 border border-[var(--border)] bg-[var(--surface)] flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-mono">
-                      <span className="font-bold text-[var(--brand)]">{card.step}</span>
-                      <span className="text-[var(--text-muted)]">{card.code}</span>
-                    </div>
-                    <h3 className="text-base font-bold font-serif text-[var(--text-primary)] tracking-tight">{card.title}</h3>
-                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{card.desc}</p>
-                  </div>
-                  <div className="pt-3 border-t border-[var(--border)] flex items-center justify-between">
-                    <Icon className="w-4 h-4 text-[var(--brand)]" />
-                    <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold uppercase">READY</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          5. SECTION: CITIZEN REPORTING WIRE (#citizen-network)
-          ───────────────────────────────────────────────────────────── */}
-      <section id="citizen-network" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-[var(--border)] bg-[var(--surface-elevated)]">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-
-          <div className="lg:col-span-6 space-y-5">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-[var(--brand)] uppercase tracking-wider">
-              <Radio className="w-3.5 h-3.5" />
-              <span>// SECTION 04 · CIVIC TELEMETRY WIRE</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
-              Every citizen report feeds the city picture
-            </h2>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-              When waterlogging occurs on underpasses or arterial culverts, citizens can lodge instant geotagged reports with optional photo proof. Our PostGIS engine maps coordinates to the exact municipal ward in milliseconds.
-            </p>
-
-            <div className="space-y-2 text-xs text-[var(--text-secondary)] font-mono">
-              <div className="flex items-center gap-2 p-2.5 bg-[var(--surface)] border border-[var(--border)]">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>Zero registration required for civic submissions</span>
-              </div>
-              <div className="flex items-center gap-2 p-2.5 bg-[var(--surface)] border border-[var(--border)]">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>Instant Socket.IO real-time broadcast to MCD dispatchers</span>
-              </div>
-              <div className="flex items-center gap-2 p-2.5 bg-[var(--surface)] border border-[var(--border)]">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>Photo proof capture with verified timestamp telemetry</span>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <Link
-                to="/report"
-                className="py-2.5 px-5 bg-[var(--brand)] hover:opacity-90 text-white text-xs font-semibold inline-flex items-center gap-2 no-underline transition-opacity cursor-pointer shadow-sm"
-              >
-                <Camera className="w-3.5 h-3.5" />
-                <span>Submit Waterlogging Incident Report</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Sample Live Civic Feed Card */}
-          <div className="lg:col-span-6 surface-card p-5 border border-[var(--border)] space-y-4 bg-[var(--surface)]">
-            <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                Live Incident Wire Sample
-              </span>
-              <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>LIVE TELEMETRY</span>
-              </span>
-            </div>
-
-            <div className="space-y-3 font-mono text-xs">
-              <div className="p-3 bg-[var(--surface-soft)] border border-[var(--border)] space-y-1.5">
-                <div className="flex justify-between items-center text-[var(--brand)] font-bold">
-                  <span>WARD 056 · CONNAUGHT PLACE</span>
-                  <span className="px-1.5 py-0.5 text-[10px] bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30">
-                    45 CM DEPTH · CRITICAL
-                  </span>
-                </div>
-                <p className="text-[11px] text-[var(--text-secondary)] font-sans">
-                  Minto Bridge underpass heavy water accumulation, traffic diverted via Connaught Circus.
-                </p>
-                <div className="flex justify-between items-center text-[10px] text-[var(--text-muted)] pt-1 border-t border-[var(--border)]">
-                  <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold">
-                    <Camera className="w-3 h-3" />
-                    <span>Photo proof attached</span>
-                  </span>
-                  <span>14 min ago</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-[var(--surface-soft)] border border-[var(--border)] space-y-1.5">
-                <div className="flex justify-between items-center text-[var(--brand)] font-bold">
-                  <span>WARD 012 · BURARI</span>
-                  <span className="px-1.5 py-0.5 text-[10px] bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
-                    25 CM DEPTH · HIGH
-                  </span>
-                </div>
-                <p className="text-[11px] text-[var(--text-secondary)] font-sans">
-                  Main stormwater culvert blocked with debris near Ring Road exit. Runoff backing up.
-                </p>
-                <div className="flex justify-between items-center text-[10px] text-[var(--text-muted)] pt-1 border-t border-[var(--border)]">
-                  <span>GPS: 28.7612° N, 77.1944° E</span>
-                  <span>32 min ago</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          6. SECTION: MISSION-CRITICAL ENGINEERING TOLERANCES
-          ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="max-w-2xl space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-[var(--brand)] uppercase tracking-wider">
-              <Server className="w-3.5 h-3.5" />
-              <span>// SECTION 05 · TECHNICAL SPECIFICATIONS & TOLERANCES</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
-              Mission-critical engineering tolerances
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 font-mono text-xs">
-            <div className="p-3 bg-[var(--surface)] border border-[var(--border)] space-y-1">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase">SPATIAL ENGINE</div>
-              <div className="font-bold text-[var(--text-primary)]">PostGIS 16</div>
-              <div className="text-[10px] text-cyan-700 dark:text-cyan-400">SRID: 4326 WGS84</div>
-            </div>
-
-            <div className="p-3 bg-[var(--surface)] border border-[var(--border)] space-y-1">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase">FORMULA ENGINE</div>
-              <div className="font-bold text-[var(--text-primary)]">Mass-Balance</div>
-              <div className="text-[10px] text-emerald-700 dark:text-emerald-400">Deterministic W1-3</div>
-            </div>
-
-            <div className="p-3 bg-[var(--surface)] border border-[var(--border)] space-y-1">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase">WEATHER SENSORS</div>
-              <div className="font-bold text-[var(--text-primary)]">Open-Meteo</div>
-              <div className="text-[10px] text-cyan-700 dark:text-cyan-400">15-Min Ingestion</div>
-            </div>
-
-            <div className="p-3 bg-[var(--surface)] border border-[var(--border)] space-y-1">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase">DUPLEX WIRE</div>
-              <div className="font-bold text-[var(--text-primary)]">Socket.IO v4</div>
-              <div className="text-[10px] text-emerald-700 dark:text-emerald-400">&lt; 50ms Broadcast</div>
-            </div>
-
-            <div className="p-3 bg-[var(--surface)] border border-[var(--border)] space-y-1">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase">OFFLINE FALLBACK</div>
-              <div className="font-bold text-[var(--text-primary)]">Zero-Crash</div>
-              <div className="text-[10px] text-amber-700 dark:text-amber-400">In-Memory Cache</div>
-            </div>
-
-            <div className="p-3 bg-[var(--surface)] border border-[var(--border)] space-y-1">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase">LOOKUP LATENCY</div>
-              <div className="font-bold text-[var(--text-primary)]">&lt; 25 ms</div>
-              <div className="text-[10px] text-emerald-700 dark:text-emerald-400">Indexed Containment</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          7. SECTION: CLOSING MISSION COMMAND CALL TO ACTION
-          ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--surface-elevated)] to-[var(--bg)] text-center relative overflow-hidden border-b border-[var(--border)]">
-        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-          <div className="w-14 h-14 bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/20 flex items-center justify-center mx-auto">
-            <Waves className="w-7 h-7" />
-          </div>
-
-          <div className="space-y-2">
-            <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
-              When the rain changes,
-              <br />
-              <span className="italic text-[var(--brand)]">PRAVAH changes with it.</span>
-            </h2>
-            <p className="max-w-xl mx-auto text-xs sm:text-sm text-[var(--text-secondary)]">
-              Unified command for municipal engineers, disaster response officers, and citizens across the National Capital Territory of Delhi.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[var(--bg)] text-center border-b border-[var(--border)]">
+        <div className="max-w-2xl mx-auto space-y-4">
+          <h2 className="text-2xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
+            Ready to explore Delhi flood intelligence?
+          </h2>
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+            Unified command for municipal engineers, disaster response officers, and citizens.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               to="/dashboard"
               className="py-2.5 px-6 bg-[var(--brand)] hover:opacity-90 text-white text-xs font-semibold flex items-center gap-2 no-underline transition-opacity cursor-pointer shadow-sm"
             >
-              <span>[01] Enter City Intelligence</span>
+              <span>Enter Operations Console</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
             <Link
               to="/incidents"
               className="py-2.5 px-5 bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--text-primary)] text-xs font-medium border border-[var(--border)] no-underline transition-colors"
             >
-              <span>[02] Emergency Incident Center</span>
-            </Link>
-            <Link
-              to="/admin"
-              className="py-2.5 px-4 bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-medium border border-[var(--border)] no-underline transition-colors"
-            >
-              <span>[03] Admin Portal</span>
+              <span>Emergency Incident Center</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          8. DEDICATED COMPREHENSIVE FOOTER
-          ───────────────────────────────────────────────────────────── */}
+      {/* Global Footer */}
       <Footer />
 
     </div>
