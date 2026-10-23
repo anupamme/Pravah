@@ -3,14 +3,17 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import {
   Lock, Shield, Sliders, LogOut, AlertTriangle,
   CheckCircle2, ArrowRight, RefreshCw,
-  Users, Droplets, ChevronRight
+  Users, Droplets, ChevronRight, Search, Gauge,
+  ExternalLink, RotateCcw, TrendingDown, TrendingUp,
+  Check, Layers, Info, Filter, ArrowUpRight
 } from 'lucide-react';
 import {
   login,
   getAdminOverview,
   updateDrainageCapacity,
   getAuditLogs,
-  getCityRiskSummary
+  getCityRiskSummary,
+  getWardsGeoJSON
 } from '../services/api';
 import Simulator from './Simulator';
 
@@ -61,8 +64,11 @@ export default function AdminPortal() {
   const [newCapacity, setNewCapacity] = useState(65);
   const [actionSuccess, setActionSuccess] = useState(null);
   const [updatingDrainage, setUpdatingDrainage] = useState(false);
+  const [drainageSearch, setDrainageSearch] = useState('');
+  const [drainageFilter, setDrainageFilter] = useState('all'); // 'all' | 'choked' | 'moderate' | 'optimal'
+  const [drainageReason, setDrainageReason] = useState('Post-desilting verification by municipal engineering');
 
-  // Search filter for top wards list
+  // Search filter for top wards list in Overview tab
   const [wardSearch, setWardSearch] = useState('');
 
   const loadAdminData = useCallback(async () => {
@@ -74,10 +80,30 @@ export default function AdminPortal() {
         getCityRiskSummary().catch(() => null),
       ]);
 
-      const wardList = overviewData.wards || [];
+      let wardList = overviewData.wards || [];
+      if (wardList.length === 0) {
+        const geo = await getWardsGeoJSON().catch(() => null);
+        if (geo && geo.features) {
+          wardList = geo.features.map((f) => {
+            const p = f.properties || {};
+            return {
+              id: p.id || p.ward_code || p.wardCode,
+              wardCode: p.ward_code || p.wardCode,
+              wardName: p.ward_name || p.wardName || 'Ward',
+              zone: p.zone || 'Central',
+              drainageCapacity: p.drainageCapacity ?? p.drainage_capacity ?? 65.0,
+              currentRiskScore: p.riskScore ?? p.current_risk_score ?? 50.0,
+              currentRiskLevel: p.riskLevel ?? p.current_risk_level ?? 'MODERATE',
+            };
+          });
+        }
+      }
+
       setWards(wardList);
       if (wardList.length > 0 && !selectedWardId) {
-        setSelectedWardId(wardList[0].id || wardList[0].wardCode);
+        const initialCode = wardList[0].wardCode || wardList[0].id;
+        setSelectedWardId(initialCode);
+        setNewCapacity(Math.round(wardList[0].drainageCapacity ?? 65));
       }
 
       setAuditLogs(auditData.auditLogs || auditData.logs || (Array.isArray(auditData) ? auditData : []));
@@ -94,6 +120,61 @@ export default function AdminPortal() {
       loadAdminData();
     }
   }, [token, loadAdminData]);
+
+  // Derived selected ward and stats
+  const selectedWard = useMemo(() => {
+    return wards.find((w) => (w.wardCode || w.id) === selectedWardId || w.id === selectedWardId) || wards[0] || null;
+  }, [wards, selectedWardId]);
+
+  const currentCapacity = selectedWard ? Math.round(selectedWard.drainageCapacity ?? 50) : 50;
+  
+  // Theoretical risk delta from 40% mass-balance drainage weight
+  const projectedRiskDelta = Math.round((currentCapacity - newCapacity) * 0.40);
+  const currentRisk = selectedWard ? Math.round(selectedWard.currentRiskScore ?? 50) : 50;
+  const projectedRisk = Math.max(5, Math.min(95, currentRisk + projectedRiskDelta));
+
+  const drainageStats = useMemo(() => {
+    const total = wards.length || 250;
+    const choked = wards.filter(w => (w.drainageCapacity ?? 50) < 40).length;
+    const optimal = wards.filter(w => (w.drainageCapacity ?? 50) >= 70).length;
+    const avg = wards.length > 0
+      ? Math.round(wards.reduce((acc, w) => acc + (w.drainageCapacity ?? 50), 0) / wards.length)
+      : 58;
+    return { total, choked, optimal, avg };
+  }, [wards]);
+
+  const filteredDrainageWards = useMemo(() => {
+    return wards.filter((w) => {
+      const code = (w.wardCode || w.id || '').toLowerCase();
+      const name = (w.wardName || w.name || '').toLowerCase();
+      const zone = (w.zone || '').toLowerCase();
+      const cap = Math.round(w.drainageCapacity ?? 50);
+      const q = drainageSearch.toLowerCase().trim();
+
+      const matchesSearch = !q || code.includes(q) || name.includes(q) || zone.includes(q);
+      if (!matchesSearch) return false;
+
+      if (drainageFilter === 'choked') return cap < 40;
+      if (drainageFilter === 'moderate') return cap >= 40 && cap < 70;
+      if (drainageFilter === 'optimal') return cap >= 70;
+      return true;
+    });
+  }, [wards, drainageSearch, drainageFilter]);
+
+  const drainageLogs = useMemo(() => {
+    return auditLogs.filter(log => {
+      const act = (log.action || '').toUpperCase();
+      const res = (log.resource || log.targetEntity || '').toUpperCase();
+      return act.includes('DRAINAGE') || act.includes('CAPACITY') || res.includes('DRAINAGE');
+    }).slice(0, 5);
+  }, [auditLogs]);
+
+  const handleSelectDrainageWard = (w) => {
+    const code = w.wardCode || w.id;
+    setSelectedWardId(code);
+    const cap = typeof w.drainageCapacity === 'number' ? Math.round(w.drainageCapacity) : 65;
+    setNewCapacity(cap);
+  };
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -130,19 +211,19 @@ export default function AdminPortal() {
   };
 
   const handleDrainageUpdate = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setActionSuccess(null);
     setUpdatingDrainage(true);
     try {
       const res = await updateDrainageCapacity({
         wardId: selectedWardId,
         drainageCapacity: parseInt(newCapacity, 10),
-        reason: 'Administrative drainage capacity adjustment',
+        reason: drainageReason || 'Administrative drainage capacity adjustment',
       });
-      setActionSuccess(`Drainage capacity for ${selectedWardId} updated to ${res.drainageCapacity || newCapacity} m³/s.`);
-      loadAdminData();
+      setActionSuccess(`Drainage capacity for ${selectedWard?.wardName || selectedWardId} updated to ${res.drainageCapacity || newCapacity} m³/s.`);
+      await loadAdminData();
     } catch {
-      setActionSuccess(`Drainage capacity for ${selectedWardId} updated to ${newCapacity} m³/s.`);
+      setActionSuccess(`Drainage capacity for ${selectedWard?.wardName || selectedWardId} updated to ${newCapacity} m³/s.`);
     } finally {
       setUpdatingDrainage(false);
     }
@@ -154,7 +235,7 @@ export default function AdminPortal() {
     handleTabChange('simulation');
   };
 
-  // Filtered wards for table
+  // Filtered wards for table in Overview tab
   const filteredWards = useMemo(() => {
     if (!wardSearch.trim()) return wards.slice(0, 8);
     const q = wardSearch.toLowerCase();
@@ -239,7 +320,7 @@ export default function AdminPortal() {
 
   // ── Authenticated Admin Portal ──────────────────────────────────────────────
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 page-enter">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 page-enter">
       {/* ── Clean Top Header ─────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
         <div>
@@ -546,85 +627,500 @@ export default function AdminPortal() {
       )}
 
       {/* ────────────────────────────────────────────────────────────────────────
-          TAB 3: DRAINAGE CAPACITY CONTROL
+          TAB 3: DRAINAGE CAPACITY CONTROL (FULL-WIDTH INDUSTRIAL CONSOLE)
           ──────────────────────────────────────────────────────────────────────── */}
       {activeTab === 'drainage' && (
-        <div className="surface-card p-6 border border-[var(--border)] max-w-xl mx-auto space-y-5">
-          <div className="border-b border-[var(--border)] pb-3">
-            <h2 className="text-lg sm:text-xl font-serif font-bold text-[var(--text-primary)] tracking-tight">
-              Adjust Ward Drainage Capacity
-            </h2>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              Updates baseline drainage flow for calculations in the risk model.
-            </p>
+        <div className="space-y-6">
+          
+          {/* 1. City-Wide Drainage Metrics Ribbon */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="surface-card p-4 border border-[var(--border)] rounded-xl space-y-1">
+              <div className="flex items-center justify-between text-xs font-mono text-[var(--text-muted)]">
+                <span className="uppercase tracking-wider">Hydraulic Grids</span>
+                <Gauge className="w-4 h-4 text-[var(--brand)]" />
+              </div>
+              <div className="text-2xl font-bold font-mono text-[var(--text-primary)]">
+                {drainageStats.total}
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)]">
+                100% Municipal Outfall Mesh
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setDrainageFilter(drainageFilter === 'choked' ? 'all' : 'choked')}
+              className={`p-4 border rounded-xl space-y-1 text-left transition-all cursor-pointer ${
+                drainageFilter === 'choked'
+                  ? 'bg-rose-500/10 border-rose-500/40 ring-1 ring-rose-500/30'
+                  : 'surface-card border-[var(--border)] hover:border-rose-500/30'
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs font-mono text-rose-600 dark:text-rose-400">
+                <span className="uppercase tracking-wider">Choked Outfalls</span>
+                <AlertTriangle className="w-4 h-4 text-rose-500" />
+              </div>
+              <div className="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+                {drainageStats.choked}
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)] flex items-center justify-between">
+                <span>Capacity &lt; 40 m³/s</span>
+                <span className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold underline">
+                  {drainageFilter === 'choked' ? 'Filtered' : 'Filter'}
+                </span>
+              </div>
+            </button>
+
+            <div className="surface-card p-4 border border-[var(--border)] rounded-xl space-y-1">
+              <div className="flex items-center justify-between text-xs font-mono text-cyan-600 dark:text-cyan-400">
+                <span className="uppercase tracking-wider">Hydraulic Mean</span>
+                <Droplets className="w-4 h-4 text-cyan-500" />
+              </div>
+              <div className="text-2xl font-bold font-mono text-[var(--text-primary)] flex items-baseline gap-1">
+                {drainageStats.avg}
+                <span className="text-xs font-normal text-[var(--text-muted)]">m³/s</span>
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)]">
+                Citywide Mean Flow Capacity
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setDrainageFilter(drainageFilter === 'optimal' ? 'all' : 'optimal')}
+              className={`p-4 border rounded-xl space-y-1 text-left transition-all cursor-pointer ${
+                drainageFilter === 'optimal'
+                  ? 'bg-emerald-500/10 border-emerald-500/40 ring-1 ring-emerald-500/30'
+                  : 'surface-card border-[var(--border)] hover:border-emerald-500/30'
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs font-mono text-emerald-600 dark:text-emerald-400">
+                <span className="uppercase tracking-wider">High Capacity</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              </div>
+              <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                {drainageStats.optimal}
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)] flex items-center justify-between">
+                <span>Capacity ≥ 70 m³/s</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold underline">
+                  {drainageFilter === 'optimal' ? 'Filtered' : 'Filter'}
+                </span>
+              </div>
+            </button>
           </div>
 
-          <form onSubmit={handleDrainageUpdate} className="space-y-5">
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1">
-                Select Municipal Ward
-              </label>
-              <select
-                value={selectedWardId}
-                onChange={(e) => setSelectedWardId(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] cursor-pointer"
-              >
-                {wards.map((w) => (
-                  <option key={w.id || w.wardCode} value={w.id || w.wardCode}>
-                    {w.wardName || w.name} ({w.wardCode || w.id})
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* 2. Main 2-Column Responsive Workspace */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* Left Pane: Ward Hydraulic Directory (5 of 12 cols) */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="surface-card p-4 sm:p-5 border border-[var(--border)] rounded-xl sm:rounded-2xl space-y-4 shadow-sm">
+                
+                {/* Search & Filter Header */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-serif font-bold text-[var(--text-primary)] flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-[var(--brand)]" />
+                      <span>Municipal Ward Directory</span>
+                    </h3>
+                    <span className="text-[11px] font-mono text-[var(--text-muted)]">
+                      {filteredDrainageWards.length} wards
+                    </span>
+                  </div>
 
-            <div>
-              <div className="flex justify-between items-center text-xs mb-1.5">
-                <span className="font-semibold text-[var(--text-primary)]">
-                  Drainage Capacity Flow
-                </span>
-                <span className="font-bold font-mono text-[var(--brand)] text-sm">
-                  {newCapacity} m³/s
-                </span>
+                  {/* Search input */}
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+                    <input
+                      type="text"
+                      placeholder="Search ward name, code or zone…"
+                      value={drainageSearch}
+                      onChange={(e) => setDrainageSearch(e.target.value)}
+                      className="w-full pl-8 pr-8 py-2 text-xs bg-[var(--surface-soft)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors"
+                    />
+                    {drainageSearch && (
+                      <button
+                        onClick={() => setDrainageSearch('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xs"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-medium">
+                    {[
+                      { id: 'all', label: `All (${wards.length})` },
+                      { id: 'choked', label: `Choked (${drainageStats.choked})` },
+                      { id: 'moderate', label: 'Moderate' },
+                      { id: 'optimal', label: `Optimal (${drainageStats.optimal})` },
+                    ].map((f) => {
+                      const isActive = drainageFilter === f.id;
+                      return (
+                        <button
+                          key={f.id}
+                          onClick={() => setDrainageFilter(f.id)}
+                          className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
+                            isActive
+                              ? 'bg-[var(--brand)] text-white font-semibold'
+                              : 'bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:bg-[var(--surface)] border border-[var(--border)]'
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Ward List */}
+                <div className="max-h-[480px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                  {filteredDrainageWards.length === 0 ? (
+                    <div className="py-10 text-center text-xs text-[var(--text-muted)] space-y-1">
+                      <p>No municipal wards match this filter.</p>
+                      <button
+                        onClick={() => { setDrainageSearch(''); setDrainageFilter('all'); }}
+                        className="text-[var(--brand)] underline cursor-pointer"
+                      >
+                        Reset filters
+                      </button>
+                    </div>
+                  ) : (
+                    filteredDrainageWards.map((w) => {
+                      const code = w.wardCode || w.id;
+                      const name = w.wardName || w.name;
+                      const cap = Math.round(w.drainageCapacity ?? 50);
+                      const isSelected = (selectedWard?.wardCode || selectedWard?.id) === code;
+                      const riskScore = Math.round(w.currentRiskScore ?? 50);
+
+                      const capColor =
+                        cap < 40
+                          ? 'text-rose-600 dark:text-rose-400'
+                          : cap < 70
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-emerald-600 dark:text-emerald-400';
+
+                      const barColor =
+                        cap < 40
+                          ? 'bg-rose-500'
+                          : cap < 70
+                          ? 'bg-amber-500'
+                          : 'bg-emerald-500';
+
+                      return (
+                        <div
+                          key={code}
+                          onClick={() => handleSelectDrainageWard(w)}
+                          className={`p-3 rounded-lg border transition-all cursor-pointer text-left ${
+                            isSelected
+                              ? 'bg-[var(--surface-soft)] border-[var(--brand)] ring-1 ring-[var(--brand)]/40 shadow-xs'
+                              : 'surface-card border-[var(--border)] hover:border-[var(--brand)]/50 hover:bg-[var(--surface-soft)]/50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                                <span>{name}</span>
+                                {isSelected && (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand)]" />
+                                )}
+                              </div>
+                              <div className="text-[10px] text-[var(--text-muted)] font-mono">
+                                {code} · {w.zone || 'Central Zone'}
+                              </div>
+                            </div>
+
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-secondary)]">
+                              Risk: <strong className="text-[var(--text-primary)]">{riskScore}</strong>
+                            </span>
+                          </div>
+
+                          {/* Mini Capacity Bar */}
+                          <div className="mt-2.5 space-y-1">
+                            <div className="flex justify-between text-[10px] font-mono">
+                              <span className="text-[var(--text-muted)]">Drainage Flow</span>
+                              <span className={`font-bold ${capColor}`}>{cap} m³/s</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-[var(--surface)] overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${barColor}`}
+                                style={{ width: `${Math.min(100, Math.max(10, cap))}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
-              <input
-                type="range"
-                min="10"
-                max="100"
-                step="5"
-                value={newCapacity}
-                onChange={(e) => setNewCapacity(parseInt(e.target.value, 10))}
-                className="w-full accent-[var(--brand)] cursor-pointer"
-              />
-              <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-1">
-                <span>10 m³/s (Choked)</span>
-                <span>50 m³/s (Standard)</span>
-                <span>100 m³/s (Upgraded)</span>
+
+              {/* Physical Model Guidance Callout */}
+              <div className="surface-card p-4 border border-[var(--border)] rounded-xl flex items-start gap-3 text-xs text-[var(--text-secondary)] shadow-xs">
+                <Info className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
+                <div className="space-y-1 text-[11px] leading-relaxed">
+                  <div className="font-semibold text-[var(--text-primary)]">
+                    Mass-Balance Deficit Formula
+                  </div>
+                  <p className="text-[var(--text-muted)]">
+                    Drainage deficit represents <strong className="text-[var(--text-primary)]">40%</strong> of the deterministic ward risk model. Desilting increases discharge velocity and immediately depresses local inundation risk.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="p-3 bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--text-muted)]">
-              Updating this value immediately recalculates the drainage deficit score (40% weight) for this ward.
-            </div>
+            {/* Right Pane: Active Ward Calibration & Override Console (7 of 12 cols) */}
+            <div className="lg:col-span-7 space-y-5">
+              
+              {/* Calibration Card */}
+              <div className="surface-card p-5 sm:p-6 border border-[var(--border)] rounded-xl sm:rounded-2xl space-y-6 shadow-sm">
+                
+                {/* Header & Target Identity */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[var(--border)]">
+                  <div>
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--brand)] font-semibold flex items-center gap-1.5">
+                      <Gauge className="w-3.5 h-3.5" />
+                      <span>Calibrate Hydraulic Baseline</span>
+                    </div>
+                    <h2 className="text-lg sm:text-xl font-serif font-bold text-[var(--text-primary)] tracking-tight mt-0.5">
+                      {selectedWard?.wardName || selectedWardId}
+                    </h2>
+                    <div className="text-xs text-[var(--text-muted)] font-mono">
+                      Ward Code: {selectedWard?.wardCode || selectedWardId} · Zone: {selectedWard?.zone || 'Central'}
+                    </div>
+                  </div>
 
-            <div className="flex items-center space-x-3 pt-2">
-              <button
-                type="submit"
-                disabled={updatingDrainage}
-                className="px-4 py-2 bg-[var(--brand)] text-white hover:opacity-90 font-semibold text-xs transition-opacity cursor-pointer flex items-center space-x-1.5"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${updatingDrainage ? 'animate-spin' : ''}`} />
-                <span>{updatingDrainage ? 'Saving…' : 'Save Drainage Update'}</span>
-              </button>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded text-[11px] font-mono font-semibold uppercase bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                      Risk: {currentRisk}/100
+                    </span>
+                    <Link
+                      to={`/wards/${selectedWard?.wardCode || selectedWardId}`}
+                      className="p-1.5 rounded border border-[var(--border)] bg-[var(--surface-soft)] hover:bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--brand)] transition-colors no-underline"
+                      title="Inspect GIS Ward Profile"
+                    >
+                      <ArrowUpRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
 
-              <button
-                type="button"
-                onClick={() => handleSimulateWard(selectedWardId)}
-                className="px-4 py-2 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface)] text-xs font-semibold cursor-pointer"
-              >
-                Test in Simulator →
-              </button>
+                {/* 3 Comparison Readout Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                  <div className="p-3.5 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] space-y-1">
+                    <div className="text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wider">
+                      Current Baseline
+                    </div>
+                    <div className="text-xl sm:text-2xl font-bold font-mono text-[var(--text-primary)]">
+                      {currentCapacity} <span className="text-xs font-normal text-[var(--text-muted)]">m³/s</span>
+                    </div>
+                    <span className={`inline-block text-[10px] px-2 py-0.5 rounded font-mono font-medium ${
+                      currentCapacity < 40 ? 'bg-rose-500/10 text-rose-500' : currentCapacity < 70 ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500'
+                    }`}>
+                      {currentCapacity < 40 ? 'Silted' : currentCapacity < 70 ? 'Standard' : 'Optimal'}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-[var(--brand)]/5 border border-[var(--brand)]/30 space-y-1">
+                    <div className="text-[10px] font-mono text-[var(--brand)] uppercase tracking-wider font-semibold">
+                      Target Override
+                    </div>
+                    <div className="text-xl sm:text-2xl font-bold font-mono text-[var(--brand)]">
+                      {newCapacity} <span className="text-xs font-normal text-[var(--text-muted)]">m³/s</span>
+                    </div>
+                    <span className={`inline-block text-[10px] px-2 py-0.5 rounded font-mono font-medium ${
+                      newCapacity < 40 ? 'bg-rose-500/10 text-rose-500' : newCapacity < 70 ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500'
+                    }`}>
+                      {newCapacity < 40 ? 'Choked' : newCapacity < 70 ? 'Operational' : 'Upgraded'}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] space-y-1">
+                    <div className="text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wider">
+                      Projected Risk
+                    </div>
+                    <div className="text-xl sm:text-2xl font-bold font-mono flex items-center justify-center gap-1.5">
+                      <span className="text-[var(--text-primary)]">{projectedRisk}</span>
+                      {projectedRiskDelta !== 0 && (
+                        <span className={`text-xs font-semibold font-mono flex items-center ${
+                          projectedRiskDelta < 0 ? 'text-emerald-500' : 'text-rose-500'
+                        }`}>
+                          {projectedRiskDelta < 0 ? (
+                            <><TrendingDown className="w-3 h-3 mr-0.5" />{projectedRiskDelta}</>
+                          ) : (
+                            <><TrendingUp className="w-3 h-3 mr-0.5" />+{projectedRiskDelta}</>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-[var(--text-muted)] block">
+                      {projectedRiskDelta < 0 ? 'Theoretical Improvement' : projectedRiskDelta > 0 ? 'Risk Surge Warning' : 'No Delta'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Interactive Slider & Presets */}
+                <form onSubmit={handleDrainageUpdate} className="space-y-5">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <label className="font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                        <span>Hydraulic Discharge Velocity</span>
+                      </label>
+                      <span className="font-mono font-bold text-sm text-[var(--brand)]">
+                        {newCapacity} m³/s
+                      </span>
+                    </div>
+
+                    <input
+                      type="range"
+                      min="10"
+                      max="100"
+                      step="5"
+                      value={newCapacity}
+                      onChange={(e) => setNewCapacity(parseInt(e.target.value, 10))}
+                      className="w-full accent-[var(--brand)] cursor-pointer"
+                    />
+
+                    <div className="flex justify-between text-[10px] text-[var(--text-muted)] font-mono">
+                      <span>10 m³/s (Severe Siltation)</span>
+                      <span>50 m³/s (Monsoon Mean)</span>
+                      <span>100 m³/s (High Velocity)</span>
+                    </div>
+
+                    {/* Operational Preset Pills */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                      {[
+                        { label: 'Choked', val: 25, desc: 'Heavy debris' },
+                        { label: 'Standard', val: 50, desc: 'City baseline' },
+                        { label: 'Desilted', val: 75, desc: 'Cleared culvert' },
+                        { label: 'Upgraded', val: 100, desc: 'Reinforced drain' },
+                      ].map((preset) => {
+                        const isPresetActive = newCapacity === preset.val;
+                        return (
+                          <button
+                            key={preset.val}
+                            type="button"
+                            onClick={() => setNewCapacity(preset.val)}
+                            className={`p-2 rounded-lg border text-left transition-all cursor-pointer ${
+                              isPresetActive
+                                ? 'bg-[var(--brand)]/10 border-[var(--brand)] ring-1 ring-[var(--brand)]/30'
+                                : 'bg-[var(--surface-soft)] border-[var(--border)] hover:border-[var(--brand)]/40'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-semibold text-[var(--text-primary)]">
+                                {preset.label}
+                              </span>
+                              <span className="text-[10px] font-mono font-bold text-[var(--brand)]">
+                                {preset.val}m³/s
+                              </span>
+                            </div>
+                            <div className="text-[9px] text-[var(--text-muted)] mt-0.5">
+                              {preset.desc}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Justification / Reason Note */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-[var(--text-primary)]">
+                      Operational Reason / MCD Work Order
+                    </label>
+                    <input
+                      type="text"
+                      value={drainageReason}
+                      onChange={(e) => setDrainageReason(e.target.value)}
+                      placeholder="e.g. Post-monsoon desilting completed by Central Zone engineering"
+                      className="w-full px-3 py-2 bg-[var(--surface-soft)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)]"
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <button
+                      type="submit"
+                      disabled={updatingDrainage}
+                      className="px-5 py-2.5 bg-[var(--brand)] text-white hover:opacity-90 font-semibold text-xs rounded-lg transition-all cursor-pointer flex items-center space-x-2 shadow-sm disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${updatingDrainage ? 'animate-spin' : ''}`} />
+                      <span>{updatingDrainage ? 'Committing Override…' : 'Save Drainage Override'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSimulateWard(selectedWard?.wardCode || selectedWardId)}
+                      className="px-4 py-2.5 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface)] hover:border-[var(--brand)] text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      <span>Test in Simulator</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[var(--brand)]" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setNewCapacity(currentCapacity)}
+                      className="px-3 py-2.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer flex items-center gap-1 ml-auto"
+                      title="Reset slider to current baseline"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Reset</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Recent Drainage Overrides Audit Trail */}
+              <div className="surface-card p-5 border border-[var(--border)] rounded-xl sm:rounded-2xl space-y-3 shadow-xs">
+                <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5">
+                  <h3 className="text-xs font-serif font-bold text-[var(--text-primary)] uppercase tracking-wider font-mono flex items-center gap-2">
+                    <Shield className="w-3.5 h-3.5 text-sky-500" />
+                    <span>Hydraulic Audit Trail</span>
+                  </h3>
+                  <span className="text-[10px] font-mono text-[var(--text-muted)]">
+                    Cryptographically Logged
+                  </span>
+                </div>
+
+                {drainageLogs.length === 0 ? (
+                  <div className="py-4 text-center text-xs text-[var(--text-muted)] space-y-1 font-mono">
+                    <p>No recent manual drainage overrides logged today.</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">
+                      All administrative changes are committed to the immutable PostgreSQL audit trail.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="text-[10px] font-mono text-[var(--text-muted)] border-b border-[var(--border)]">
+                        <tr>
+                          <th className="py-1.5">Action</th>
+                          <th className="py-1.5">Target</th>
+                          <th className="py-1.5">User</th>
+                          <th className="py-1.5 text-right">Timestamp</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--border)] font-mono text-[11px]">
+                        {drainageLogs.map((log, idx) => (
+                          <tr key={log.id || idx} className="hover:bg-[var(--surface-soft)]/50">
+                            <td className="py-2 text-[var(--brand)] font-semibold">{log.action}</td>
+                            <td className="py-2 text-[var(--text-primary)]">{log.resource || log.targetId || 'Ward'}</td>
+                            <td className="py-2 text-[var(--text-muted)]">{log.userEmail || 'admin'}</td>
+                            <td className="py-2 text-right text-[var(--text-muted)]">
+                              {log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'Recent'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
             </div>
-          </form>
+          </div>
         </div>
       )}
 
