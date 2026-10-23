@@ -8,9 +8,18 @@ export default function ThemeToggle() {
   });
 
   useEffect(() => {
+    const active = document.documentElement.dataset.theme || localStorage.getItem('pravah-theme') || 'dark';
+    document.documentElement.dataset.theme = active;
+    document.documentElement.classList.toggle('dark', active === 'dark');
+    document.documentElement.classList.toggle('light', active === 'light');
+    setTheme(active);
+
     const handleSync = () => {
-      const active = document.documentElement.dataset.theme || localStorage.getItem('pravah-theme') || 'dark';
-      setTheme(active);
+      const current = document.documentElement.dataset.theme || localStorage.getItem('pravah-theme') || 'dark';
+      document.documentElement.dataset.theme = current;
+      document.documentElement.classList.toggle('dark', current === 'dark');
+      document.documentElement.classList.toggle('light', current === 'light');
+      setTheme(current);
     };
 
     window.addEventListener('storage', handleSync);
@@ -26,6 +35,8 @@ export default function ThemeToggle() {
     e?.stopPropagation();
     const next = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
+    document.documentElement.classList.toggle('dark', next === 'dark');
+    document.documentElement.classList.toggle('light', next === 'light');
     try {
       localStorage.setItem('pravah-theme', next);
     } catch {
