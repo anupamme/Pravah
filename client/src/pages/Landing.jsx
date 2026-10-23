@@ -8,7 +8,10 @@ import {
   AlertTriangle,
   CloudRain,
   ChevronDown,
+  CheckCircle2,
   Sliders,
+  Layers,
+  Radio,
   Eye,
   Search,
   Filter,
@@ -79,9 +82,9 @@ export default function Landing() {
       {/* ─────────────────────────────────────────────────────────────
           1. HERO SECTION: 3D MOTION EARTH OBSERVATORY
           ───────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[92vh] w-full flex flex-col justify-between pt-24 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden select-none bg-black">
+      <section className="relative min-h-[92vh] sm:min-h-screen w-full flex flex-col justify-between pt-24 pb-10 px-4 sm:px-6 lg:px-8 overflow-hidden select-none bg-black">
 
-        {/* 3D Motion Earth Video Viewport — Crystal Clear, Bright & Unobstructed */}
+        {/* 3D Motion Earth Video — Crystal Clear, Bright & Unobstructed */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <video
             autoPlay
@@ -91,14 +94,14 @@ export default function Landing() {
             className="w-full h-full object-cover object-center scale-[1.02]"
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
           />
-          {/* Gentle Directional Shadow for Text Contrast — Rotating Earth on the right shines bright */}
+          {/* Gentle Directional Shadow for Text Contrast — Rotating Earth on the right stays 100% luminous */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/35 to-transparent pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
         </div>
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
-          {/* Left Column: Focused & Breathable */}
+          {/* Left Column: Authoritative Editorial & Breathable Composition */}
           <div className="lg:col-span-8 space-y-6 text-left max-w-xl">
             {/* Pill Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
@@ -107,7 +110,7 @@ export default function Landing() {
             </div>
 
             {/* Authoritative Headline */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-[78px] font-serif text-white tracking-tight leading-[0.96]">
+            <h1 className="font-instrument text-white text-4xl sm:text-6xl lg:text-7xl xl:text-[80px] leading-[0.95] tracking-tight text-glow">
               Know the risk.
               <br />
               <span className="italic font-light text-cyan-200">
@@ -117,7 +120,7 @@ export default function Landing() {
 
             {/* Concise One-Sentence Punchline */}
             <p className="text-sm sm:text-base text-white/85 leading-relaxed font-normal max-w-lg">
-              Real-time municipal flood monitoring, explainable risk intelligence, and emergency dispatch across Delhi.
+              Real-time municipal flood monitoring, explainable risk intelligence, and emergency dispatch across all 250 wards of Delhi.
             </p>
 
             {/* Fluid Rounded Pill Action Buttons */}
@@ -138,6 +141,18 @@ export default function Landing() {
                 <span>Report an Incident</span>
               </Link>
             </div>
+
+            {/* Verification Badges */}
+            <div className="pt-2 flex flex-wrap items-center gap-5 text-xs text-white/70 font-mono">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>PostGIS Polygon Containment</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Zero-Crash Offline Resilient</span>
+              </span>
+            </div>
           </div>
 
           {/* Right Column: Kept completely open so the 3D rotating Earth is 100% visible */}
@@ -149,7 +164,7 @@ export default function Landing() {
           <span className="tracking-wider uppercase">28.6139° N · 77.2090° E · DELHI NCT</span>
           <a
             href="#city-map"
-            className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors no-underline font-sans text-xs font-medium"
+            className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors no-underline font-sans text-xs font-medium cursor-pointer"
           >
             <span>EXPLORE PLATFORM</span>
             <ChevronDown className="w-4 h-4 animate-bounce" />
@@ -163,7 +178,7 @@ export default function Landing() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 relative z-20">
         <div className="surface-card p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-[var(--border)] shadow-xl grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-[var(--text-muted)] uppercase">
+            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-[var(--text-muted)] uppercase tracking-wider">
               <MapPin className="w-3.5 h-3.5 text-[var(--brand)]" />
               <span>Coverage</span>
             </div>
@@ -174,7 +189,7 @@ export default function Landing() {
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-rose-600 dark:text-rose-400 uppercase">
+            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-rose-600 dark:text-rose-400 uppercase tracking-wider">
               <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
               <span>Alert Wards</span>
             </div>
@@ -185,7 +200,7 @@ export default function Landing() {
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-cyan-700 dark:text-cyan-400 uppercase">
+            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-cyan-700 dark:text-cyan-400 uppercase tracking-wider">
               <CloudRain className="w-3.5 h-3.5 text-cyan-500" />
               <span>Precipitation</span>
             </div>
@@ -197,15 +212,15 @@ export default function Landing() {
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-emerald-700 dark:text-emerald-400 uppercase">
+            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
               <Activity className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Risk Mean</span>
+              <span>City Risk Index</span>
             </div>
             <div className="text-3xl sm:text-4xl font-black font-mono text-emerald-700 dark:text-emerald-400 flex items-baseline justify-center gap-1">
               {avgRiskScore}
               <span className="text-sm font-normal text-[var(--text-muted)]">/100</span>
             </div>
-            <div className="text-xs text-[var(--text-secondary)]">Citywide Index</div>
+            <div className="text-xs text-[var(--text-secondary)]">Deterministic City Mean</div>
           </div>
         </div>
       </section>
@@ -220,10 +235,10 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[var(--border)]">
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-bold uppercase tracking-wider mb-2">
-                Geospatial Intelligence
+                01 · Geospatial Intelligence
               </span>
-              <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
-                Delhi Municipal Ward Topography
+              <h2 className="font-instrument text-3xl sm:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
+                Delhi, mapped in real time.
               </h2>
             </div>
 
@@ -267,7 +282,7 @@ export default function Landing() {
               {loading ? (
                 <div className="h-[520px] flex items-center justify-center font-mono text-xs text-[var(--text-muted)] space-x-2">
                   <span className="w-2 h-2 rounded-full bg-[var(--brand)] animate-ping" />
-                  <span>Loading Delhi Boundaries…</span>
+                  <span>Loading Delhi Geospatial Boundaries…</span>
                 </div>
               ) : (
                 <WardMap
@@ -378,10 +393,10 @@ export default function Landing() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border)]">
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-sky-500/10 text-[var(--brand)] text-xs font-bold uppercase tracking-wider mb-2">
-                Deterministic Model
+                02 · Deterministic Engine
               </span>
-              <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-tight">
-                Explainable Risk Engine
+              <h2 className="font-instrument text-3xl sm:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
+                Transparent math, not black-box guesses.
               </h2>
             </div>
             <Link
@@ -389,7 +404,7 @@ export default function Landing() {
               className="py-2.5 px-5 rounded-full btn-secondary text-xs font-semibold flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer no-underline"
             >
               <Sliders className="w-3.5 h-3.5 text-amber-500" />
-              <span>Launch Simulator</span>
+              <span>Test in Simulator</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -398,40 +413,40 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="surface-card p-6 rounded-2xl border border-[var(--border)] space-y-3 bg-[var(--surface)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-[var(--brand)]">DRAINAGE DEFICIT</span>
                 <span className="text-2xl font-black font-mono text-[var(--brand)]">40%</span>
+                <Layers className="w-5 h-5 text-[var(--brand)]" />
               </div>
               <h3 className="text-lg font-bold font-serif text-[var(--text-primary)] tracking-tight">
-                Stormwater Capacity Deficit
+                Drainage Deficit
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Evaluates culvert carrying volume, siltation depth, and outfall backflow against 50-year return storms.
+                Evaluates stormwater line carrying volume, siltation depth, and culvert cross-sectional flow volume against 50-year return storm events.
               </p>
             </div>
 
             <div className="surface-card p-6 rounded-2xl border border-[var(--border)] space-y-3 bg-[var(--surface)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-cyan-700 dark:text-cyan-400">RAINFALL SURGE</span>
                 <span className="text-2xl font-black font-mono text-cyan-700 dark:text-cyan-400">35%</span>
+                <CloudRain className="w-5 h-5 text-cyan-600" />
               </div>
               <h3 className="text-lg font-bold font-serif text-[var(--text-primary)] tracking-tight">
-                Meteorological Precipitation
+                Rainfall Forecast
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                6h, 12h, and 24h convective precipitation projections pulled from high-resolution radar feeds.
+                6h, 12h, and 24h multi-horizon convective precipitation projections fetched directly from high-resolution Open-Meteo meteorological radar feeds.
               </p>
             </div>
 
             <div className="surface-card p-6 rounded-2xl border border-[var(--border)] space-y-3 bg-[var(--surface)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">CIVIC DISPATCH</span>
                 <span className="text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400">25%</span>
+                <Radio className="w-5 h-5 text-emerald-600" />
               </div>
               <h3 className="text-lg font-bold font-serif text-[var(--text-primary)] tracking-tight">
-                Geotagged Incident Telemetry
+                Civic Complaints
               </h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Verified citizen waterlogging reports filtered for boundary containment and decayed over time.
+                Real-time citizen waterlogging reports filtered for coordinate bounding validity, deduplicated, and decayed chronologically over time.
               </p>
             </div>
           </div>
@@ -449,7 +464,7 @@ export default function Landing() {
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-3xl sm:text-5xl font-serif text-[var(--text-primary)] tracking-tight">
+            <h2 className="font-instrument text-3xl sm:text-5xl font-normal text-[var(--text-primary)] tracking-tight">
               When the rain changes,
               <br />
               <span className="italic text-[var(--brand)]">PRAVAH changes with it.</span>
