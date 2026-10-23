@@ -396,7 +396,7 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
-  border-radius: 0px;
+  border-radius: 1rem;
   box-shadow: var(--shadow-sm);
   transition: all 0.25s ease;
 }
