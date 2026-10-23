@@ -296,7 +296,7 @@
   }
 
   .font-instrument {
-    font-family: 'Instrument Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   .font-limelight {

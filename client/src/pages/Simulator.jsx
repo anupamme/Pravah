@@ -211,7 +211,7 @@ export default function Simulator({ embedded = false, initialWardId = null, onRe
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-serif text-[var(--text-primary)] tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
             Scenario Simulator & Expenditure Estimator
           </h2>
           <p className="text-xs text-[var(--text-muted)]">
