@@ -406,6 +406,54 @@
   box-shadow: var(--shadow-md);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   INDUSTRIAL HUD & TECHNICAL DESIGN PRIMITIVES
+   ───────────────────────────────────────────────────────────── */
+.industrial-border {
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.industrial-corner {
+  position: relative;
+}
+.industrial-corner::before,
+.industrial-corner::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  pointer-events: none;
+  z-index: 2;
+}
+.industrial-corner::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--brand);
+  border-left: 2px solid var(--brand);
+}
+.industrial-corner::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--brand);
+  border-right: 2px solid var(--brand);
+}
+
+.telemetry-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+:root[data-theme='light'] .telemetry-grid {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+}
+
+.scanline-overlay {
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
 .btn-primary {
   display: inline-flex;
   align-items: center;
