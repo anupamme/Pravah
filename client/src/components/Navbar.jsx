@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShieldAlert } from 'lucide-react';
+import { Menu, X, ShieldAlert, Lock } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
@@ -18,7 +18,6 @@ export default function Navbar() {
     { label: 'City Overview', path: '/dashboard' },
     { label: 'Incidents', path: '/incidents' },
     { label: 'Analytics', path: '/analytics' },
-    { label: 'Admin Portal', path: '/admin' },
   ];
 
   return (
@@ -62,10 +61,20 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right: Theme Toggle & Report Action */}
-          <div className="flex items-center gap-3">
+          {/* Right: Theme Toggle, Lock (Admin Portal), & Report Action */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
             {/* Sun/Moon Theme Toggle */}
             <ThemeToggle />
+
+            {/* Lock Symbol: Discreet Admin Portal trigger placed immediately after dual mode and before report button */}
+            <Link
+              to="/admin"
+              aria-label="Admin Portal"
+              title="Admin Portal"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--brand)] transition-all cursor-pointer shadow-xs no-underline"
+            >
+              <Lock size={15} strokeWidth={1.8} className="text-[var(--text-secondary)] hover:text-[var(--brand)] transition-colors" />
+            </Link>
 
             {/* Report Incident Minimal Pill */}
             <Link
@@ -126,11 +135,21 @@ export default function Navbar() {
               </div>
             </div>
 
-            <div className="space-y-4 pt-6 border-t border-[var(--border)]">
+            <div className="space-y-3 pt-6 border-t border-[var(--border)]">
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs text-[var(--text-muted)] font-medium">Appearance</span>
                 <ThemeToggle />
               </div>
+
+              <Link
+                to="/admin"
+                onClick={() => setMobileOpen(false)}
+                className="w-full py-2 px-3 rounded-lg border border-[var(--border)] text-xs font-medium flex items-center justify-center gap-2 no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              >
+                <Lock size={13} />
+                <span>Admin Portal</span>
+              </Link>
+
               <Link
                 to="/report"
                 onClick={() => setMobileOpen(false)}

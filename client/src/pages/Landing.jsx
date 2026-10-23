@@ -116,12 +116,12 @@ export default function Landing() {
             muted
             loop
             playsInline
-            className="w-full h-full object-cover object-center scale-[1.02] opacity-80 dark:opacity-100 transition-opacity duration-300"
+            className="w-full h-full object-cover object-center scale-[1.02]"
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
           />
-          {/* Dual-Theme Responsive Gradient Masks: Clean daylight in light mode, deep cosmos in dark mode */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-50/95 via-slate-50/80 to-slate-50/20 dark:from-black/90 dark:via-black/50 dark:to-transparent pointer-events-none transition-colors duration-300" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/80 to-transparent dark:from-black/80 dark:via-black/30 dark:to-transparent pointer-events-none transition-colors duration-300" />
+          {/* Gentle Directional Shadows: Keep the rotating 3D Earth 100% luminous & crystal clear on the right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-50/90 via-slate-50/45 to-transparent dark:from-black/85 dark:via-black/35 dark:to-transparent pointer-events-none transition-colors duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent pointer-events-none transition-colors duration-300" />
         </div>
 
         {/* Hero Editorial Content */}
@@ -165,9 +165,8 @@ export default function Landing() {
           <div className="lg:col-span-4 hidden lg:block pointer-events-none" />
         </div>
 
-        {/* Lower Hero Bar: Geolocation Aligned Pixel-Perfect In Place Of 250 Wards Above City Risk Index */}
-        <div className="relative z-10 max-w-6xl mx-auto w-full flex items-center justify-between pt-3 border-t border-slate-200 dark:border-white/15 text-xs text-slate-600 dark:text-white/70 font-mono transition-colors duration-300">
-          <span className="tracking-wider uppercase font-semibold">DELHI NCT HYDRAULIC OBSERVATORY</span>
+        {/* Lower Hero Bar: Geolocation Aligned Pixel-Perfect Above City Risk Index */}
+        <div className="relative z-10 max-w-6xl mx-auto w-full flex items-center justify-end pt-3 border-t border-slate-200 dark:border-white/15 text-xs text-slate-600 dark:text-white/70 font-mono transition-colors duration-300">
           <span className="text-[11px] text-slate-700 dark:text-white/80 tracking-wider font-semibold">
             28.6139° N · 77.2090° E · DELHI NCT
           </span>
@@ -428,56 +427,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          4. CRITICAL UNDERPASSES & VULNERABILITY NODES
-          ───────────────────────────────────────────────────────────── */}
-      <section className="py-14 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-soft)]/40 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-3 border-b border-[var(--border)]">
-            <div>
-              <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-xs font-bold uppercase tracking-wider mb-2 font-mono">
-                Telemetry Grid · Key Choke Points
-              </span>
-              <h2 className="font-instrument text-2xl sm:text-3xl lg:text-4xl font-normal text-[var(--text-primary)] tracking-tight">
-                Critical Underpasses & Hotspot Matrix
-              </h2>
-            </div>
-            <div className="text-xs text-[var(--text-muted)] font-mono">
-              Sensors Online · 100% Signal Integrity
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
-            {[
-              { name: 'Minto Bridge', status: 'Clear', water: '0.0 m', pumps: '2 Staged', color: 'emerald' },
-              { name: 'ITO Chauk Underpass', status: 'Clear', water: '0.0 m', pumps: '1 Staged', color: 'emerald' },
-              { name: 'Tilak Bridge', status: 'Normal', water: '0.0 m', pumps: 'Automated', color: 'emerald' },
-              { name: 'Zakhira Underpass', status: 'Watch', water: '0.05 m', pumps: '1 Staged', color: 'amber' },
-              { name: 'Pul Prahladpur', status: 'Clear', water: '0.0 m', pumps: 'Mobile Unit', color: 'emerald' },
-            ].map((node, i) => (
-              <div
-                key={i}
-                className="p-3.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2 hover:border-[var(--brand)] transition-colors shadow-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[var(--text-primary)] font-serif">{node.name}</span>
-                  <span className={`w-2 h-2 rounded-full ${node.color === 'emerald' ? 'bg-emerald-400' : 'bg-amber-400'} animate-pulse`} />
-                </div>
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-[var(--text-muted)]">Water Ponding</span>
-                  <span className="font-semibold text-[var(--text-primary)]">{node.water}</span>
-                </div>
-                <div className="flex items-center justify-between text-[11px] font-mono pt-1 border-t border-[var(--border)] text-[var(--text-secondary)]">
-                  <span>Dewatering:</span>
-                  <span className="font-medium text-[var(--brand)]">{node.pumps}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          5. DETERMINISTIC MASS-BALANCE ENGINE
+          4. DETERMINISTIC MASS-BALANCE ENGINE
           ───────────────────────────────────────────────────────────── */}
       <section id="risk-engine" className="py-16 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)] bg-[var(--surface-elevated)] transition-colors duration-300">
         <div className="max-w-7xl mx-auto space-y-8">

@@ -64,7 +64,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
           {/* Brand & Municipal Mandate (Spans 4 cols on lg) */}
-          <div className="lg:col-span-4 space-y-3.5">
+          <div className="lg:col-span-4 space-y-3">
             <div className="flex items-center gap-2.5">
               <Link to="/" className="inline-block text-decoration-none group select-none" aria-label="Pravah Home">
                 <span className="font-limelight text-2xl tracking-wider text-[var(--text-primary)] uppercase group-hover:text-[var(--brand)] transition-colors">
@@ -76,11 +76,7 @@ export default function Footer() {
               </span>
             </div>
 
-            <p className="text-xs text-[var(--text-secondary)] max-w-sm leading-relaxed">
-              Unified real-time municipal flood monitoring, deterministic risk intelligence, and emergency dispatch decision support for the National Capital Territory of Delhi.
-            </p>
-
-            <div className="pt-1 space-y-1.5 text-xs text-[var(--text-muted)] font-mono">
+            <div className="space-y-2 text-xs text-[var(--text-secondary)] font-mono">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
                 <span>Delhi Disaster Management Authority (DDMA)</span>
@@ -222,7 +218,7 @@ export default function Footer() {
             ───────────────────────────────────────────────────────────── */}
         <div className="mt-10 pt-5 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[var(--text-muted)]">
           <div className="text-center sm:text-left">
-            © 2026 Municipal Corporation of Delhi (MCD) & DDMA · Delhi Flood Intelligence Platform.
+            © 2026 Suhani Yadav · Delhi Flood Intelligence Platform (MCD & DDMA)
           </div>
           
           <div className="flex items-center gap-4 sm:gap-6">
