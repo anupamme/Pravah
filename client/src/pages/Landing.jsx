@@ -679,15 +679,15 @@ export default function Landing() {
             ))}
           </div>
 
-          {/* Back to Top */}
-          <div className="pt-4 flex justify-center">
+          {/* Back to Top (Rightmost, Icon Only) */}
+          <div className="pt-4 flex justify-end">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-elevated)] hover:border-[var(--brand)]/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-medium transition-all shadow-xs cursor-pointer group"
-              aria-label="Scroll back to top"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-elevated)] hover:border-[var(--brand)]/50 text-[var(--text-secondary)] hover:text-[var(--brand)] transition-all shadow-xs flex items-center justify-center cursor-pointer group"
+              aria-label="Back to top"
+              title="Back to top"
             >
-              <span>Back to Top</span>
-              <ArrowUp size={13} strokeWidth={2} className="group-hover:-translate-y-0.5 transition-transform text-[var(--brand)]" />
+              <ArrowUp size={16} strokeWidth={2.25} className="group-hover:-translate-y-0.5 transition-transform" />
             </button>
           </div>
         </div>
