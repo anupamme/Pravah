@@ -1,0 +1,713 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Waves, AlertTriangle, ShieldCheck, Gauge, ArrowUpRight,
+  TrendingUp, TrendingDown, RefreshCw, Sliders, Droplets,
+  Activity, Compass, Radio, ChevronRight, Eye, ShieldAlert,
+  ArrowDownCircle, Anchor
+} from 'lucide-react';
+
+/**
+ * YamunaRiverGauge — High-Fidelity Hydrological River Cross-Section & Dynamic Flood Simulator.
+ * Realistic Delhi Old Railway Bridge (ORB) Loha Pul cutaway, graduated staff gauge,
+ * storm outfall flap-gate backflow mechanics, and hydrodynamic wave velocity rendering.
+ */
+
+export const GAUGE_BENCHMARKS = {
+  MIN_BED: 202.50,
+  SAFE_BASELINE: 204.00,
+  WARNING_MARK: 205.33,
+  DANGER_MARK: 205.53,
+  RECORD_CREST_2023: 208.66,
+};
+
+export default function YamunaRiverGauge({
+  initialWaterLevel = 204.85,
+  onWaterLevelChange = null,
+  showSimulationControls = true,
+  className = '',
+}) {
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulatedLevel, setSimulatedLevel] = useState(initialWaterLevel);
+  const [waveOffset, setWaveOffset] = useState(0);
+
+  // Sync with initialWaterLevel prop
+  useEffect(() => {
+    if (!isSimulating) {
+      setSimulatedLevel(initialWaterLevel);
+    }
+  }, [initialWaterLevel, isSimulating]);
+
+  useEffect(() => {
+    if (onWaterLevelChange) {
+      onWaterLevelChange(simulatedLevel);
+    }
+  }, [simulatedLevel, onWaterLevelChange]);
+
+  // Smooth sinusoidal wave phase progression
+  useEffect(() => {
+    let animId;
+    let lastTime = performance.now();
+    const loop = (currentTime) => {
+      const delta = currentTime - lastTime;
+      lastTime = currentTime;
+      setWaveOffset((prev) => (prev + delta * 0.08) % 1000);
+      animId = requestAnimationFrame(loop);
+    };
+    animId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  // Hydrological physics model
+  const metrics = useMemo(() => {
+    const level = Number(simulatedLevel);
+    const dangerDiff = level - GAUGE_BENCHMARKS.DANGER_MARK;
+    const warningDiff = level - GAUGE_BENCHMARKS.WARNING_MARK;
+
+    let stage = 'SAFE';
+    let statusText = 'SAFE DISCHARGE';
+    let theme = 'safe'; // 'safe' | 'warning' | 'danger' | 'critical'
+
+    if (level >= 207.00) {
+      stage = 'CATASTROPHIC';
+      statusText = 'RECORD CREST / RING RD BREACH';
+      theme = 'critical';
+    } else if (level >= GAUGE_BENCHMARKS.DANGER_MARK) {
+      stage = 'DANGER';
+      statusText = 'DANGER MARK BREACHED';
+      theme = 'danger';
+    } else if (level >= GAUGE_BENCHMARKS.WARNING_MARK) {
+      stage = 'WARNING';
+      statusText = 'WARNING STAGE SURGE';
+      theme = 'warning';
+    } else if (level >= 204.50) {
+      stage = 'ELEVATED';
+      statusText = 'MONSOON BASELINE SWELL';
+      theme = 'elevated';
+    }
+
+    // Normalized cross-section water height (20% at bed 202.50m up to 94% at 208.66m)
+    const normalizedHeight = Math.min(
+      Math.max(
+        ((level - GAUGE_BENCHMARKS.MIN_BED) / (GAUGE_BENCHMARKS.RECORD_CREST_2023 - GAUGE_BENCHMARKS.MIN_BED)) * 100,
+        18
+      ),
+      95
+    );
+
+    // Flow velocity (m/s) modeled on hydraulic gradient
+    const baselineVelocity = 1.35;
+    const velocity = (baselineVelocity + Math.max(0, level - GAUGE_BENCHMARKS.SAFE_BASELINE) * 0.65).toFixed(2);
+
+    // Barrage release (cusecs)
+    let dischargeCusecs;
+    if (level < 204.50) {
+      dischargeCusecs = Math.round(24000 + (level - 203.0) * 8000);
+    } else if (level < GAUGE_BENCHMARKS.WARNING_MARK) {
+      dischargeCusecs = Math.round(48000 + (level - 204.50) * 45000);
+    } else if (level < GAUGE_BENCHMARKS.DANGER_MARK) {
+      dischargeCusecs = Math.round(145000 + (level - GAUGE_BENCHMARKS.WARNING_MARK) * 280000);
+    } else {
+      dischargeCusecs = Math.round(210000 + (level - GAUGE_BENCHMARKS.DANGER_MARK) * 115000);
+    }
+
+    // River Depth
+    const riverDepth = (level - GAUGE_BENCHMARKS.MIN_BED).toFixed(2);
+
+    // Outfall flap gates status
+    const isOutfallSubmerged = level >= 205.20;
+    const isBackflowActive = level >= GAUGE_BENCHMARKS.WARNING_MARK;
+
+    return {
+      level,
+      stage,
+      statusText,
+      theme,
+      dangerDiff,
+      warningDiff,
+      normalizedHeight,
+      velocity: Number(velocity),
+      dischargeCusecs,
+      riverDepth,
+      isOutfallSubmerged,
+      isBackflowActive,
+    };
+  }, [simulatedLevel]);
+
+  // Color schemes for water layers
+  const colors = useMemo(() => {
+    switch (metrics.theme) {
+      case 'critical':
+      case 'danger':
+        return {
+          accent: '#ef4444',
+          waterTop: 'rgba(239, 68, 68, 0.45)',
+          waterMid: 'rgba(185, 28, 28, 0.70)',
+          waterDeep: 'rgba(127, 29, 29, 0.95)',
+          waveStroke: '#fca5a5',
+          glow: 'rgba(239, 68, 68, 0.35)',
+          badgeBg: 'bg-rose-500/15 border-rose-500/30 text-rose-400',
+          speedTag: 'text-rose-400',
+        };
+      case 'warning':
+        return {
+          accent: '#f59e0b',
+          waterTop: 'rgba(245, 158, 11, 0.40)',
+          waterMid: 'rgba(180, 83, 9, 0.70)',
+          waterDeep: 'rgba(120, 53, 15, 0.95)',
+          waveStroke: '#fde68a',
+          glow: 'rgba(245, 158, 11, 0.25)',
+          badgeBg: 'bg-amber-500/15 border-amber-500/30 text-amber-400',
+          speedTag: 'text-amber-400',
+        };
+      case 'elevated':
+        return {
+          accent: '#0ea5e9',
+          waterTop: 'rgba(14, 165, 233, 0.40)',
+          waterMid: 'rgba(2, 132, 199, 0.70)',
+          waterDeep: 'rgba(3, 105, 161, 0.95)',
+          waveStroke: '#7dd3fc',
+          glow: 'rgba(14, 165, 233, 0.25)',
+          badgeBg: 'bg-sky-500/15 border-sky-500/30 text-sky-400',
+          speedTag: 'text-sky-400',
+        };
+      case 'safe':
+      default:
+        return {
+          accent: '#10b981',
+          waterTop: 'rgba(6, 182, 212, 0.35)',
+          waterMid: 'rgba(14, 116, 144, 0.65)',
+          waterDeep: 'rgba(15, 23, 42, 0.95)',
+          waveStroke: '#67e8f9',
+          glow: 'rgba(6, 182, 212, 0.20)',
+          badgeBg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
+          speedTag: 'text-emerald-400',
+        };
+    }
+  }, [metrics.theme]);
+
+  // Wave path generator
+  const getWavePath = (amplitude, frequency, phase, baseHeight) => {
+    const width = 1200;
+    const points = [];
+    for (let x = 0; x <= width; x += 20) {
+      const y = baseHeight + Math.sin((x * frequency + phase) * 0.015) * amplitude;
+      points.push(`${x},${y.toFixed(1)}`);
+    }
+    return `M0,${baseHeight} L${points.join(' L')} L1200,300 L0,300 Z`;
+  };
+
+  return (
+    <div className={`surface-card rounded-2xl border border-[var(--border)] overflow-hidden shadow-xl transition-all duration-300 ${className}`}>
+      
+      {/* ── Command Header & Real-Time Status ───────────────────────────────── */}
+      <div className="p-4 sm:p-5 bg-[var(--surface-elevated)] border-b border-[var(--border)] space-y-4">
+        
+        {/* Top Title Bar */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/25 flex items-center justify-center text-sky-400 shadow-sm shrink-0">
+              <Waves className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
+                  Yamuna River Hydrological Telemetry
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--surface-soft)] text-[var(--text-muted)] border border-[var(--border)]">
+                  OLD RAILWAY BRIDGE · CWC #YAM-01
+                </span>
+                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border ${colors.badgeBg} flex items-center gap-1`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+                  <span>{metrics.statusText}</span>
+                </span>
+              </div>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                Physical cross-section, bridge girder clearance, flow velocity, and municipal drainage backflow.
+              </p>
+            </div>
+          </div>
+
+          {/* Interactive Mode Toggle */}
+          {showSimulationControls && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setIsSimulating(!isSimulating);
+                  if (isSimulating) setSimulatedLevel(initialWaterLevel);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border shadow-xs ${
+                  isSimulating
+                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                    : 'bg-[var(--surface-soft)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>{isSimulating ? 'Simulation Active' : 'What-If Scrubber'}</span>
+              </button>
+
+              {isSimulating && (
+                <button
+                  onClick={() => setSimulatedLevel(initialWaterLevel)}
+                  className="p-1.5 rounded-xl text-xs border border-[var(--border)] hover:bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                  title="Reset to live CWC baseline"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── Key Metrics Ribbon (5 Precision KPI Cells) ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 font-mono">
+          
+          {/* 1. Water Level */}
+          <div className="p-3 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+              <span>WATER LEVEL (MSL)</span>
+              <Gauge className="w-3.5 h-3.5 text-sky-400" />
+            </div>
+            <div className="my-1 flex items-baseline gap-1">
+              <span className="text-2xl font-black text-[var(--text-primary)]">
+                {metrics.level.toFixed(2)}
+              </span>
+              <span className="text-xs text-[var(--text-muted)]">m</span>
+            </div>
+            <div className="text-[10px]">
+              {metrics.level >= GAUGE_BENCHMARKS.DANGER_MARK ? (
+                <span className="text-rose-400 font-bold flex items-center gap-0.5">
+                  <TrendingUp className="w-3 h-3" />
+                  <span>+{metrics.dangerDiff.toFixed(2)}m above Danger</span>
+                </span>
+              ) : metrics.level >= GAUGE_BENCHMARKS.WARNING_MARK ? (
+                <span className="text-amber-400 font-semibold flex items-center gap-0.5">
+                  <TrendingUp className="w-3 h-3" />
+                  <span>+{metrics.warningDiff.toFixed(2)}m above Warning</span>
+                </span>
+              ) : (
+                <span className="text-emerald-400 font-medium">
+                  {(GAUGE_BENCHMARKS.WARNING_MARK - metrics.level).toFixed(2)}m margin to Warning
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* 2. Flow Speed / Velocity */}
+          <div className="p-3 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+              <span>FLOW VELOCITY</span>
+              <Compass className="w-3.5 h-3.5 text-cyan-400" />
+            </div>
+            <div className="my-1 flex items-baseline gap-1">
+              <span className={`text-2xl font-black ${colors.speedTag}`}>
+                {metrics.velocity.toFixed(2)}
+              </span>
+              <span className="text-xs text-[var(--text-muted)]">m/s</span>
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5">
+              <div className="w-full bg-[var(--border)] h-1.5 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${Math.min(100, (metrics.velocity / 4.5) * 100)}%`,
+                    backgroundColor: colors.accent,
+                  }}
+                />
+              </div>
+              <span className="text-[9px] shrink-0 font-bold">{Math.round((metrics.velocity * 3.6))} km/h</span>
+            </div>
+          </div>
+
+          {/* 3. Water Depth */}
+          <div className="p-3 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+              <span>CHANNEL DEPTH</span>
+              <Droplets className="w-3.5 h-3.5 text-blue-400" />
+            </div>
+            <div className="my-1 flex items-baseline gap-1">
+              <span className="text-2xl font-black text-[var(--text-primary)]">
+                {metrics.riverDepth}
+              </span>
+              <span className="text-xs text-[var(--text-muted)]">m</span>
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)]">
+              Bed Elevation: 202.50m MSL
+            </div>
+          </div>
+
+          {/* 4. Hathnikund Barrage Discharge */}
+          <div className="p-3 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+              <span>BARRAGE DISCHARGE</span>
+              <Activity className="w-3.5 h-3.5 text-indigo-400" />
+            </div>
+            <div className="my-1 flex items-baseline gap-1">
+              <span className="text-xl font-black text-[var(--text-primary)]">
+                {metrics.dischargeCusecs.toLocaleString()}
+              </span>
+              <span className="text-[10px] text-[var(--text-muted)]">cfs</span>
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] truncate">
+              Transit: Yamunanagar → Delhi (~48h)
+            </div>
+          </div>
+
+          {/* 5. Outfall Drainage Backflow Status */}
+          <div className="col-span-2 sm:col-span-1 lg:col-span-1 p-3 rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+              <span>DRAIN BACKFLOW</span>
+              <ArrowDownCircle className={`w-3.5 h-3.5 ${metrics.isBackflowActive ? 'text-rose-400' : 'text-emerald-400'}`} />
+            </div>
+            <div className="my-1">
+              <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${
+                metrics.isBackflowActive
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                  : metrics.isOutfallSubmerged
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+              }`}>
+                {metrics.isBackflowActive ? 'Flap Gates Shut' : metrics.isOutfallSubmerged ? 'Gravity Impeded' : 'Normal Gravity'}
+              </span>
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] truncate">
+              Kashmere Gate · ITO Drains
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Interactive Scrubber Slider Bar (Shown When Active) ── */}
+        {isSimulating && (
+          <div className="p-4 rounded-xl bg-[var(--surface-soft)] border border-amber-500/30 space-y-3 animate-fadeIn">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
+              <div className="flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-amber-400" />
+                <span className="font-bold text-[var(--text-primary)]">What-If River Stage Scrubber:</span>
+                <span className="text-amber-400 font-bold">{metrics.level.toFixed(2)} m</span>
+              </div>
+              <span className="text-[10px] text-[var(--text-muted)]">
+                Drag to simulate river swell, flow velocity, and bridge submergence
+              </span>
+            </div>
+
+            <input
+              type="range"
+              min="203.00"
+              max="208.66"
+              step="0.05"
+              value={simulatedLevel}
+              onChange={(e) => setSimulatedLevel(parseFloat(e.target.value))}
+              className="w-full accent-amber-500 cursor-pointer h-2.5 bg-[var(--border)] rounded-lg appearance-none"
+            />
+
+            {/* Quick Benchmark Buttons */}
+            <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
+              <span className="text-[var(--text-muted)] mr-1">Bench Targets:</span>
+              <button
+                type="button"
+                onClick={() => setSimulatedLevel(203.80)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  simulatedLevel === 203.80
+                    ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                Dry Base (203.80m)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimulatedLevel(204.85)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  simulatedLevel === 204.85
+                    ? 'bg-sky-500 text-white border-sky-500 shadow-sm'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                Live Gauge (204.85m)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimulatedLevel(GAUGE_BENCHMARKS.WARNING_MARK)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  simulatedLevel === GAUGE_BENCHMARKS.WARNING_MARK
+                    ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                ⚠️ Warning Mark (205.33m)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimulatedLevel(GAUGE_BENCHMARKS.DANGER_MARK)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  simulatedLevel === GAUGE_BENCHMARKS.DANGER_MARK
+                    ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                🚨 Danger Mark (205.53m)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimulatedLevel(GAUGE_BENCHMARKS.RECORD_CREST_2023)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  simulatedLevel === GAUGE_BENCHMARKS.RECORD_CREST_2023
+                    ? 'bg-red-700 text-white border-red-700 shadow-sm'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                💥 2023 Historic Peak (208.66m)
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Visual Hydrological Channel Cross-Section Viewport ──────────────── */}
+      <div className="relative w-full h-64 sm:h-72 bg-gradient-to-b from-[#06101E] via-[#09182C] to-[#040A14] overflow-hidden select-none border-t border-[var(--border)]">
+        
+        {/* Atmospheric Sky Backdrop with Distant Delhi Skyline Silhouette */}
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 300">
+            {/* Distant Trees & Ghats */}
+            <path d="M0,140 Q150,135 300,138 T600,135 T1000,140 L1000,300 L0,300 Z" fill="#0f2b48" />
+          </svg>
+        </div>
+
+        {/* ── Old Railway Bridge (Loha Pul) Steel Truss Span & Masonry Piers ── */}
+        <div className="absolute top-0 left-0 right-0 h-32 pointer-events-none z-10 opacity-70">
+          <svg className="w-full h-full" viewBox="0 0 1200 160" preserveAspectRatio="none">
+            {/* Upper Deck Railroad Track Girder */}
+            <rect x="0" y="24" width="1200" height="8" fill="#334155" />
+            <rect x="0" y="20" width="1200" height="4" fill="#1e293b" />
+
+            {/* Steel Truss Triangles (Loha Pul Architecture) */}
+            {Array.from({ length: 16 }).map((_, i) => (
+              <g key={i}>
+                <line x1={i * 75} y1="32" x2={i * 75 + 37.5} y2="8" stroke="#475569" strokeWidth="2.5" />
+                <line x1={i * 75 + 37.5} y1="8" x2={(i + 1) * 75} y2="32" stroke="#475569" strokeWidth="2.5" />
+                <line x1={i * 75} y1="32" x2={(i + 1) * 75} y2="32" stroke="#334155" strokeWidth="3" />
+                <line x1={i * 75 + 37.5} y1="8" x2={i * 75 + 37.5} y2="32" stroke="#334155" strokeWidth="1.5" />
+              </g>
+            ))}
+
+            {/* Heavy Stone Masonry Piers extending into the river */}
+            {[260, 600, 940].map((pierX, idx) => (
+              <g key={idx}>
+                {/* Pier Column */}
+                <rect x={pierX - 22} y="32" width="44" height="240" fill="#1e293b" stroke="#334155" strokeWidth="1.5" rx="3" />
+                {/* Pier Cutwater Arch */}
+                <path d={`M${pierX - 22},120 L${pierX},145 L${pierX + 22},120 Z`} fill="#0f172a" />
+                {/* Pier Distress Sensor Beacon */}
+                <circle cx={pierX} cy="36" r="3.5" fill={metrics.stage === 'DANGER' || metrics.stage === 'CATASTROPHIC' ? '#ef4444' : '#10b981'} className={metrics.stage === 'DANGER' || metrics.stage === 'CATASTROPHIC' ? 'animate-ping' : ''} />
+              </g>
+            ))}
+          </svg>
+        </div>
+
+        {/* ── River Embankment Levee Slopes (West & East) ── */}
+        <div className="absolute top-0 bottom-0 left-0 w-24 sm:w-36 bg-gradient-to-r from-[#0d1e30] via-[#081524] to-transparent pointer-events-none z-20 border-r border-dashed border-sky-500/20 flex flex-col justify-between p-3 font-mono text-[9px]">
+          <div>
+            <span className="text-[var(--brand)] font-bold block">WEST EMBANKMENT</span>
+            <span className="text-[var(--text-muted)] block text-[8px]">Kashmere Gate / Ring Rd</span>
+          </div>
+
+          {/* Storm Drain Outfall Pipe Graphic (Kashmere Gate Outfall) */}
+          <div className="relative p-2 rounded-lg bg-[var(--surface-elevated)]/90 border border-[var(--border)] shadow-xs">
+            <span className="text-[8px] font-bold text-[var(--text-primary)] block">Drain #14 Outfall</span>
+            <span className={`text-[7px] font-semibold uppercase px-1 py-0.2 rounded block mt-0.5 ${
+              metrics.isBackflowActive ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'
+            }`}>
+              {metrics.isBackflowActive ? 'Backflow Flap Shut' : 'Free Outfall'}
+            </span>
+          </div>
+
+          <span className="text-[var(--text-muted)] text-[8px]">Invert: 204.10m</span>
+        </div>
+
+        <div className="absolute top-0 bottom-0 right-0 w-24 sm:w-36 bg-gradient-to-l from-[#0d1e30] via-[#081524] to-transparent pointer-events-none z-20 border-l border-dashed border-sky-500/20 flex flex-col justify-between p-3 text-right font-mono text-[9px]">
+          <div>
+            <span className="text-[var(--brand)] font-bold block">EAST EMBANKMENT</span>
+            <span className="text-[var(--text-muted)] block text-[8px]">Trans-Yamuna Floodplain</span>
+          </div>
+          <span className="text-[var(--text-muted)] text-[8px]">Geeta Colony Bund</span>
+        </div>
+
+        {/* ── Calibrated Hydrographic Staff Gauge (Graduated Water Pole) ── */}
+        <div className="absolute top-10 bottom-6 left-28 sm:left-40 w-10 sm:w-12 bg-amber-400 text-stone-900 font-mono font-black text-[9px] z-30 shadow-2xl border-2 border-stone-950 flex flex-col justify-between py-1 select-none pointer-events-none">
+          {/* Ticks from 208.66m down to 202.50m */}
+          <div className="flex items-center justify-between px-1 border-b border-black">
+            <span>208.6</span>
+            <span className="text-[7px]">MAX</span>
+          </div>
+          <div className="flex items-center justify-between px-1 border-b border-black text-rose-900 bg-rose-400/40">
+            <span>205.5</span>
+            <span className="text-[7px]">DGR</span>
+          </div>
+          <div className="flex items-center justify-between px-1 border-b border-black text-amber-900 bg-amber-200">
+            <span>205.3</span>
+            <span className="text-[7px]">WRN</span>
+          </div>
+          <div className="flex items-center justify-between px-1 border-b border-black text-emerald-950 bg-emerald-300/50">
+            <span>204.0</span>
+            <span className="text-[7px]">BAS</span>
+          </div>
+          <div className="flex items-center justify-between px-1 text-[8px]">
+            <span>202.5</span>
+            <span className="text-[7px]">BED</span>
+          </div>
+        </div>
+
+        {/* ── Official Elevation Benchmark Guide Lines across Channel ── */}
+        
+        {/* Historic Record 2023 (208.66m) */}
+        <div className="absolute top-[10%] left-24 sm:left-36 right-24 sm:right-36 flex items-center gap-2 pointer-events-none z-10">
+          <div className="h-px flex-1 border-t border-dashed border-red-500/40" />
+          <span className="font-mono text-[9px] text-red-400/80 bg-[#06101E]/80 px-2 py-0.5 rounded border border-red-500/30 shadow-xs">
+            2023 Historic Peak: 208.66m
+          </span>
+          <div className="h-px flex-1 border-t border-dashed border-red-500/40" />
+        </div>
+
+        {/* Official Danger Mark (205.53m) */}
+        <div className="absolute top-[34%] left-24 sm:left-36 right-24 sm:right-36 flex items-center gap-2 pointer-events-none z-20">
+          <div className="h-px flex-1 border-t-2 border-dashed border-rose-500" />
+          <span className="font-mono text-[9px] font-bold text-rose-300 bg-rose-950/90 px-2.5 py-0.5 rounded border border-rose-500/60 shadow-md flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+            <span>OFFICIAL DANGER MARK · 205.53m</span>
+          </span>
+          <div className="h-px flex-1 border-t-2 border-dashed border-rose-500" />
+        </div>
+
+        {/* Official Warning Mark (205.33m) */}
+        <div className="absolute top-[46%] left-24 sm:left-36 right-24 sm:right-36 flex items-center gap-2 pointer-events-none z-20">
+          <div className="h-px flex-1 border-t border-dashed border-amber-500" />
+          <span className="font-mono text-[9px] font-bold text-amber-300 bg-amber-950/90 px-2.5 py-0.5 rounded border border-amber-500/60 shadow-xs">
+            WARNING MARK · 205.33m
+          </span>
+          <div className="h-px flex-1 border-t border-dashed border-amber-500" />
+        </div>
+
+        {/* ── Actual Real Flowing River Water (Hydrodynamic Wave Layers) ── */}
+        <div
+          className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out z-25"
+          style={{
+            height: `${metrics.normalizedHeight}%`,
+            boxShadow: `0 -12px 40px ${colors.glow}`,
+          }}
+        >
+          {/* Surface Float / Water Level Telemetry Indicator */}
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#08182B] border border-sky-400/40 shadow-xl font-mono text-[11px] text-white">
+            <Anchor className="w-3.5 h-3.5 text-sky-400" />
+            <span className="font-black text-sky-300">{metrics.level.toFixed(2)} m</span>
+            <span className="text-slate-400">|</span>
+            <span className="font-semibold text-emerald-400">{metrics.velocity.toFixed(2)} m/s flow</span>
+          </div>
+
+          {/* Floating CWC Telemetry Buoy */}
+          <div
+            className="absolute -top-7 right-44 sm:right-64 z-35 pointer-events-none transition-transform"
+            style={{
+              transform: `translateY(${Math.sin(waveOffset * 0.05) * 5}px) rotate(${Math.sin(waveOffset * 0.03) * 6}deg)`,
+            }}
+          >
+            <div className="w-5 h-7 flex flex-col items-center">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping mb-0.5" />
+              <div className="w-4 h-4 rounded-full bg-amber-500 border border-amber-300 shadow-md flex items-center justify-center text-[7px] font-bold text-stone-950">
+                CWC
+              </div>
+              <div className="w-1 h-2 bg-stone-700" />
+            </div>
+          </div>
+
+          {/* SVG Animated Flowing Wave Streamlines */}
+          <div className="relative w-full h-full overflow-hidden">
+            
+            {/* Wave Layer 1: Deep Backwater Current */}
+            <svg
+              className="absolute -top-7 left-0 w-full h-20 pointer-events-none"
+              preserveAspectRatio="none"
+              viewBox="0 0 1200 300"
+            >
+              <path
+                d={getWavePath(12, 1.2, waveOffset * 0.6, 30)}
+                fill={colors.waterDeep}
+              />
+            </svg>
+
+            {/* Wave Layer 2: Mid Silt Turbulence */}
+            <svg
+              className="absolute -top-8 left-0 w-full h-24 pointer-events-none"
+              preserveAspectRatio="none"
+              viewBox="0 0 1200 300"
+            >
+              <path
+                d={getWavePath(16, 1.8, waveOffset * 1.1 + 80, 36)}
+                fill={colors.waterMid}
+              />
+            </svg>
+
+            {/* Wave Layer 3: Surface Water Froth & Foam Crests */}
+            <svg
+              className="absolute -top-9 left-0 w-full h-28 pointer-events-none"
+              preserveAspectRatio="none"
+              viewBox="0 0 1200 300"
+            >
+              <path
+                d={getWavePath(20, 2.4, waveOffset * 1.6 + 180, 42)}
+                fill={colors.waterTop}
+                stroke={colors.waveStroke}
+                strokeWidth="2"
+              />
+            </svg>
+
+            {/* Deep Water Column Gradient */}
+            <div
+              className="absolute top-10 bottom-0 left-0 right-0 pointer-events-none"
+              style={{
+                background: `linear-gradient(to bottom, ${colors.waterMid}, ${colors.waterDeep}, #030810)`,
+              }}
+            />
+
+            {/* Current Streamline Particles showing River Flow Velocity */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+              <div
+                className="w-full h-full flex flex-col justify-around"
+                style={{
+                  animation: `riverFlow ${Math.max(1.5, (10 - metrics.velocity * 1.8)).toFixed(1)}s linear infinite`,
+                }}
+              >
+                <div className="w-28 h-0.5 bg-white rounded-full ml-10 shadow-sm" />
+                <div className="w-44 h-0.5 bg-white/80 rounded-full ml-48" />
+                <div className="w-36 h-0.5 bg-white/70 rounded-full ml-96" />
+                <div className="w-20 h-0.5 bg-white/90 rounded-full ml-32" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* River Bed Alluvial Silt Base Foundation */}
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0a0f18] border-t border-stone-800 flex items-center justify-between px-4 text-[8px] font-mono text-stone-400 select-none z-30">
+          <span>YAMUNA ALLUVIAL SILT BED (202.50m MSL)</span>
+          <span>DISCHARGE CAPACITY: 4,00,000 CFS</span>
+        </div>
+
+      </div>
+
+      {/* ── Tactical River Basin Footer Bar ─────────────────────────────────── */}
+      <div className="p-3.5 bg-[var(--surface-elevated)] border-t border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs font-mono text-[var(--text-muted)]">
+        <div className="flex items-center gap-2">
+          <Radio className={`w-4 h-4 ${metrics.level >= GAUGE_BENCHMARKS.DANGER_MARK ? 'text-rose-400 animate-pulse' : 'text-emerald-400'}`} />
+          <span>Yamuna Stage Gauge Active · Sampling Rate 1 Hz</span>
+        </div>
+        <div className="flex items-center gap-3 text-[11px]">
+          <span>GIRDER CLEARANCE: <strong className="text-[var(--text-primary)]">{(GAUGE_BENCHMARKS.RECORD_CREST_2023 - metrics.level).toFixed(2)}m</strong></span>
+          <span>·</span>
+          <span>BARRAGE INFLOW: <strong className="text-[var(--text-primary)]">{metrics.dischargeCusecs.toLocaleString()} cfs</strong></span>
+        </div>
+      </div>
+
+    </div>
+  );
+}

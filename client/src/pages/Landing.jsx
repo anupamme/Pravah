@@ -19,6 +19,7 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WardMap from '../components/WardMap';
+import YamunaRiverGauge from '../components/YamunaRiverGauge';
 import LightModeEarthGlobe from '../components/LightModeEarthGlobe';
 import { getCityRiskSummary, getCurrentWeather, getWardsGeoJSON } from '../services/api';
 
@@ -457,52 +458,6 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Live Yamuna River Basin Gauge Bar */}
-          <div className="p-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs space-y-2.5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <Waves className="w-4 h-4 text-cyan-500 shrink-0" />
-                <span className="font-bold text-[var(--text-primary)] tracking-wide">
-                  YAMUNA RIVER BASIN · OLD RAILWAY BRIDGE (ORB)
-                </span>
-                <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 uppercase">
-                  Safe Flow
-                </span>
-              </div>
-              <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-3">
-                <span>Hathnikund Barrage: <strong className="text-[var(--text-secondary)]">28,400 cusecs</strong></span>
-                <span className="hidden md:inline">·</span>
-                <span className="hidden md:inline">Flow Velocity: <strong className="text-[var(--text-secondary)]">1.8 m/s</strong></span>
-              </div>
-            </div>
-
-            {/* River Level Hydrograph Bar */}
-            <div className="space-y-1">
-              <div className="relative w-full h-2.5 rounded-full bg-[var(--surface-soft)] border border-[var(--border)] overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-sky-500 transition-all duration-700"
-                  style={{ width: '42%' }}
-                />
-              </div>
-
-              {/* Threshold Labels */}
-              <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] pt-0.5">
-                <div>
-                  <span className="text-[var(--text-primary)] font-bold text-xs">204.85 m</span>
-                  <span className="ml-1 text-[var(--text-secondary)]">(Current Level)</span>
-                </div>
-                <div className="text-center">
-                  <span className="text-amber-600 dark:text-amber-400 font-semibold">205.33 m</span>
-                  <span className="ml-1">(Warning Mark)</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-rose-600 dark:text-rose-400 font-semibold">205.53 m</span>
-                  <span className="ml-1">(Danger Mark)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* 4-Tier Risk Distribution Ribbon */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
             <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400">
@@ -614,6 +569,9 @@ export default function Landing() {
               </p>
             </div>
           </div>
+
+          {/* Real-Time Hydrological Yamuna Flow & Dynamic Cutaway */}
+          <YamunaRiverGauge initialWaterLevel={204.85} showSimulationControls={true} />
 
         </div>
       </section>

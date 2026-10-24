@@ -4,8 +4,8 @@
  */
 
 const express = require('express');
-const { registerSchema, loginSchema } = require('../schemas/auth.schema');
-const { registerUser, loginUser } = require('../services/auth.service');
+const { registerSchema, loginSchema, googleLoginSchema } = require('../schemas/auth.schema');
+const { registerUser, loginUser, loginWithGoogle } = require('../services/auth.service');
 const { authenticate } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
@@ -58,6 +58,43 @@ router.post('/login', async (req, res, next) => {
     const { user, token } = await loginUser(parseResult.data);
     return res.status(200).json({
       message: 'Login successful.',
+      user,
+      token,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/auth/google
+ * Public: Authenticates via Google Identity Services (GIS) ID Token.
+ * Verifies token cryptographically, auto-provisions or retrieves Admin, returns JWT.
+ */
+router.post('/google', async (req, res, next) => {
+  try {
+    const parseResult = googleLoginSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({
+        error: 'Validation Error',
+        details: parseResult.error.errors.map((e) => ({
+          field: e.path.join('.'),
+          message: e.message,
+        })),
+      });
+    }
+
+    const ipAddress = req.ip || req.connection?.remoteAddress || '127.0.0.1';
+    const userAgent = req.headers['user-agent'] || 'Google Web Client';
+
+    const { user, token } = await loginWithGoogle({
+      credential: parseResult.data.credential,
+      ipAddress,
+      userAgent,
+    });
+
+    return res.status(200).json({
+      message: 'Google authentication successful.',
       user,
       token,
     });

@@ -22,10 +22,10 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-200 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
         scrolled
-          ? 'bg-[var(--surface-glass-strong)] backdrop-blur-xl border-b border-[var(--border)] shadow-sm'
-          : 'bg-[var(--surface-glass)] backdrop-blur-md border-b border-[var(--border)]'
+          ? 'bg-white/70 dark:bg-[#070e17]/75 backdrop-blur-xl backdrop-saturate-180 border-b border-slate-200/80 dark:border-white/10 shadow-[0_8px_32px_0_rgba(14,165,233,0.06),0_1px_2px_0_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.45)]'
+          : 'bg-white/35 dark:bg-black/25 backdrop-blur-md border-b border-slate-200/40 dark:border-white/5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,7 +76,7 @@ export default function Navbar() {
             {/* Report Incident Minimal Pill */}
             <Link
               to="/report"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-[var(--surface)] border border-[var(--border-strong)] text-[var(--text-primary)] hover:border-[var(--brand)] hover:text-[var(--brand)] transition-colors no-underline shadow-sm"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-white/60 dark:bg-white/5 backdrop-blur-md border border-slate-200/80 dark:border-white/15 text-[var(--text-primary)] hover:border-[var(--brand)] hover:text-[var(--brand)] transition-all no-underline shadow-xs hover:shadow-sm"
             >
               <ShieldAlert size={14} className="text-amber-500" />
               <span>Report</span>
@@ -96,7 +96,7 @@ export default function Navbar() {
         {/* Mobile Slide-in Drawer */}
         {mobileOpen && (
           <div
-            className="lg:hidden fixed inset-y-0 right-0 w-[80%] max-w-[300px] bg-[var(--surface-glass-strong)] backdrop-blur-2xl border-l border-[var(--border)] p-6 flex flex-col justify-between shadow-2xl z-50 transition-transform duration-200"
+            className="lg:hidden fixed inset-y-0 right-0 w-[80%] max-w-[300px] bg-white/85 dark:bg-[#070e17]/90 backdrop-blur-2xl border-l border-slate-200/80 dark:border-white/10 p-6 flex flex-col justify-between shadow-2xl z-50 transition-transform duration-200"
           >
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-[var(--border)]">
