@@ -19,6 +19,7 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WardMap from '../components/WardMap';
+import LightModeEarthGlobe from '../components/LightModeEarthGlobe';
 import { getCityRiskSummary, getCurrentWeather, getWardsGeoJSON } from '../services/api';
 
 export default function Landing() {
@@ -160,10 +161,9 @@ export default function Landing() {
           ───────────────────────────────────────────────────────────── */}
       <section className="relative min-h-[74vh] sm:min-h-[80vh] w-full flex flex-col justify-between pt-24 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden select-none bg-slate-50 dark:bg-black transition-colors duration-300">
 
-        {/* 3D Motion Earth Video Background */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-          {/* Subtle Ambient Planetary Halo in Light Mode */}
-          <div className="absolute right-0 lg:right-16 top-1/2 -translate-y-1/2 w-[340px] sm:w-[460px] h-[340px] sm:h-[460px] rounded-full bg-sky-300/20 dark:bg-cyan-500/10 blur-3xl pointer-events-none" />
+        {/* Dark Mode: 3D Motion Deep-Space Cosmic Earth Video */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden hidden dark:block" aria-hidden="true">
+          <div className="absolute right-0 lg:right-16 top-1/2 -translate-y-1/2 w-[340px] sm:w-[460px] h-[340px] sm:h-[460px] rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
 
           <video
             autoPlay
@@ -175,10 +175,21 @@ export default function Landing() {
           />
 
           {/* Dark Mode Cosmic Gradient: Preserves sharp text contrast against deep space */}
-          <div className="absolute inset-0 hidden dark:block bg-gradient-to-r from-black/90 via-black/40 to-transparent pointer-events-none transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent pointer-events-none" />
           
           {/* Subtle Bottom Transition to Metric Ribbon */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/50 to-transparent pointer-events-none transition-colors duration-300" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/50 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Light Mode: Sleek Holographic 3D Interactive Earth Observatory */}
+        <div className="absolute inset-0 z-0 overflow-hidden block dark:hidden pointer-events-none" aria-hidden="true">
+          {/* Right-aligned 3D Globe with interactive pointer controls */}
+          <div className="absolute inset-y-0 right-0 w-full lg:w-[62%] h-full pointer-events-auto">
+            <LightModeEarthGlobe />
+          </div>
+          {/* Left subtle gradient vignette to preserve razor-sharp typography contrast */}
+          <div className="absolute inset-y-0 left-0 w-full lg:w-[50%] bg-gradient-to-r from-slate-50 via-slate-50/80 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none" />
         </div>
 
         {/* Hero Editorial Content */}

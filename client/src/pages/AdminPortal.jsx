@@ -5,7 +5,8 @@ import {
   CheckCircle2, ArrowRight, RefreshCw,
   Users, Droplets, ChevronRight, Search, Gauge,
   ExternalLink, RotateCcw, TrendingDown, TrendingUp,
-  Check, Layers, Info, Filter, ArrowUpRight
+  Check, Layers, Info, Filter, ArrowUpRight,
+  Radio, Terminal
 } from 'lucide-react';
 import {
   login,
