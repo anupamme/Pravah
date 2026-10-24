@@ -458,7 +458,6 @@ export default function Landing() {
             </div>
           </div>
 
-          /* Live Yamuna River Basin Flow & Dynamic Hydro-Gauge */
           <YamunaRiverGauge initialWaterLevel={204.85} showSimulationControls={true} />
 
           {/* 4-Tier Risk Distribution Ribbon */}
