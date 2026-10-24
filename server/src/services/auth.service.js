@@ -8,8 +8,12 @@
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const prisma = require('../config/prisma');
 const jwtConfig = require('../config/jwt.config');
+const { recordAuditLog } = require('./audit.service');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || undefined);
 
 // In-memory fallback users for development testing when PostgreSQL is offline
 const DEMO_PASSWORD_HASH = bcrypt.hashSync('PravahDev@2026', 10);
@@ -199,6 +203,142 @@ async function loginUser({ email, password }) {
   };
 }
 
+/**
+ * Authenticates an administrator via Google OAuth (ID token / GIS).
+ * Verifies token cryptographically using Google's public keys.
+ */
+async function loginWithGoogle({ credential, ipAddress = '127.0.0.1', userAgent = 'Google Auth Web' }) {
+  if (!credential) {
+    const err = new Error('Google credential token is missing.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  let googleUser = null;
+
+  // 1. Attempt genuine Google ID token verification using google-auth-library
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.split(',') : undefined,
+    });
+    const payload = ticket.getPayload();
+    if (payload && payload.email) {
+      googleUser = {
+        email: payload.email,
+        name: payload.name || payload.email.split('@')[0],
+        picture: payload.picture || null,
+        sub: payload.sub,
+        emailVerified: payload.email_verified,
+        authProvider: 'GOOGLE_GIS_VERIFIED',
+      };
+    }
+  } catch (verifyErr) {
+    // 2. Resilient Fallback for local development or demo credentials
+    // If not production and credential contains decoded payload or demo signature
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        // Try decoding JWT without verification for demo testing
+        const decoded = jwt.decode(credential);
+        if (decoded && (decoded.email || decoded.sub)) {
+          googleUser = {
+            email: decoded.email || 'admin.google@delhi.gov.in',
+            name: decoded.name || 'Municipal Google Administrator',
+            picture: decoded.picture || null,
+            sub: decoded.sub || 'google-demo-sub-12345',
+            emailVerified: true,
+            authProvider: 'GOOGLE_DEV_DECODED',
+          };
+        }
+      } catch {
+        // Ignore decode error
+      }
+
+      // If still null, check if it's a test string like "demo_google_token"
+      if (!googleUser && credential.startsWith('demo_google_')) {
+        googleUser = {
+          email: 'admin.google@pravah.delhi.gov.in',
+          name: 'Municipal Commissioner (Google SSO)',
+          picture: null,
+          sub: 'google-demo-user-id',
+          emailVerified: true,
+          authProvider: 'GOOGLE_SANDBOX_SIMULATION',
+        };
+      }
+    }
+
+    if (!googleUser) {
+      const err = new Error(`Google token verification failed: ${verifyErr.message}`);
+      err.statusCode = 401;
+      throw err;
+    }
+  }
+
+  // 3. Find existing user or auto-provision administrator
+  let user = await findUserByEmail(googleUser.email);
+  if (!user) {
+    // Provision new municipal administrator profile
+    try {
+      user = await prisma.user.create({
+        data: {
+          email: googleUser.email,
+          name: googleUser.name,
+          passwordHash: bcrypt.hashSync(`PravahGoogleAuth@${Date.now()}`, 10),
+          role: 'ADMIN',
+          isActive: true,
+        },
+      });
+    } catch {
+      user = {
+        id: `google-${googleUser.sub || Date.now()}`,
+        email: googleUser.email,
+        name: googleUser.name,
+        role: 'ADMIN',
+        isActive: true,
+        createdAt: new Date(),
+      };
+      MEMORY_USERS.push(user);
+    }
+  }
+
+  if (!user.isActive) {
+    const err = new Error('This administrative Google account has been deactivated.');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  // 4. Issue official Pravah JWT token with ADMIN role
+  const token = generateToken(user);
+
+  // 5. Record immutable security audit event
+  await recordAuditLog({
+    action: 'ADMIN_SESSION_AUTHENTICATED',
+    actorId: user.id,
+    actorEmail: user.email,
+    actorRole: user.role,
+    ipAddress,
+    userAgent,
+    targetEntity: 'AuthSession',
+    targetId: `google-sso-${Date.now()}`,
+    details: {
+      authMethod: 'GOOGLE_OAUTH_GIS',
+      authProvider: googleUser.authProvider,
+      emailVerified: googleUser.emailVerified,
+    },
+  }).catch(() => {});
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      picture: googleUser.picture,
+    },
+    token,
+  };
+}
+
 module.exports = {
   generateToken,
   verifyToken,
@@ -206,4 +346,5 @@ module.exports = {
   findUserById,
   registerUser,
   loginUser,
+  loginWithGoogle,
 };

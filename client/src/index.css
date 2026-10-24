@@ -710,3 +710,25 @@ input[type='range']::-webkit-slider-thumb:hover {
   filter: none;
   opacity: 1;
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   DYNAMIC YAMUNA RIVER CURRENT ANIMATIONS
+   ───────────────────────────────────────────────────────────── */
+@keyframes riverFlow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes waveCrest {
+  0%, 100% {
+    transform: translateY(0px) scaleY(1);
+  }
+  50% {
+    transform: translateY(-4px) scaleY(1.08);
+  }
+}

@@ -329,6 +329,7 @@ export const getAnalyticsTrends = () => fetchApi('/api/analytics/trends').catch(
 
 // Auth & Admin
 export const login = (credentials) => fetchApi('/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
+export const loginWithGoogle = (payload) => fetchApi('/api/auth/google', { method: 'POST', body: JSON.stringify(payload) });
 export const getAdminOverview = () => fetchApi('/api/admin/overview').catch(() => ({}));
 export const updateDrainageCapacity = (payload) => fetchApi('/api/admin/update-drainage', { method: 'POST', body: JSON.stringify(payload) });
 export const getAuditLogs = () => fetchApi('/api/admin/audit-logs').catch(() => []);

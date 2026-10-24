@@ -34,8 +34,16 @@ const loginSchema = z.object({
     .min(1, 'Password is required'),
 });
 
+const googleLoginSchema = z.object({
+  credential: z
+    .string({ required_error: 'Google ID credential token is required' })
+    .min(1, 'Google credential token cannot be empty'),
+  clientId: z.string().optional(),
+});
+
 module.exports = {
   RoleEnum,
   registerSchema,
   loginSchema,
+  googleLoginSchema,
 };
