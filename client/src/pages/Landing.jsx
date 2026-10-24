@@ -458,8 +458,6 @@ export default function Landing() {
             </div>
           </div>
 
-          <YamunaRiverGauge initialWaterLevel={204.85} showSimulationControls={true} />
-
           {/* 4-Tier Risk Distribution Ribbon */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
             <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400">
@@ -571,6 +569,9 @@ export default function Landing() {
               </p>
             </div>
           </div>
+
+          {/* Real-Time Hydrological Yamuna Flow & Dynamic Cutaway */}
+          <YamunaRiverGauge initialWaterLevel={204.85} showSimulationControls={true} />
 
         </div>
       </section>
